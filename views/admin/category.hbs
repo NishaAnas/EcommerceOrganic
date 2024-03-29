@@ -1,0 +1,93 @@
+<body>
+    <div class="container-fluid">
+        <h1>Category Management</h1>
+
+        {{#if error}}
+        <div class="alert alert-danger" role="alert">
+            {{error}}
+        </div>
+        {{/if}}
+        {{#if success}}
+        <div class="alert alert-success" role="alert">
+            {{success}}
+        </div>
+        {{/if}}
+        <div
+            class="d-flex flex-row align-items-baseline justify-content-around">
+            <!-- Search Form -->
+            <form class="form-inline my-4 d-flex flex-row gap-2">
+                <input class="form-control mr-sm-2" type="search"
+                    placeholder="Search" aria-label="Search">
+                <button class="btn my-2 my-sm-0"
+                    style=" background-color: #6A9739; color: white;"
+                    type="submit">Search</button>
+            </form>
+
+            <!-- Add Category Button -->
+            <div class="btn-group me-2">
+                <a href="/admin/addcategory" class="btn btn-sm mb-4"
+                    style=" background-color: #6A9739; color: white;">+ Add
+                    Category</a>
+            </div>
+
+        </div>
+        
+        <!-- Category List -->
+        <table class="table-light">
+            <thead>
+                <tr>
+                    <th scope="col" style="width: 20%;">Category Name</th>
+                    <th scope="col" style="width: 40%;">Description</th>
+                    <th scope="col" style="width: 10%;">Active</th>
+                    <th scope="col" style="width: 10%;">Deleted</th>
+                    <th scope="col" style="width: 30%;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each Category}}
+                <tr scope="row" class="align-middle gap=3"
+                    style="padding: 10px 0;">
+                    <td>{{this.name}}</td>
+                    <td>{{this.description}}</td>
+                    <!-- Toggle button for isActive -->
+                    <td><label class="switch">
+                            <input type="checkbox" {{#if
+                                this.isActive}}checked{{/if}} disabled>
+                            <span class="slider"></span>
+                        </label>
+                    </td>
+                    <!-- Toggle button for isDeleted -->
+                    <td><label class="switch">
+                            <input type="checkbox" {{#if
+                                this.isDeleted}}checked{{/if}} disabled>
+                            <span class="slider"></span>
+                        </label></td>
+                    <td>
+                        <div class="d-flex flex-row justify-content-left gap-2">
+                            <a href="/admin/viewCategory/{{this._id}}"
+                                type="button"
+                                class="btn btn-secondary btn-small">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <a href="/admin/editCategory/{{this._id}}"
+                                type="button"
+                                class="btn btn-secondary btn-small">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <form
+                                action="/admin/editCategory/{{this._id}}?_method=DELETE"
+                                method="POST" class="position-relative">
+                                <button type="submit"
+                                    class="btn btn-secondary btn-small">
+                                    <i class="bi bi-person-x"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+
+        </table>
+    </div>
+</body>

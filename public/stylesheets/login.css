@@ -1,0 +1,138 @@
+.container-fluid{
+    width:100%
+}
+
+.login-section-wrapper {
+    display: -webkit-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    flex-direction: column;
+    padding: 68px 100px;
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 100%; 
+    max-width: 800px; 
+    margin: 0 auto;
+}
+
+@media (max-width: 991px) {
+    .login-section-wrapper {
+        padding-left: 50px;
+        padding-right: 50px;
+    }
+}
+
+@media (max-width: 575px) {
+    .login-section-wrapper {
+        padding-top: 20px;
+        padding-bottom: 20px;
+        min-height: 100vh;
+    }
+}
+
+.login-wrapper {
+    width: 300px;
+    max-width: 100%;
+    
+}
+
+@media (max-width: 575px) {
+    .login-wrapper {
+        width: 100%;
+    }
+}
+
+.login-wrapper label {
+    font-size: 14px;
+    font-weight: bold;
+    color: #b0adad;
+}
+
+.login-wrapper .form-control {
+    border: none;
+    border-bottom: 1px solid #e7e7e7;
+    border-radius: 0;
+    padding: 9px 5px;
+    min-height: 40px;
+    font-size: 18px;
+    font-weight: normal;
+}
+
+.login-wrapper .form-control::-webkit-input-placeholder {
+    color: #b0adad;
+}
+
+.login-wrapper .form-control::-moz-placeholder {
+    color: #b0adad;
+}
+
+.login-wrapper .form-control:-ms-input-placeholder {
+    color: #b0adad;
+}
+
+.login-wrapper .form-control::-ms-input-placeholder {
+    color: #b0adad;
+}
+
+.login-wrapper .form-control::placeholder {
+    color: #b0adad;
+}
+
+.login-wrapper .login-btn {
+    padding: 13px 20px;
+    background-color: #4f28fd;
+    border-radius: 0;
+    font-size: 20px;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 14px;
+    width: 100%;
+}
+
+.login-wrapper .login-btn:hover {
+    border: 1px solid #28affd;
+    background-color: #fff;
+    color: #28affd;
+}
+
+.login-wrapper a.forgot-password-link {
+    color: #080808;
+    font-size: 14px;
+    text-decoration: underline;
+    display: inline-block;
+    margin-bottom: 54px;
+}
+
+@media (max-width: 575px) {
+    .login-wrapper a.forgot-password-link {
+        margin-bottom: 16px;
+    }
+}
+
+.login-wrapper-footer-text {
+    font-size: 16px;
+    color: #000000;
+    margin-bottom: 0;
+}
+.login-wrapper-footer-text.signup:hover{
+        color: red;
+}
+
+.login-title {
+    font-size: 30px;
+    color: #000;
+    font-weight: bold;
+    margin-bottom: 25px;
+}
+.error-message {
+    font-size: 14px;
+    color: red;
+    margin-top: 5px; /* Adjust as needed */
+}
+
+

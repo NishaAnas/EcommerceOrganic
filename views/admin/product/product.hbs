@@ -1,0 +1,90 @@
+<body>
+    <div class="container-fluid">
+        <h1>Product Management</h1>
+
+        {{#if error}}
+        <div class="alert alert-danger" role="alert">
+            {{error}}
+        </div>
+        {{/if}}
+        {{#if success}}
+        <div class="alert alert-success" role="alert">
+            {{success}}
+        </div>
+        {{/if}}
+        <div
+            class="d-flex flex-row align-items-baseline justify-content-around">
+            <!-- Search Form -->
+            <form class="form-inline my-4 d-flex flex-row gap-2">
+                <input class="form-control mr-sm-2" type="search"
+                    placeholder="Search" aria-label="Search">
+                <button class="btn my-2 my-sm-0"
+                    style=" background-color: #6A9739; color: white;"
+                    type="submit">Search</button>
+            </form>
+
+            <!-- Add Category Button -->
+            <div class="btn-group me-2">
+                <a href="/admin/addProduct" class="btn btn-sm mb-4"
+                    style=" background-color: #6A9739; color: white;">+ Add
+                    Product</a>
+            </div>
+
+        </div>
+        
+        <!-- Product List -->
+        <table class="table-light">
+            <thead>
+                <tr>
+                    <th scope="col" style="width: 10%;">Product <br>SKU</th>
+                    <th scope="col" style="width: 15%;">Title</th>
+                    <th scope="col" style="width: 20%;">Category</th>
+                    <th scope="col" style="width: 15%;">Price</th>
+                    <th scope="col" style="width: 20%;">Images</th>
+                    <th scope="col" style="width: 10%;">Active</th>
+                    <th scope="col" style="width: 10%;">Deleted</th>
+                    <th scope="col" style="width: 10%;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each Product}}
+                <tr scope="row" class="align-middle gap=3" style="padding: 10px 0;">
+                    <td>{{this.sku}}</td>
+                    <td>{{this.title}}</td>
+                    <td>{{this.categoryName}}</td>
+                    <td>{{this.price}}</td>
+                    <td>
+                        <img style="width: 100px; height: 100px;" src="/{{this.images.[0]}}" alt="Product Image">
+                    </td>
+                    <!-- Toggle button for isActive -->
+                    <td><label class="switch">
+                            <input type="checkbox" {{#if this.isActive}}checked{{/if}} disabled>
+                            <span class="slider"></span>
+                        </label>
+                    </td>
+                    <!-- Toggle button for isDeleted -->
+                    <td><label class="switch">
+                            <input type="checkbox" {{#if this.isDeleted}}checked{{/if}} disabled>
+                            <span class="slider"></span>
+                        </label></td>
+                    <td>
+                        <div class="d-flex flex-row justify-content-left gap-2">
+                            <a href="/admin/viewProduct/{{this._id}}" type="button" class="btn btn-secondary btn-small">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <a href="/admin/editProduct/{{this._id}}" type="button" class="btn btn-secondary btn-small">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <form action="/admin/editProduct/{{this._id}}?_method=DELETE" method="POST" class="position-relative">
+                                <button type="submit" class="btn btn-secondary btn-small">
+                                    <i class="bi bi-person-x"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+</body>

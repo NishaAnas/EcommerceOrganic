@@ -1,0 +1,88 @@
+{{!< userLayout}}
+<script src="https://apis.google.com/js/platform.js" async defer></script>
+{{!-- <meta name="google-signin-client_id" content="{{ googleClientId }}"> --}}
+
+<body>
+  <main>
+    <div class="container-fluid m-5 p-3 gap-2">
+      <div
+        class="row d-flex flex-column align-items-center justify-contents-center"
+        style="width: 100%;">
+        <div class="col-sm-6 login-section-wrapper">
+          <div class="login-wrapper my-auto">
+            <h1 class="login-title">My Account</h1>
+            <h2 class="login-subtile">Login</h2>
+            {{#if error}}
+            <div class="alert alert-danger" role="alert">
+              {{error}}
+            </div>
+            {{/if}}
+            <form action="/login" method="post" onsubmit="validateForm(event)">
+              <div class="form-group mb-4">
+                <label for="email">UserName or Email</label>
+                <input type="text" name="email" id="email" class="form-control"
+                  placeholder="email@example.com" required>
+              </div>
+              <div class="form-group mb-4">
+                <label for="password">Password</label>
+                <input type="password" name="password" id="password"
+                  class="form-control" placeholder="enter your passsword"
+                  required>
+              </div>
+
+              <button type="submit" name="login" class="btn btn-primary p-3"
+                style="width: 100%; background-color: #6A9739;">Login</button>
+            </form>
+
+            <div
+              class="d-flex flex-row align-items-center justify-content-between">
+              <div>
+                <div
+                  class="d-flex flex-row align-items-center justify-content-between">
+                  <div>
+                    <div
+                      class="input-group mb-3 p-3 d-flex flex-row align-items-center  gap-2">
+                      <input class="form-check-input mt-0 p-2"
+                        name="remember-me-check" type="checkbox" value>
+                      <label class="rememberme p-2" for="rememberme">Remember
+                        Me</label>
+                    </div>
+                    <div>
+                      <a class="lost-password" href="/forgotPassword"
+                        class="text-reset"
+                        style="color: #6A9739; text-decoration: none;">Lost My
+                        Password</a></p>
+                    <p class="login-wrapper-footer-text">I am New Here!!
+                      <a class="login-wrapper-footer-text signup"
+                        style="color: #6A9739; " href="/signup"
+                        class="text-reset">SignUp</a></p>
+                  </div>
+                </div>
+                {{!-- <div
+                  class="d-flex flex-column align-items-center justify-contents-flex-end">
+                  <label for="signup with"> LOGIN With!!!!</label>
+                  <div
+                    class="d-flex flex-row align-items-center justify-contents-flex-end gap-3">
+                    <form action="/auth/google" method="POST">
+                      <button type="submit" class="g-signin2"
+                        id="googleSignInButton" data-onsuccess="onSignIn">Sign
+                        in with Google</button>
+                    </form>
+
+                    <button type="button" name="google"
+                      class="btn btn-outline-primary btn-block"
+                      style="background-color:#3B5998;"><i
+                        class="bi bi-facebook"></i></button>
+                  </div>
+                </div> --}}
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+    </main>
+  </body>
+  <script src="/javascripts/login.js"></script>

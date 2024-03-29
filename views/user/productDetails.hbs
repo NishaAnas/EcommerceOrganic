@@ -1,0 +1,62 @@
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 m-3">
+                <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        {{#each productDetails.images}}
+                        <div class="carousel-item {{#if (isEqual @index 0)}}active{{/if}}">
+                            <img src="/{{this}}" class="d-block w-100" alt="Product Image">
+                        </div>
+                        {{/each}}
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+                <div class="row mt-3">
+                    {{#each productDetails.images}}
+                    <div class="col-3">
+                        <img src="/{{this}}" class="img-thumbnail" alt="Thumbnail" data-bs-target="#productCarousel" data-bs-slide-to="{{@index}}">
+                    </div>
+                    {{/each}}
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h2>{{productDetails.title}}</h2>
+                <p>Price: £{{productDetails.price}}</p>
+                <p>Stock: {{stock}}</p>
+                <p>Rating: {{rating}}</p>
+                <h3>Reviews</h3>
+                <ul>
+                    {{#each reviews}}
+                    <li>{{this.user}}: {{this.comment}}</li>
+                    {{/each}}
+                </ul>
+            </div>
+        </div>
+        <hr>
+        <h3>Related Products</h3>
+        <div class="row">
+            {{#each relatedProducts}}
+            <div class="col-xs-6 col-sm-4 col-md-3 mb-4">
+                <div class="card gap-3" style="width: 18rem; height: 30rem;">
+                    <img src="/{{this.images.[0]}}" class="card-img-top" alt="{{this.title}}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{this.title}}</h5>
+                        <p class="card-text">Price: {{this.price}}</p>
+                        <a href="/productDetails/{{this._id}}" class="btn" style="background-color: #6A9739; color: white;">View Details</a>
+                    </div>
+                </div>
+            </div>
+            {{/each}}
+        </div>
+            </div>
+        </div>
+    </div>
+</body>

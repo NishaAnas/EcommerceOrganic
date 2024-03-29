@@ -1,0 +1,31 @@
+<body>
+<main>
+  <div class="container-fluid m-5 p-3 gap-2">
+    <div class="row d-flex flex-column align-items-center justify-contents-center" style="width: 100%;">
+      <div class="col-sm-6 login-section-wrapper">
+        <div class="login-wrapper my-auto">
+          <h1 class="login-title">OTP Verification</h1>
+          {{#if error}}
+          <div class="alert alert-danger" role="alert">
+            {{error}}
+          </div>
+          {{/if}}
+          <h4 class="login-subtile">We sent a verification code to your mobile<br>Enter the code from the mobile below</h4>
+          <form action="/verifyOtp" method="post" onsubmit="return validateForm()">
+            <div class="form-group mb-4">
+              <label for="otp">Verification Code</label>
+              <input type="text" name="otp" id="otp" class="form-control" maxlength="6" placeholder="Enter 6-digit code" required>
+            </div>
+            <button type="submit" name="verifyOtp" class="btn btn-primary p-3" style="width: 100%; background-color: #6A9739;">Verify My Account</button>
+          </form>
+          <div class="p-3 d-flex flex-row align-items-center justify-content-around">
+            <div id="timer">02:00</div> <!-- Timer starts at 30 seconds -->
+             <button id="resendButton" class="btn btn-primary p-3" style=" background-color: #6A9739;">Resend OTP</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+</body>
+<script src="/javascripts/otp-verification.js"></script>

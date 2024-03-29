@@ -1,0 +1,125 @@
+<link href="/vendor/cropperjs/dist/cropper.min.css" rel="stylesheet">
+<body>
+    <h1 class="text-center mb-4">Add New Product</h1>
+    <div class="row">
+        <div class="col">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a
+                            href="/admin/product">Product
+                            Management</a></li>
+                    <li class="breadcrumb-item active">Add Product</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    {{#if error}}
+    <div class="alert alert-danger" role="alert">
+        {{error}}
+    </div>
+    {{/if}}
+    {{#if success}}
+    <div class="alert alert-success" role="alert">
+        {{success}}
+    </div>
+    {{/if}}
+    <form id="addProductForm" action="/admin/addproduct" method="post"
+        enctype="multipart/form-data">
+        <div class="d-flex flex-column align-items-stretch gap-4">
+            <div class="row mb-4">
+                <label for="product-sku" class="col-sm-2 col-form-label">Product
+                    SKU:</label>
+                <div class="col-sm-10">
+                    <input type="text" id="product-sku" name="sku"
+                        class="form-control" required>
+                    <div class="invalid-feedback">Please enter a product
+                        SKU.</div>
+                </div>
+            </div>
+            <div class="row mb-4">
+                <label for="product-title"
+                    class="col-sm-2 col-form-label">Title:</label>
+                <div class="col-sm-10">
+                    <input type="text" id="product-title" name="title"
+                        class="form-control" required>
+                    <div class="invalid-feedback">Please enter a product
+                        title.</div>
+                </div>
+            </div>
+             <div class="row mb-4">
+                <label for="product-description"
+                    class="col-sm-2 col-form-label">Description:</label>
+                <div class="col-sm-10">
+                    <input type="text" id="product-description" name="productDescription"
+                        class="form-control" required>
+                    <div class="invalid-feedback">Please enter a product
+                        title.</div>
+                </div>
+            </div>
+            <div>
+                <div class="row mb-4">
+                    <label for="product-price"
+                        class="col-sm-2 col-form-label">Price:</label>
+                    <div class="col-sm-10">
+                        <input type="number" id="product-price" name="price"
+                            class="form-control" required>
+                        <div class="invalid-feedback">Please enter a product
+                            price.</div>
+                    </div>
+                </div>
+                <div class="row mb-4">
+                    <label for="product-category"
+                        class="col-sm-2 col-form-label">Category:</label>
+                    <div class="col-sm-10">
+                        <select id="product-category" name="categoryId"
+                            class="form-select" required>
+                            {{#each categories}}
+                            <option value="{{this._id}}">{{this.name}}</option>
+                            {{/each}}
+                        </select>
+                        <div class="invalid-feedback">Please select a product
+                            category.</div>
+                    </div>
+                    <div class="row mb-4 py-4">
+                        <label for="product-images"
+                            class="col-sm-2 col-form-label">Images:</label>
+                        <div class="col-sm-10">
+                            <input type="file" id="product-images" name="images"
+                                class="form-control"
+                                onchange="getImagePreview(event)"
+                                accept="image/*" multiple>
+                            <div id="imgPreview"
+                                class="position-relative m-auto"
+                                style="width: 90%;"></div>
+                            <button id="crop-images"
+                                class="btn btn-secondary m-3"
+                                onclick="cropImage(event)">Crop Images</button>
+                            <div class="invalid-feedback">Please upload product
+                                images.</div>
+                        </div>
+                        <div class="row mb-4">
+                            <div class="col-sm-2 offset-sm-2">
+                                <div class="form-check">
+                                    <input type="checkbox" id="product-active"
+                                        name="isActive"
+                                        class="form-check-input">
+                                    <label for="product-active"
+                                        class="form-check-label">Active</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-10 offset-sm-2">
+                                <button type="submit" name="addProduct"
+                                    class="btn btn-primary p-3"
+                                    style="width: 100%; background-color: #6A9739;" onclick="return validateForm(event)">Add
+                                    Product</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <script src="/vendor/cropperjs/dist/cropper.min.js"></script>
+            <script src="/javascripts/addProduct.js"></script>
+
+</body>
