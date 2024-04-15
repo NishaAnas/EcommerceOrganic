@@ -8,6 +8,16 @@
   href="https://fonts.googleapis.com/css2?family=Inter:wght@400&display=swap" />
   
 <body>
+            {{#if error}}
+            <div id="flashMessage" class="alert alert-danger" role="alert">
+              {{error}}
+            </div>
+            {{/if}}
+            {{#if success}}
+            <div id="flashMessage" class="alert alert-success" role="alert">
+              {{success}}
+            </div>
+            {{/if}}
   <div class="container-fluid ">
     <main>
       <section class="website-image row ">
@@ -283,4 +293,5 @@
       </main>
     </div>
   </div>
+  <script src="/javascripts/index.js"></script>
 </body>

@@ -1,0 +1,50 @@
+{{!< userLayout}}
+<script src="https://apis.google.com/js/platform.js" async defer></script>
+<body>
+  <main>
+    <div class="container-fluid m-5 p-3 gap-2">
+      <div class="row d-flex flex-column align-items-center justify-contents-center"style="width: 100%;">
+        <div class="col-sm-6 login-section-wrapper">
+          <div class="login-wrapper my-auto">
+            <h1 class="login-title" style="color: #6A9739;">ADMIN</h1>
+            <h3 class="login-subtile">Login</h3>
+            {{#if error}}
+            <div class="alert alert-danger">
+              {{error}}
+            </div>
+            {{/if}}
+            {{#if success}}
+            <div class="alert alert-success">
+              {{success}}
+            </div>
+            {{/if}}
+            <form id="login_form" action="/admin/adminlogin" method="post">
+              <div class="form-group mb-4">
+                <label for="email">Email</label>
+                <input type="text" name="email" id="email" class="form-control" placeholder="email@example.com" autocomplete="off">
+                <span id="email_error" style="color: red;"></span>
+              </div>
+
+              <div class="form-group mb-4">
+                <label for="password">Password</label>
+                <input type="password" name="password" id="password" class="form-control" placeholder="enter your passsword" autocomplete="off">
+                <span id="password_error" style="color: red;"></span>
+              </div>
+                <button type="submit" name="login" class="btn btn-primary p-3" style="width: 100%; background-color: #6A9739;">Login</button>
+            </form>
+
+              <div class="d-flex flex-row align-items-center justify-content-between">
+                    <div>
+                      <a class="lost-password" href="/forgotPassword" class="text-reset" style="color: #6A9739; text-decoration: none;">Forgot My Password</a></p>
+                      <p class="login-wrapper-footer-text">I am New Here!!
+                      <a class="login-wrapper-footer-text signup" style="color: #6A9739; " href="/admin/adminsignup" class="text-reset">SignUp</a></p>
+                    </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+  <script src="/javascripts/adminlogin.js"></script>

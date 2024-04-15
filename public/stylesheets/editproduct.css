@@ -1,0 +1,58 @@
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Style for the header */
+.h2 {
+    font-size: 2rem;
+    font-weight: 500;
+    color: #333;
+}
+
+/* Style for form inputs */
+.form-control {
+    display: block;
+    /* width: 100%; */
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: .25rem;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+/* Style for buttons */
+.btn-primary {
+    color: #fff;
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .form-group {
+        flex-direction: column;
+    }
+}
+.image-container{
+    height: 120px;
+    width: 200px;
+    border-radius: 6px;
+    overflow: hidden;
+}
+.image-container img{
+    height: 100px;
+    width: auto;
+    object-fit: cover;
+}
+.image-container span{
+    right: 20px;
+    color: black;
+    font-size: 28px;
+    font-weight: normal;
+    cursor: pointer;
+}

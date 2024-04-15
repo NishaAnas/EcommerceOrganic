@@ -4,8 +4,8 @@
       <div class="row d-flex flex-column align-items-center justify-contents-center" style="width: 100%;">     
         <div class="col-sm-6 login-section-wrapper">
         <div class="login-wrapper my-auto">           
-          <h1 class="login-title">My Account</h1>
-          <h2 class="login-subtile">Register</h2>
+          <h1 class="login-title" style="color: #6A9739; ">My Account</h1>
+          <h3 class="login-subtile">Register</h3>
           {{#if error}}
           <div class="alert alert-danger" role="alert">
             {{error}}
@@ -16,42 +16,39 @@
             {{success}}
           </div>
           {{/if}}
-                  <form action="/signup" method="post">
-                  <div class="form-group mb-4 d-flex flex-column" >
-                      <label for="firstName">First Name </label>
-                      <input type="text" name="firstName" id="firstName" class="form-control"   placeholder="First Name" required>
-                      </div>
-                        <div class="form-group mb-4 d-flex flex-column  ">
-                          
-                        <label for="lastName">Last Name </label>
-                        <input type="text" name="lastName" id="lastName" class="form-control"  placeholder="Last Name" required>
+                  <form action="/signup" method="post" id="signup_form">
+                      <div class="form-group mb-4">
+                        <label for="userName"><b>User Name</b> </label>
+                          <input type="text" name="userName" id="userName" class="form-control" placeholder="User Name" >
+                          <span id="username_error" style="color: red;"></span>
+                          </div>
+                      <div class="form-group mb-4">
+                      <label for="email"><b>Email Address</b></label>
+                      <input type="email" name="email" id="email" class="form-control" placeholder="email@example.com" >
+                      <span id="email_error"  style="color: red;"></span>
                       </div>
                       <div class="form-group mb-4">
-                        <label for="userName">User Name </label>
-                          <input type="text" name="userName" id="userName" class="form-control" placeholder="User Name" required>
-                          </div>
-                       <div class="form-group mb-4">
-                      <label for="email">Email Address</label>
-                      <input type="email" name="email" id="email" class="form-control" placeholder="email@example.com" required>
-                      </div>
-                       <div class="form-group mb-4">
-                        <label for="password">Password</label>
-                        <input type="password" name="password" id="password" class="form-control" placeholder="Enter your passsword" required>
+                        <label for="password"><b>Password</b></label>
+                        <input type="password" name="password" id="password" class="form-control" placeholder="Enter your passsword" >
+                        <span id="password_error"  style="color: red;"></span>
                         </div>
                         <div class="form-group mb-4">
-                        <label for="confirmpassword">Confirm Password</label>
-                        <input type="password" name="conformpassword" id="conformpassword" class="form-control" placeholder="Re-enter your passsword" required>
+                        <label for="confirmpassword"><b>Confirm Password</b></label>
+                        <input type="password" name="conformpassword" id="conformpassword" class="form-control" placeholder="Re-enter your passsword" >
+                        <span id="conformpassword_error"  style="color: red;"></span>
                         </div>
                         <div class="form-group mb-4">
-                        <label for="phoneNumber">Phone Number</label>
-                        <input type="text" name="phoneNumber" id="phoneNumber" class="form-control" placeholder="Enter your phone Number" required>
+                        <label for="phoneNumber"><b>Phone Number</b></label>
+                        <input type="text" name="phoneNumber" id="phoneNumber" class="form-control" placeholder="Enter your phone Number" >
+                        <span id="phonenumber_error"  style="color: red;"></span>
                         </div>
-                      <button type="submit" name="register" class="btn btn-primary p-3" style="width: 100%; background-color: #6A9739;" onclick="return validateForm(event)">Register</button>
+                        <span id="form_error" style="color: red;" ></span>
+                      <button type="submit" name="register" class="btn btn-primary p-3" style="width: 100%; background-color: #6A9739;">Register</button>
 
                     </form>
                     <div class="d-flex flex-row align-items-center justify-content-between">
             <div>
-                         <div class="input-group mb-3 p-3 d-flex flex-row align-items-center  gap-2">                     
+                        <div class="input-group mb-3 p-3 d-flex flex-row align-items-center  gap-2">                     
                       <input class="form-check-input mt-0 p-2"  name="remember-me-check" type="checkbox" value="">                     
                       <label class="rememberme p-2" for="rememberme">Remember Me</label>
                   </div>
@@ -60,13 +57,7 @@
                 <a class="login-wrapper-footer-text signup" style="color: #6A9739; " href="/login" class="text-reset">Login</a></p>
             </div>   
           </div>
-          <div class="d-flex flex-column align-items-center justify-contents-flex-end">
-            <label for="signup with"> SignUp With!!!!</label>
-            <div class="d-flex flex-row align-items-center justify-contents-flex-end gap-3">
-                <button type="button" name="google" class="btn btn-outline-primary btn-block" style="background-color: #DD4B39;"><i class="bi bi-google"></i></button>
-                 <button type="button" name="google" class="btn btn-outline-primary btn-block" style="background-color:#3B5998;"><i class="bi bi-facebook"></i></button>
-            </div>
-          </div>
+          
         </div>
        </div>      
             </div>

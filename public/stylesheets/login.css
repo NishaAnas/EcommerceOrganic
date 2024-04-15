@@ -1,3 +1,6 @@
+.body{
+    font-family: 'Poppins', sans-serif;
+}
 .container-fluid{
     width:100%
 }
@@ -134,5 +137,3 @@
     color: red;
     margin-top: 5px; /* Adjust as needed */
 }
-
-

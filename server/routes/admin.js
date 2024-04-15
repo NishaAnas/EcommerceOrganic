@@ -1,16 +1,35 @@
 var express = require('express')
 var router = express.Router();
 var adminController = require('../controller/adminController')
+const { upload, resizeImages } = require('../config/multer');
+const path = require('path');
+
+//GET Admin Login
+router.get('/adminlogin',adminController.getAdminLogin);
+
+//POST Admin Login
+router.post('/adminlogin',adminController.postAdminLogin)
+
+//GET Admin Signup
+router.get('/adminsignup',adminController.getAdminSignup);
+
+//POST Admin Signup
+router.post('/adminsignup',adminController.postAdminSignup);
+
+//GET Admin Logout
+router.get('/adminlogout',adminController.getadminLogout);
 
 //GET admin Home Page
 router.get('/',adminController.getAdminhomePage )
 
+//GET AddCategory  page
+router.get('/addcategory',adminController.getaddCategoryPage)
+
+//POST Add category page
+router.post('/addcategory',adminController.postaddCategory)
 
 //GET Category mangement page
 router.get('/category',adminController.getCategoryPage )
-
-//GET View Category Page
-router.get('/viewCategory/:_id',adminController.getViewCategory)
 
 // /* GET Edit Category page. */
 router.get('/editCategory/:_id',adminController.editCategory);
@@ -21,18 +40,6 @@ router.put('/editCategory/:_id',adminController.editPutcategory)
 // /* POST Edit Category page.(Delete) */
 router.put('/deleteCategory/:_id', adminController.markdeleteCategory);
 
- /* POST Edit Product page.(Delete) */
-router.delete('/editCategory/:_id', adminController.deleteCategory);
-
-//GET AddCategory  page
-router.get('/addcategory',adminController.getaddCategoryPage)
-
-//POST Add category page
-router.post('/addcategory',adminController.postaddCategory)
-
-
-
-
 
 
 //GET Product mangement page
@@ -42,36 +49,22 @@ router.get('/product',adminController.getProductPage )
 router.get('/addProduct',adminController.getAddProduct)
 
 //POST Add Product Page
-router.post('/addProduct',adminController.postAddProduct)
-
-//GET View Product Page
-router.get('/viewProduct/:_id',adminController.getViewProduct)
+router.post('/addProduct', upload.array('image'), resizeImages ,adminController.postAddProduct)
 
 //GET Edit Product Page
-router.get('/editProduct/:_id',adminController.getEditPage)
+router.get('/editProduct/:_id', adminController.getEditPage)
 
 //  /* POST Edit Product page.(UPDATE) */
-router.put('/editProduct/:_id',adminController.editPutProduct)
+router.put('/editProduct/:_id', upload.array('image'), resizeImages , adminController.editPutProduct)
 
 // /* POST Edit Category page.(Delete) */
 router.put('/deleteProduct/:_id', adminController.markdeleteProduct);
-
- /* POST Edit Product page.(Delete) */
-router.delete('/editProduct/:_id', adminController.deleteProduct);
-
-
-
-
-
 
 
 
 
 //GET User Management Page
 router.get('/user',adminController.getUserManagement)
-
-//GET User View Page
-router.get('/viewUser/:_id',adminController.getViewUser)
 
 //GET Blocked User
 router.get('/blockedUser',adminController.getBlockedUser)
@@ -81,5 +74,9 @@ router.get('/editUser/:_id',adminController.getEditUser)
 
 //PUT Edit User Page
 router.put('/editUser/:_id',adminController.putEditUser)
+
+// /* POST Edit User page.(Delete) */
+//router.put('/deleteUser/:_id', adminController.markdeleteUser);
+
 
 module.exports = router;

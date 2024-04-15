@@ -1,88 +1,116 @@
-function validateForm(event) {
-  console.log("Validation function called");
-  // Prevent the form from submitting if validation fails
-  event.preventDefault();
-  var firstName = document.getElementById('firstName').value
-  var lastName = document.getElementById('lastName').value
-  var userName = document.getElementById("userName").value;
-  var email = document.getElementById("email").value;
-  var password = document.getElementById("password").value;
-  var conformPassword = document.getElementById("conformpassword").value;
-  var phoneNumber = document.getElementById("phoneNumber").value;
+  const userName = document.getElementById("userName");
+  const email = document.getElementById("email");
+  const password = document.getElementById("password");
+  const conformPassword = document.getElementById("conformpassword");
+  const phoneNumber = document.getElementById("phoneNumber");
+  const form = document.getElementById('signup_form')
 
-  //validate first name
-  if (firstName.trim().length < 3 || firstName.trim().length > 20) {
-    alert("First Name must be between 3 and 20 characters long");
-    return false;
-  }
-  if (!/^[a-zA-Z]{3,}$/.test(firstName)) {
-    alert("First Name must start with an alphabet and contain at least 3 characters");
-    return false;
-  }
+  const username_error = document.getElementById("username_error");
+  const email_error = document.getElementById("email_error");
+  const password_error = document.getElementById("password_error");
+  const conformPassword_error = document.getElementById("conformpassword_error");
+  const phoneNumber_error = document.getElementById("phonenumber_error");
+  const form_error = document.getElementById('form_error')
+
+  form.addEventListener('submit',(e)=>{
+    e.preventDefault();
+    let isValid = true;
+
+    username_error.innerHTML = "";
+    email_error.innerHTML = "";
+    password_error.innerHTML = "";
+    conformPassword_error.innerHTML = "";
+    phoneNumber_error.innerHTML = "";
+    form_error.innerHTML = "";
+
+    const userNameValue = userName.value.trim();
+    const emailValue = email.value.trim();
+    const passwordValue = password.value.trim();
+    const confirmPasswordValue = conformPassword.value.trim();
+    const phoneNumberValue = phoneNumber.value.trim();
+
+    if (userNameValue.trim() === '' || emailValue.trim() === '' ||  passwordValue.trim() === '' || confirmPasswordValue.trim() === '' || phoneNumberValue.trim() === '') {
+      isValid = false;
+      form_error.innerHTML = "All the Fields are required please fill all the Fields accordingly"
+    }
+
+    //validation of UserName
+    const username_regex1= /^[a-zA-Z]/
+    const username_regex2 = /^[a-zA-Z][a-zA-Z0-9_]*$/;
+    
+    
+    if (userNameValue.trim().length < 3 || userNameValue.trim().length > 20) {
+      isValid = false;
+        username_error.innerHTML = "Username must be between 3 to 20 characters long"
+    } 
+    if(!username_regex1.test(userNameValue)){
+      isValid = false;
+          username_error.innerHTML = "Username must start with a letter"
+    } else
+    if(!username_regex2.test(userNameValue)){
+      isValid = false;
+          username_error.innerHTML = "Username must contain only alphanumeric characters and underscores."
+          }
+     
+
+      //validation of email Address
+      const email_regex = /^[a-z]{3,}@[a-z]+\.(com|in|org|net)$/;
+      if (emailValue.trim().length > 50 || emailValue.trim().length < 8) {
+        isValid = false;
+        email_error.innerHTML = "Enter valid email address"
+      }else
+       if(!email_regex.test(emailValue)){
+        isValid = false;
+      email_error.innerHTML = 'Enter a valid Email Address'
+    }
+    
+    //validation of password
+    const password_regex1 =/.{8,}/      //Password must be at least 8 characters long
+    const password_regex2 =/\d/         //Password must contain at least one number
+    const password_regex3 =/[a-z]/      //Password must contain at least one lowercase letter
+    const password_regex4 =/[^A-Za-z0-9]/   //Password must contain at least one special character
+    const password_regex5 =/[A-Z]/         //Password must contain at least one uppercase letter  
+    
+    if(passwordValue.trim().length < 8){
+      isValid = false;
+      password_error.innerHTML = 'Password must contain atleast 8 characters'
+    }else 
+    if (!password_regex2.test(passwordValue)) {
+      isValid = false;
+      password_error.innerHTML = "Password must contain at least one number"  
+    } else
+    if (!password_regex3.test(passwordValue)) {
+      isValid = false;
+      password_error.innerHTML = "Password must contain at least one lowercase letter"  
+    }else
+     if (!password_regex4.test(passwordValue)) {
+      isValid = false;
+      password_error.innerHTML = "Password must contain at least one special character"  
+    }else
+     if (!password_regex5.test(passwordValue)) {
+      isValid = false;
+      password_error.innerHTML = "Password must contain at least one uppercase letter" 
+    }  
+      //validation of Confirm Password
+      if(confirmPasswordValue.trim().length < 8){
+        isValid = false;
+      conformPassword_error.innerHTML = 'Password must contain atleast 8 characters'
+      }else 
+      if (passwordValue !== confirmPasswordValue) {
+        isValid = false;
+      conformPassword_error.innerHTML = "Not Matching With the Password"
+    }
 
 
-  //validate last name
-  if (lastName.trim().length < 3 || lastName.trim().length > 20) {
-    alert("Last Name must be between 3 and 20 characters long");
-    return false;
-  }
-  if (!/^[a-zA-Z]{3,}$/.test(lastName)) {
-    alert("Last Name must start with an alphabet and contain at least 3 characters");
-    return false;
-  }
-
-
-  // Validate username length
-  if (userName.trim().length < 3 || userName.trim().length > 20) {
-    alert("Username must be between 3 and 20 characters long");
-    return false;
-  }
-  if (!/^[a-zA-Z][a-zA-Z0-9]{2,19}$/.test(userName)) {
-    alert("Username must start with an alphabet, contain only alphanumeric characters, and be between 3 and 20 characters long");
-    return false;
-  }
-
-  // Validate email length
-  if (email.trim().length > 50) {
-    alert("Email address should not exceed 50 characters");
-    return false;
-  }
-
-  // Validate email format
-  var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    alert("Please enter a valid email address");
-    return false;
-  }
-
-  // Validate password
-  if (password.length < 8) {
-    alert("Password must be at least 8 characters long");
-    return false;
-  }
-
-  // Validate confirm password
-  if (password !== conformPassword) {
-    alert("Passwords do not match");
-    return false;
-  }
-
-  // Validate phone number
-  var phoneRegex = /^\d{10}$/;
-  if (!phoneRegex.test(phoneNumber)) {
-    alert("Please enter a valid 10-digit phone number");
-    return false;
-  }
-  if (!/^(?!([0-9])\1{9})\d{10}$/.test(phoneNumber)) {
-    alert("Please enter a valid 10-digit phone number without repeating the same digit");
-    return false;
-  }
-  var passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,20}$/;
-  if (!passwordRegex.test(password)) {
-    alert("Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character");
-    return false;
-  }
-
-  // If all validations pass, allow form submission
-  document.querySelector("form").submit();
-}
+      //validation of Phone Number
+      const phoneRegex = /^[1-9]\d{9}$/;
+      if(phoneNumberValue.length < 10 || !phoneRegex.test(phoneNumberValue)){
+        isValid = false;
+        phoneNumber_error.innerHTML = 'Enter a valid Phone number'
+      }
+       
+      if(isValid){
+        form.submit();
+      }
+    
+  })  

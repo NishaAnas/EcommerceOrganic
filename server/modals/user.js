@@ -3,24 +3,16 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
-    firstName:{
-        type:String,
-        trim:true
-    },
-    lastName:{
-        type:String,
-        trim:true
-    },
     userName: {
         type: String,
         required: true,
-        unique: true, // Ensures unique userName addresses
-        trim: true // Remove leading/trailing whitespace
+        unique: true, 
+        trim: true 
     },
     email: {
         type: String,
         required: true,
-        unique: true, // Ensures unique email addresses
+        unique: true, 
         trim: true
     },
     hashedPassword: {
@@ -28,7 +20,7 @@ const userSchema = new Schema({
         required: true
     },
     phoneNumber: {
-        type: String, // Consider using a specific phone number format library
+        type: String, 
         required: true,
         trim: true
     },

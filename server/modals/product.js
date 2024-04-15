@@ -7,7 +7,7 @@ const productSchema = new Schema({
     sku: {
       type: String,
       required: true,
-      unique: true // Ensures unique product SKU
+      unique: true 
     },
     title: {
       type: String,
@@ -15,7 +15,6 @@ const productSchema = new Schema({
     },
     description: {
       type: String,
-      required: true
     },
     price: {
       type: Number,

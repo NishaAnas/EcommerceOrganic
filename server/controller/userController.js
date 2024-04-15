@@ -14,50 +14,51 @@ const authToken = process.env.TWILIO_AUTH_TOKEN;
 const twilioPhonenumber = process.env.TWILIO_PHONE_NUMBER
 
 
-
 const twilioClient = new twilio(accountSid, authToken)
 
 
 //GET User Home Page
-exports.userHome = async(req, res) => {
+exports.userHome = async (req, res) => {
    try {
       const categories = await category.find({}).lean();
-      if (req.session.loggedIn) {
-         res.render('index', { loggedIn: req.session.loggedIn, categories });
-      } else {
+      if (req.session.userloggedIn) {
+         const successMessage = req.flash('success');
+         res.render('index', { userloggedIn: req.session.userloggedIn,  categories, success: successMessage });
+         }
+         if (req.user) {
+            const successMessage = req.flash('success');
+            res.render('index', { 
+                user: req.user, 
+                categories, 
+                success: successMessage 
+            });
+            return; // Exit the function if Passport user exists
+        }
+         else {
+         req.flash('error', 'Please log in to access the user home page.')
          res.redirect('/login');
       }
    } catch (error) {
+      req.flash('error', 'An error occurred while loading the user home page.');
+      res.redirect('/login');
       console.error(error);
-      res.status(500).send('Internal Server Error');
    }
 }
 
 
-
-//SuccessLOGIN using Google Authentication
-const successGoogleLogin = (req, res) => {
-   if (!req.user)
-      res.redirect('/failure');
-   console.log(req.user);
-   res.send("Welcome " + req.user.email);
-}
-
-const failureGoogleLogin = (req, res) => {
-   res.send("Error");
-}
-
 //GET Login Page
 exports.login = (req, res) => {
    console.log('login page loaded')
-   console.log(process.env.GOOGLE_CLIENT_ID)
-   res.render('login', { googleClientId: process.env.GOOGLE_CLIENT_ID });
-}
+   const error = req.flash('error');
+   const success = req.flash('success');
+   res.render('login', { success , error });
+   }
 
 
 //GET Signup Page
 exports.signup = (req, res) => {
-   res.render('signup');
+   const error = req.flash('error');
+   res.render('signup', { error });
 }
 
 //POST Signup Page
@@ -70,7 +71,8 @@ exports.postSignup = async (req, res) => {
    // Validate password and confirmation
    if (!password == conformPassword) {
       console.log('password does not match')
-      return res.render('signup', { error: 'Passwords do not match.' });
+      req.flash('error', 'Passwords do not match.');
+      return res.render('signup');
    }
    try {
       // Generate OTP
@@ -82,39 +84,36 @@ exports.postSignup = async (req, res) => {
       // Check if the user already exists
       const existingUser = await user.findOne({ $or: [{ userName }, { email }] });
       if (existingUser) {
-         return res.render('signup', { error: 'Username or email already exists.' });
+         req.flash('error', 'Email already exists.');
+         return res.render('signup');
       }
-
       // Save signup data to session
       req.session.signupData = {
-         firstName,
-         lastName,
          userName,
          email,
          password: hashedPassword,
          phoneNumber,
          otp
       };
-
       console.log(req.session.signupData)
       // Send OTP via SMS
       await sendOTPViaSMS(phoneNumber, otp);
-
       // Send OTP via email
       await sendOTPViaEmail(email, otp);
-
       // Render OTP verification page
       res.render('otp-verification', { email, phoneNumber });
-
    } catch (error) {
       console.error('Error during signup:', error);
-      res.render('signup', { error: 'An error occurred during registration.' });
+      req.flash('error', 'An error occurred during registration.');
+      res.redirect('/signup');
    }
 }
 
 //GET OTP-Verification Page
 exports.otpverify = (req, res) => {
-   res.render('otp-verification');
+   const success = req.flash('success')
+   const error = req.flash('error');
+   res.render('otp-verification', { error,success });
 }
 
 //POST verify OTP
@@ -126,13 +125,12 @@ exports.postVerifyotp = async (req, res) => {
       console.log(req.session.signupData)
 
       if (otpEntered !== otp) {
-         return res.render('otp-verification', { error: 'OTP mismatch. Please enter the correct OTP.' });
+         req.flash('error', 'OTP mismatch. Please enter the correct OTP.');
+         return res.render('otp-verification');
       }
 
       // Create new user
       const newUser = new user({
-         firstName,
-         lastName,
          userName,
          email,
          hashedPassword: password,
@@ -148,8 +146,10 @@ exports.postVerifyotp = async (req, res) => {
       // Send confirmation email
       await sendConfirmationEmail(email);
 
-      // Redirect to login page
-      res.render('login', { success: 'user Registered Successfully' });
+      req.flash('success', 'User registered successfully.');
+       setTimeout(() => {
+         res.redirect('/login');
+       }, 3000);
 
    } catch (error) {
       console.error('Error during OTP verification:', error);
@@ -215,46 +215,38 @@ exports.postLogin = async (req, res) => {
    console.log(req.body)
    try {
       const { email, password } = req.body;
-
       const existingUser = await user.findOne({ email });
 
       if (!existingUser) {
-         return res.render('login', { error: 'Invalid email or password.' });
+         req.flash('error', 'Invalid email or password.');
+         res.redirect('/login');
       }
-
+      //Check if th euser is blocked
+      if (existingUser.isBlocked) {
+         req.flash('error', 'This emailId is blocked. Please contact the administrator for assistance.');
+         return res.redirect('/login');
+      }
       // Compare the provided password with the hashed password in the database
       const passwordMatch = await bcrypt.compare(password, existingUser.hashedPassword);
 
       // If passwords don't match, render login page with error message
       if (!passwordMatch) {
-         return res.render('login', { error: 'Invalid email or password.' });
-      }
-
-      req.session.loggedIn = true;
-      req.session.email = email;
-      req.session.userId = existingUser._id;
-      req.session.firstName = existingUser.firstName;
-      req.session.lastName = existingUser.lastName;
-      req.session.phoneNumber = existingUser.phoneNumber;
-      req.session.isAdmin = email === 'admin123@gmail.com';
-
-      console.log('User found');
-      console.log('FirstName:', req.session.firstName);
-      console.log('LastName:', req.session.lastName);
-      console.log('phoneNumber:', req.session.phoneNumber);
-      console.log('userId:', req.session.userId);
-      console.log('email:', req.session.email);
-      console.log('isAdmin:', req.session.isAdmin);
-
-      // Redirect based on user role
-      if (req.session.isAdmin) {
-         return res.redirect(`/admin?email=${email}`);
-      } else {
+         req.flash('error', 'Invalid email or password.');
+         return res.render('login');
+      }else{
+         console.log('User found');
+         req.session.userloggedIn = true;
+         req.session.email = email;
+         req.session.userId = existingUser._id;
+         req.session.userName = existingUser.userName;
+         req.session.phoneNumber = existingUser.phoneNumber;
+         req.flash('success', 'Successfully logged in.');
          return res.redirect(`/?email=${email}`);
-      }
+         }
    } catch (error) {
       console.error('Error during login:', error);
-      res.render('login', { error: 'An error occurred during Login.' });
+      req.flash('error', 'An error occurred during Login.');
+      res.render('login');
    }
 }
 
@@ -272,19 +264,15 @@ exports.postForgotPassword = async (req, res) => {
    try {
       // Check if the email exists in the database
       const User = await user.findOne({ email });
-
       if (!User) {
          return res.render('forgotPassword', { error: 'Email not found' });
       }
-
       // Generate a unique reset password token
       const resetToken = crypto.randomBytes(20).toString('hex');
-
       // Save the reset token and its expiration time in the user document
       user.resetPasswordToken = resetToken;
       user.resetPasswordExpires = Date.now() + 3600000; // Token expires in 1 hour
       await user.create(User);
-
       // Send an email with the reset password link
       const resetPasswordLink = `http://localhost:3000/resetPassword?token=${resetToken}`;
       await sendResetPasswordEmail(email, resetPasswordLink);
@@ -337,11 +325,9 @@ exports.postResetPassword = async (req, res) => {
    try {
       // Find the user with the reset password token
       const user = await user.findOne({ resetPasswordToken: token, resetPasswordExpires: { $gt: Date.now() } });
-
       if (!user) {
          return res.render('resetPassword', { error: 'Invalid or expired token' });
       }
-
       // Update the user's password
       user.password = newPassword;
       // Clear the reset password token and its expiration time
@@ -359,6 +345,8 @@ exports.postResetPassword = async (req, res) => {
 
 //GET Logout Page
 exports.getLogout = (req, res) => {
+   req.logout();
+
    req.session.destroy((err) => {
       if (err) {
          console.error('Error in destroying the session:', err);
@@ -367,27 +355,25 @@ exports.getLogout = (req, res) => {
    });
 }
 
-
 //GET Product Listing Page
-exports.productListing = async(req,res)=>{
+exports.productListing = async (req, res) => {
    try {
       const categoryId = req.query.categoryId;
+      console.log(req.session.userloggedIn)
       if (!categoryId) {
-          return res.status(400).send('Category ID is required');
+         res.redirect('/?error=Error in fetching Category Id')
       }
       const products = await product.find({ categoryId }).lean();
-      const Category = await category.find({categoryId}).lean();
-      console.log(products)
-      console.log(Category)
-      res.render('user/productListing', { products,Category });
-  } catch (error) {
+      const Category = await category.find({ categoryId }).lean();
+      res.render('user/productListing', { products, Category });
+   } catch (error) {
       console.error(error);
-      res.status(500).send('Internal Server Error');
-  }
+      res.redirect('/?error=Error in fetching Product')
+   }
 }
 
 //GET Product Details Page
-exports.productDetails = async(req,res)=>{
+exports.productDetails = async (req, res) => {
    try {
       const productId = req.params.productId;
       const productDetails = await product.findById(productId).lean();
@@ -403,7 +389,33 @@ exports.productDetails = async(req,res)=>{
       res.render('user/productDetails', { productDetails, stock, rating, reviews, relatedProducts });
    } catch (error) {
       console.error(error);
-      res.status(500).send('Internal Server Error');
+      res.redirect('/?error=Error in fetching Product')
    }
+}
+
+//Google Success Login
+exports.successGoogleLogin = (req, res) => {
+   if (!req.user) {
+      res.redirect('/login');
+   }
+   console.log(req.user);
+   res.render('index');
+}
+
+//Failure Google Auth
+exports.failureGoogleLogin = (req, res) => {
+   res.render('login', { error: 'Google authentication failed. Please try again.' });
+}
+
+//Facebook Success Login
+exports.successFacebookLogin = (req, res) => {
+   req.session.userloggedIn=true;
+   console.log(req.user);
+   res.render('index');
+}
+
+// //Failure Facebook Auth
+exports.failureFacebookLogin = (req, res) => {
+   res.render('login', { error: 'Facebook authentication failed. Please try again.' });
 }
 
