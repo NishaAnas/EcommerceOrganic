@@ -1,6 +1,10 @@
 var express = require('express')
 var router = express.Router();
-var userController = require('../controller/userController.js')
+//var userController = require('../controller/userController.js');
+var authController = require('../controller/user/authenticationController.js');
+var prodController = require('../controller/user/productController.js');
+var cartController = require('../controller/user/cartController.js');
+var orderController = require('../controller/user/orderController.js');
 const passport = require('passport');
 require('../config/passport.js');
 
@@ -8,10 +12,10 @@ router.use(passport.initialize());
 router.use(passport.session());
 
 //GET user Home Page
-router.get('/' ,  userController.userHome)
+router.get('/' ,  authController.userHome)
 
 //GET Login Page
-router.get('/login',userController.login)
+router.get('/login',authController.login)
 
 //POST Auth using Google
 router.get('/auth/google',passport.authenticate('google',{scope:
@@ -27,10 +31,10 @@ passport.authenticate('google', {
 );
 
 //Success
-router.get('/success',userController.successGoogleLogin);
+router.get('/success',authController.successGoogleLogin);
 
 //Failure
-router.get('/failure',userController.failureGoogleLogin);
+router.get('/failure',authController.failureGoogleLogin);
 
 //POST Auth using Facebook
 router.get('/auth/facebook',passport.authenticate('facebook',{scope:
@@ -47,48 +51,53 @@ router.get('/auth/facebook/callback',
     );
 
 //Success
-router.get('/success',userController.successFacebookLogin);
+router.get('/success',authController.successFacebookLogin);
     
 //Failure
-router.get('/failure',userController.failureFacebookLogin);
+router.get('/failure',authController.failureFacebookLogin);
 
 
 //GET SignUp Page
-router.get('/signup',userController.signup)
+router.get('/signup',authController.signup)
 
 //POST Signup Page
-router.post('/signup',userController.postSignup)
+router.post('/signup',authController.postSignup)
 
 //POST Login Page
-router.post('/login',userController.postLogin)
+router.post('/login',authController.postLogin)
 
 //GET Forgot Password Page
-router.get('/forgotPassword',userController.forgotPassword)
+router.get('/forgotPassword',authController.forgotPassword)
 
 //POST Forgot Password Page
-router.post('/forgotPassword',userController.postForgotPassword)
+router.post('/forgotPassword',authController.postForgotPassword)
 
 //POST Reset Password Page
-router.post('/resetpassword',userController.postResetPassword)
+router.post('/resetpassword',authController.postResetPassword)
 
 //GET Reset Password Page
-router.get('/resetPassword',userController.resetPassword)
+router.get('/resetPassword',authController.resetPassword)
 
 //GET OTP Verification Page
-router.get('/otp-verification',userController.otpverify)
+router.get('/otp-verification',authController.otpverify)
 
 //POST Veify OTP page
-router.post('/verifyOtp',userController.postVerifyotp)
+router.post('/verifyOtp',authController.postVerifyotp)
 
 //GET Logout Page
-router.get('/logout',userController.getLogout)
+router.get('/logout',authController.getLogout)
 
 
 
 //GET Product Listing Page
-router.get('/productList',userController.productListing)
+router.get('/productList',prodController.productListing)
 
 //GET Product Details Page
-router.get('/productDetails/:productId',userController.productDetails)
+router.get('/productDetails/:productId',prodController.productDetails)
+
+
+
+//GET Cart page
+router.get('/shoppingCart/:userId',cartController.showShoppingCart)
 
 module.exports = router;

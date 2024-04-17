@@ -58,19 +58,6 @@ app.use(methodOverride('_method'));
 const isEqual = function (value1, value2) {
   return value1 === value2;
 }
-
-// const if_eq = function(a, b, opts) {
-//   return a == b ? opts.fn(this) : opts.inverse(this);
-// }
-
-// const if_gt = function(a, b, opts) {
-//   return a > b ? opts.fn(this) : opts.inverse(this);
-// }
-
-// const if_lt = function(a, b, opts) {
-//   return a < b ? opts.fn(this) : opts.inverse(this);
-// }
-
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.engine('hbs', hbs.engine({ // use hbs.engine() instead of hbs()
@@ -80,9 +67,6 @@ app.engine('hbs', hbs.engine({ // use hbs.engine() instead of hbs()
   partialsDir: __dirname + '/views/partials/',
   helpers: {
     isEqual: isEqual,
-     //if_eq: if_eq,
-     //if_gt: if_gt,
-     //if_lt: if_lt
   }
 }));
 

@@ -9,6 +9,8 @@ const passport = require('passport');
 const nodemailer = require("nodemailer");
 const crypto = require('crypto')
 
+
+
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const twilioPhonenumber = process.env.TWILIO_PHONE_NUMBER
@@ -21,19 +23,10 @@ const twilioClient = new twilio(accountSid, authToken)
 exports.userHome = async (req, res) => {
    try {
       const categories = await category.find({}).lean();
-      if (req.session.userloggedIn) {
-         const successMessage = req.flash('success');
-         res.render('index', { userloggedIn: req.session.userloggedIn,  categories, success: successMessage });
+      if (req.session.userLoggedInData) {
+         const successMessage = req.flash('Successfully Logged In');
+         res.render('user/Authentication/index', { userloggedInData: req.session.userLoggedInData,  categories, success: successMessage });
          }
-      //    if (req.user) {
-      //       const successMessage = req.flash('success');
-      //       res.render('index', { 
-      //           user: req.user, 
-      //           categories, 
-      //           success: successMessage 
-      //       });
-      //       return; // Exit the function if Passport user exists
-      //   }
          else {
          req.flash('error', 'Please log in to access the user home page.')
          res.redirect('/login');
@@ -51,28 +44,28 @@ exports.login = (req, res) => {
    console.log('login page loaded')
    const error = req.flash('error');
    const success = req.flash('success');
-   res.render('login', { success , error });
+   res.render('user/Authentication/login', { success , error });
    }
-
 
 //GET Signup Page
 exports.signup = (req, res) => {
    const error = req.flash('error');
-   res.render('signup', { error });
+   res.render('user/Authentication/signup', { error });
 }
+
 
 //POST Signup Page
 exports.postSignup = async (req, res) => {
 
    // Destructure request body
-   const { firstName, lastName, userName, email, password, conformPassword, phoneNumber } = req.body;
-   console.log(`${firstName} ${lastName} ${userName} ${email} ${password}  ${conformPassword} ${phoneNumber}`)
+   const { userName, email, password, conformPassword, phoneNumber } = req.body;
+   //console.log(` ${userName} ${email} ${password}  ${conformPassword} ${phoneNumber}`)
 
    // Validate password and confirmation
    if (!password == conformPassword) {
       console.log('password does not match')
       req.flash('error', 'Passwords do not match.');
-      return res.render('signup');
+      return res.redirect('/signup');
    }
    try {
       // Generate OTP
@@ -85,7 +78,7 @@ exports.postSignup = async (req, res) => {
       const existingUser = await user.findOne({ $or: [{ userName }, { email }] });
       if (existingUser) {
          req.flash('error', 'Email already exists.');
-         return res.render('signup');
+         return res.redirect('/signup');
       }
       // Save signup data to session
       req.session.signupData = {
@@ -101,10 +94,10 @@ exports.postSignup = async (req, res) => {
       // Send OTP via email
       await sendOTPViaEmail(email, otp);
       // Render OTP verification page
-      res.render('otp-verification', { email, phoneNumber });
+      res.render('user/Authentication/otp-verification', { email, phoneNumber });
    } catch (error) {
       console.error('Error during signup:', error);
-      req.flash('error', 'An error occurred during registration.');
+      req.flash('error', 'A Server error occurred during registration.');
       res.redirect('/signup');
    }
 }
@@ -113,20 +106,20 @@ exports.postSignup = async (req, res) => {
 exports.otpverify = (req, res) => {
    const success = req.flash('success')
    const error = req.flash('error');
-   res.render('otp-verification', { error,success });
+   res.render('user/Authentication/otp-verification', { error,success });
 }
 
 //POST verify OTP
 exports.postVerifyotp = async (req, res) => {
    try {
       const otpEntered = req.body.otp;
-      const { firstName, lastName, userName, email, password, phoneNumber, otp } = req.session.signupData;
+      const {userName, email, password, phoneNumber, otp } = req.session.signupData;
 
-      console.log(req.session.signupData)
+      //console.log(req.session.signupData)
 
       if (otpEntered !== otp) {
          req.flash('error', 'OTP mismatch. Please enter the correct OTP.');
-         return res.render('otp-verification');
+         return res.redirect('/otp-verification');
       }
 
       // Create new user
@@ -153,7 +146,8 @@ exports.postVerifyotp = async (req, res) => {
 
    } catch (error) {
       console.error('Error during OTP verification:', error);
-      res.render('signup', { error: 'An error occurred during OTP verification.' });
+      req.flash('error', 'Error during OTP verification');
+      res.redirect('/signup');
    }
 }
 
@@ -221,7 +215,7 @@ exports.postLogin = async (req, res) => {
          req.flash('error', 'Invalid email or password.');
          res.redirect('/login');
       }
-      //Check if th euser is blocked
+      //Check if the user is blocked
       if (existingUser.isBlocked) {
          req.flash('error', 'This emailId is blocked. Please contact the administrator for assistance.');
          return res.redirect('/login');
@@ -232,28 +226,30 @@ exports.postLogin = async (req, res) => {
       // If passwords don't match, render login page with error message
       if (!passwordMatch) {
          req.flash('error', 'Invalid email or password.');
-         return res.render('login');
+         return res.redirect('/login');
       }else{
          console.log('User found');
-         req.session.userloggedIn = true;
-         req.session.email = email;
-         req.session.userId = existingUser._id;
-         req.session.userName = existingUser.userName;
-         req.session.phoneNumber = existingUser.phoneNumber;
+         req.session.userLoggedInData = {
+            userloggedIn : true,
+            email : email,
+            userId : existingUser._id,
+            userName : existingUser.userName,
+            phoneNumber : existingUser.phoneNumber
+         };
          req.flash('success', 'Successfully logged in.');
          return res.redirect(`/?email=${email}`);
          }
    } catch (error) {
       console.error('Error during login:', error);
       req.flash('error', 'An error occurred during Login.');
-      res.render('login');
+      res.redirect('/login');
    }
 }
 
 
 //GET Forgot Password Page
 exports.forgotPassword = (req, res) => {
-   res.render('forgotPassword');
+   res.render('user/Authentication/forgotPassword');
 }
 
 //POST Forgot Password page
@@ -265,7 +261,8 @@ exports.postForgotPassword = async (req, res) => {
       // Check if the email exists in the database
       const User = await user.findOne({ email });
       if (!User) {
-         return res.render('forgotPassword', { error: 'Email not found' });
+         req.flash('error', 'Email not found');
+         return res.redirect('/forgotPassword');
       }
       // Generate a unique reset password token
       const resetToken = crypto.randomBytes(20).toString('hex');
@@ -277,10 +274,12 @@ exports.postForgotPassword = async (req, res) => {
       const resetPasswordLink = `http://localhost:3000/resetPassword?token=${resetToken}`;
       await sendResetPasswordEmail(email, resetPasswordLink);
 
-      res.render('login', { success: 'Reset password link sent to your email' });
+      req.flash('success', 'Reset password link sent to your email');
+      res.redirect('/login');
    } catch (error) {
       console.error('Error sending reset password email:', error);
-      res.render('forgotPassword', { error: 'Error sending reset password email' });
+      req.flash('error', 'Error sending reset password email');
+      res.redirect('/forgotPassword');
    }
 
 }
@@ -326,7 +325,8 @@ exports.postResetPassword = async (req, res) => {
       // Find the user with the reset password token
       const user = await user.findOne({ resetPasswordToken: token, resetPasswordExpires: { $gt: Date.now() } });
       if (!user) {
-         return res.render('resetPassword', { error: 'Invalid or expired token' });
+         req.flash('error', 'Invalid or expired token');
+         return res.redirect('/resetPassword');
       }
       // Update the user's password
       user.password = newPassword;
@@ -335,10 +335,12 @@ exports.postResetPassword = async (req, res) => {
       user.resetPasswordExpires = undefined;
       await user.create(user)
 
-      res.render('login', { success: 'Password reset successful' });
+      req.flash('success', 'Password reset successful');
+      res.redirect('/login');
    } catch (error) {
       console.error('Error resetting password:', error);
-      res.render('resetPassword', { error: 'Error resetting password' });
+      req.flash('error', 'Error resetting password');
+      res.redirect('/resetPassword');
    }
 }
 
@@ -354,67 +356,33 @@ exports.getLogout = (req, res) => {
    });
 }
 
-//GET Product Listing Page
-exports.productListing = async (req, res) => {
-   try {
-      const categoryId = req.query.categoryId;
-      console.log(req.session.userloggedIn)
-      if (!categoryId) {
-         res.redirect('/?error=Error in fetching Category Id')
-      }
-      const products = await product.find({ categoryId }).lean();
-      const Category = await category.find({ categoryId }).lean();
-      res.render('user/productListing', { products, Category });
-   } catch (error) {
-      console.error(error);
-      res.redirect('/?error=Error in fetching Product')
-   }
-}
-
-//GET Product Details Page
-exports.productDetails = async (req, res) => {
-   try {
-      const productId = req.params.productId;
-      const productDetails = await product.findById(productId).lean();
-      const relatedProducts = await product.find({ categoryId: productDetails.categoryId }).limit(4).lean();
-
-      // Dummy data for stock, rating, and reviews
-      const stock = 10;
-      const rating = 4.5;
-      const reviews = [
-         { user: 'User1', comment: 'Great product!' },
-         { user: 'User2', comment: 'Highly recommended.' }
-      ];
-      res.render('user/productDetails', { productDetails, stock, rating, reviews, relatedProducts });
-   } catch (error) {
-      console.error(error);
-      res.redirect('/?error=Error in fetching Product')
-   }
-}
 
 //Google Success Login
 exports.successGoogleLogin = (req, res) => {
-   if (!req.user) {
-      res.redirect('/login');
-   }
-   console.log(req.user);
-   res.render('index');
-}
-
-//Failure Google Auth
-exports.failureGoogleLogin = (req, res) => {
-   res.render('login', { error: 'Google authentication failed. Please try again.' });
-}
-
-//Facebook Success Login
-exports.successFacebookLogin = (req, res) => {
-   req.session.userloggedIn=true;
-   console.log(req.user);
-   res.render('index');
-}
-
-// //Failure Facebook Auth
-exports.failureFacebookLogin = (req, res) => {
-   res.render('login', { error: 'Facebook authentication failed. Please try again.' });
-}
-
+    if (!req.user) {
+      req.flash('error', 'Login with Google Unsuccessful');
+       res.redirect('/login');
+    }
+    console.log(req.user);
+    req.flash('success', 'Login with Google Successful');
+    res.render('user/Authentication/index');
+ }
+ 
+ //Failure Google Auth
+ exports.failureGoogleLogin = (req, res) => {
+   req.flash('error', 'Login with Google Unsuccessful');
+    res.render('user/Authentication/login');
+ }
+ 
+ //Facebook Success Login
+ exports.successFacebookLogin = (req, res) => {
+    console.log(req.user);
+    req.flash('success', 'Login with Facebook Successful');
+    res.render('user/Authentication/index');
+ }
+ 
+ // //Failure Facebook Auth
+ exports.failureFacebookLogin = (req, res) => {
+   req.flash('error', 'Login with Facebook Unsuccessful');
+    res.render('user/Authentication/login');
+ }
