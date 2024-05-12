@@ -1,15 +1,19 @@
-const user = require('../modals/user')
-const category = require('../modals/categories')
-const product = require('../modals/product')
-const admin = require ('../modals/admin')
-const { upload, resizeImages } = require('../config/multer');
+const user = require('../../modals/user')
+const category = require('../../modals/categories')
+const product = require('../../modals/product')
+const admin = require ('../../modals/admin')
+const { upload, resizeImages } = require('../../config/multer.js');
 const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
 const path = require('path');
 
 //GET Admin Login
 exports.getAdminLogin = (req,res)=>{
-    res.render('admin/Authentication/adminLogin',{success: req.flash('success'),error: req.flash('error')});
+    const isAdmin = true;
+    console.log(req.session.adminLoggedInData)
+    if (! req.session.adminLoggedInData) {
+    res.render('admin/Authentication/adminLogin',{isAdmin,success: req.flash('success'),error: req.flash('error'), layout:'athenticationlayout'});
+}
 }
 
 //POST Admin Login
@@ -30,24 +34,27 @@ exports.postAdminLogin = async(req,res)=>{
     if (!passwordMatch) {
         req.flash('error', 'Invalid email or password');
         return res.redirect(`/admin/adminlogin`);
-    }else{
+    }
+    else{
         console.log('Admin found');
-        req.session.adminloggedIn = true;
-        req.session.email = email;
-        req.session.adminId = existingAdmin._id;
+        req.session.adminLoggedInData = {
+            adminloggedIn: true,
+            email: email,
+            userId: existingAdmin._id,
+        }
         req.flash('success', 'Login Successful');
         }
         return res.redirect(`/admin?email=${email}`);
     } catch (error) {
     console.error('Error during login:', error);
-    req.flash('error', 'Server Error Occurred During Login');
+    req.flash('error', 'Server Error');
     res.redirect(`/admin/adminlogin`);
     }
 }
 
 //GET Admin SignUp
 exports.getAdminSignup = (req,res)=>{
-    res.render('admin/Authentication/adminsignup',{success: req.flash('success'),error: req.flash('error')});
+    res.render('admin/Authentication/adminsignup',{success: req.flash('success'),error: req.flash('error'), layout:'athenticationlayout'});
 }
 
 //POST Admin SignUp
@@ -86,7 +93,7 @@ if (password !== conformpassword) {
     res.redirect(`/admin/adminlogin/?success=Admin Registered Successfully`);
 } catch (error) {
     console.error('Error During Registering:', error);
-    req.flash('error', 'Server error occurred Registration');
+    req.flash('error', 'Server Error');
     res.redirect(`/admin/adminsignup`);
     }
 }
@@ -96,7 +103,6 @@ exports.getadminLogout = (req,res)=>{
         if (err) {
             console.error('Error in destroying the session:', err);
          }
-         req.flash('success', 'Logout Successfully');
          res.redirect('/admin/adminlogin');
     })
 }
@@ -105,17 +111,17 @@ exports.getadminLogout = (req,res)=>{
 //GET Admin Dashboard
 exports.getAdminhomePage = (req, res) => {
     try {
-        if ( req.session.adminloggedIn) {
-            const email = req.query.email;
+        if ( req.session.adminLoggedInData) {
+            const adminData = req.session.userLoggedInData;
             const successMessage = req.flash('success');
             const errorMessage = req.flash('error');
-            res.render('admin/Authentication/dashboard', { layout: 'adminlayout',email: email,successMessage: successMessage, errorMessage: errorMessage });
+            res.render('admin/Authentication/dashbord', { layout: 'adminlayout' , adminData , successMessage: successMessage , errorMessage: errorMessage });
         } else {
             req.flash('error', 'Please login to access the admin dashboard');
             res.redirect('/adminlogin');
         }
         } catch (error) {
-            req.flash('error', 'Server Error Occured During Login');
+            req.flash('error', 'Server Error');
         console.error(error);
         } 
 }

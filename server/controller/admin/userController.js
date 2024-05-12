@@ -1,8 +1,8 @@
-const user = require('../modals/user')
-const category = require('../modals/categories')
-const product = require('../modals/product')
-const admin = require ('../modals/admin')
-const { upload, resizeImages } = require('../config/multer');
+const user = require('../../modals/user')
+const category = require('../../modals/categories')
+const product = require('../../modals/product')
+const admin = require ('../../modals/admin')
+const { upload, resizeImages } = require('../../config/multer');
 const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
 const path = require('path');
@@ -20,7 +20,7 @@ exports.getUserManagement = async(req,res) =>{
             res.render('admin/user/userManagement',{Users,layout: 'adminlayout',success: successMessage, error: errorMessage})
     }catch(error){
         console.log(error)
-        req.flash('error', 'Error occurred during user management');
+        req.flash('error', 'Server Error');
         res.render('admin/user/userManagement', { layout: 'adminlayout', error: error });
     }
 }
@@ -39,7 +39,7 @@ exports.getBlockedUser = async(req,res)=>{
             res.render('admin/user/blockedUser',{Users,layout: 'adminlayout',success: successMessage, error: errorMessage})
     }catch(error){
         console.log(error)
-        req.flash('error', 'Error occurred during fetching blocked users');
+        req.flash('error', 'Server Error');
         res.render('admin/user/blockedUser', { layout: 'adminlayout', error: error });
     }
 }
@@ -56,7 +56,7 @@ exports.getEditUser = async(req,res)=>{
         res.render('admin/user/userEdit', { locals, userDetailsViewing, layout: 'adminlayout' });
     } catch (error) {
         console.log(error)
-        req.flash('error', 'Error occurred while fetching user details for editing');
+        req.flash('error', 'Server Error');
         res.redirect('/user/userManagement');
     }
 }
@@ -73,7 +73,7 @@ exports.putEditUser = async(req,res)=>{
         res.redirect(`/admin/user`);
     } catch (error) {
         console.log(error)
-        req.flash('error', 'User Updation failed');
+        req.flash('error', 'Server Error');
         res.redirect(`/admin/user`);
     }
 }

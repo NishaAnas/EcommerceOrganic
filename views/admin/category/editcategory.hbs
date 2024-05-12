@@ -39,27 +39,21 @@
     <div class="row form-group mb-4 p-3 gap-4">
         <div class="col">
             <label for="categoryName"><b>Category Name</b></label>
-            <input type="text" class="form-control" id="categoryName"
-                name="categoryName"
-                value="{{categoryDetailsViewing.name }}"
+            <input type="text" class="form-control" id="categoryName"name="categoryName"value="{{categoryDetailsViewing.name }}"
                 placeholder="Category Name" required>
         </div>
-        <div class="row form-group">
-            <div class="col">
-                <label for="categoryDetails"><b>Category Details</b></label>
-                <textarea class="form-control mt-3" id="categoryDetails" name="categoryDetails" placeholder="Category Details" rows="4" required>{{categoryDetailsViewing.description }}</textarea>
-            </div>
+        <div class="col">
+            <label for="categoryDetails"><b>Category Details</b></label>
+            <textarea class="form-control mt-3" id="categoryDetails" name="categoryDetails" placeholder="Category Details" rows="4" required>{{categoryDetailsViewing.description }}</textarea>
         </div>
-        <div class="d-flex flex-row align-items-center justify-content-evenly">
-    <div class="row form-group">
+    </div>
+        <div class="row form-group mb-4 p-3 gap-4">
         <div class="col">
             <label for="isActive" class="col-sm-2 col-form-check-label">isActive:</label>
             <div class="col-sm-10 form-check form-switch" style="padding-left: 4.5em;">
                 <input class="form-check-input" name="isActive" type="checkbox" role="switch" id="isActive" {{#if categoryDetailsViewing.isActive}}checked{{/if}} style="min-height: 70%;">
             </div>
         </div>
-    </div>
-    <div class="row form-group">
         <div class="col">
             <label for="isDeleted" class="col-sm-2 col-form-check-label">isDeleted:</label>
             <div class="col-sm-10 form-check form-switch" style="padding-left: 4.5em;">
@@ -68,7 +62,6 @@
         </div>
     </div>
 </div>
-
         <div class="form-group mb-4 d-flex flex-row align-items-center justify-content-center">
             <button type="submit" class="btn btn-primary">Update Category</button>
         </div>

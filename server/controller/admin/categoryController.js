@@ -1,8 +1,8 @@
-const user = require('../modals/user')
-const category = require('../modals/categories')
-const product = require('../modals/product')
-const admin = require ('../modals/admin')
-const { upload, resizeImages } = require('../config/multer');
+const user = require('../../modals/user')
+const category = require('../../modals/categories')
+const product = require('../../modals/product')
+const admin = require ('../../modals/admin')
+const { upload, resizeImages } = require('../../config/multer');
 const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
 const path = require('path');
@@ -22,7 +22,7 @@ exports.getCategoryPage = async (req, res) => {
         res.render('admin/category/category', { locals, Category, layout: 'adminlayout', success: successMessage, error: errorMessage })
     } catch (error) {
         console.log(error)
-        req.flash('error', 'Error occurred during fetching categories');
+        req.flash('error', 'Server Error');
         res.redirect('/admin/category');
     }
 }
@@ -38,6 +38,15 @@ exports.getaddCategoryPage = (req, res) => {
 exports.postaddCategory = async (req, res) => {
     try {
         const { name, description, isActive } = req.body;
+
+        const existingCategory = await category.findOne({ name: req.body.name });
+        
+        // If another category with the same name exists
+        if (existingCategory ) {
+            req.flash('error', 'Category name already exists');
+            return res.redirect(`/admin/category`);
+        }
+
         const newCategory = new category({
             name,
             description,
@@ -48,7 +57,7 @@ exports.postaddCategory = async (req, res) => {
         res.redirect('/admin/category');
     } catch (error) {
         console.error('Error saving category:', error);
-        req.flash('error', 'Error saving category. Please try again.');
+        req.flash('error', 'Server Error');
         res.redirect('/admin/addCategory');
     }
 
@@ -68,7 +77,7 @@ exports.editCategory = async (req, res) => {
         console.log(categoryDetailsViewing)
         res.render('admin/category/editCategory', { locals, categoryDetailsViewing, layout: 'adminlayout' ,success: successMessage, error: errorMessage});
     } catch (error) {
-        req.flash('error', 'Error occurred while fetching category details');
+        req.flash('error', 'Server Error');
         res.redirect('/admin/category');
         console.log(error)
     }
@@ -99,7 +108,7 @@ exports.editPutcategory = async (req, res) => {
         res.redirect(`/admin/category`);
     } catch (error) {
         console.log(error)
-        req.flash('error', 'Error occurred while updating category');
+        req.flash('error', 'Server Error');
         res.redirect(`/admin/category`);
     }
 }
@@ -118,7 +127,7 @@ exports.markdeleteCategory = async (req, res) => {
         res.redirect('/admin/category');
     } catch (error) {
         console.log(error)
-        req.flash('error', 'Error occurred while deleting category');
+        req.flash('error', 'Server Error');
         res.redirect('/admin/category');
     }
 }

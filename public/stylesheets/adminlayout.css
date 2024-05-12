@@ -1,4 +1,4 @@
-html {
+ html {
 	line-height: 1.15;
 	-webkit-text-size-adjust: 100%
 }
@@ -33,46 +33,12 @@ button {
 	text-transform: none
 }
 
-[type=button],
-button {
-	-webkit-appearance: button
-}
-
-[type=button]::-moz-focus-inner,
-button::-moz-focus-inner {
-	border-style: none;
-	padding: 0
-}
-
-[type=button]:-moz-focusring,
-button:-moz-focusring {
-	outline: 1px dotted ButtonText
-}
-
-::-webkit-file-upload-button {
-	-webkit-appearance: button;
-	font: inherit
-}
-
-@-ms-viewport {
-	width: device-width
-}
-
-*,
-html {
-	-webkit-box-sizing: border-box;
-	box-sizing: border-box
-}
 
 html {
 	-ms-overflow-style: scrollbar
 }
 
-::after,
-::before {
-	-webkit-box-sizing: inherit;
-	box-sizing: inherit
-}
+
 
 .container {
 	width: 100%;
@@ -82,16 +48,11 @@ html {
 	margin-left: auto
 }
 
-* {
-	-webkit-tap-highlight-color: transparent;
-	-webkit-transition: .3s all;
-	-o-transition: .3s all;
-	transition: .3s all
-}
+
 
 body,
 html {
-	font-family: 'Inter', sans-serif
+	font-family: 'Poppins', sans-serif;
 }
 
 a,
@@ -275,8 +236,6 @@ button:focus {
 	-webkit-box-shadow: 0 -2px 24px rgba(160, 163, 189, .25);
 	box-shadow: 0 -2px 24px rgba(160, 163, 189, .25);
 	border-radius: 4px;
-	opacity: 0;
-	visibility: hidden;
 	-webkit-transition: .3s all;
 	-o-transition: .3s all;
 	transition: .3s all;
@@ -314,9 +273,8 @@ button:focus {
 
 input {
 	border-radius: 6px;
-	background-color: #eff0f6;
 	min-height: 40px;
-	border: solid transparent 2px !important
+	/* border: solid transparent 2px !important */
 }
 
 input::-webkit-input-placeholder {
@@ -627,13 +585,16 @@ input:enabled:read-write:-webkit-any(:focus, :hover)::-webkit-calendar-picker-in
     background-color: #fff;
     min-width: 120px; /* Adjust as needed */
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    z-index: 1;
+    z-index: 2;
 }
 
 /* Show the dropdown menu on hover */
 .nav-user-wrapper:hover .nav-user-dropdown {
     display: block;
 }
+
+
+
 
 .main-nav .nav-user-wrapper .users-item-dropdown a.danger {
 	color: #f26464
@@ -689,7 +650,7 @@ input:enabled:read-write:-webkit-any(:focus, :hover)::-webkit-calendar-picker-in
 
 .users-item-dropdown {
 	right: 20px;
-	top: 60px;
+	top: 30px;
 	width: 125px
 }
 
@@ -763,4 +724,6 @@ input:enabled:read-write:-webkit-any(:focus, :hover)::-webkit-calendar-picker-in
 		justify-content: space-between;
 		width: 100%
 	}
-}
+} 
+
+

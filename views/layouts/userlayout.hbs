@@ -20,7 +20,7 @@
     <header>
       <nav class="navbar navbar-expand-lg "
         style="height: 6.5675rem; background-color: #6A9739;">
-        <div class="container-fluid">
+        <div class="container">
           <a class="navbar-brand" href="#">
             <img src="/images/organic-store-white-logo.png" alt="Organic"
               width="80" height="40">
@@ -32,7 +32,7 @@
             <span class="navbar-toggler-icon">
             </button>
             <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-              <div class="navbar-nav">
+              <div class="navbar-nav d-flex flex-row align-items-center">
                 <ul class="navbar-nav">
                   <li class="nav-item">
                     <a class="nav-link active" aria-current="page"
@@ -43,183 +43,199 @@
                       id="shopDropdown"
                       role="button" data-bs-toggle="dropdown"
                       aria-expanded="false">
-                      Shop
+                      Categories
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="shopDropdown">
                       {{#each categories}}
-                        <li><a class="dropdown-item" href="/productList?categoryId={{this._id}}">{{this.name}}</a></li>
-                        {{/each}}
-                      </ul>
-                    </li>
-                    <li class="nav-item dropdown">
-                      <a class="nav-link dropdown-toggle" href="#"
-                        id="offersDropdown"
-                        role="button" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                        Offers
-                      </a>
-                      <ul class="dropdown-menu"
-                        aria-labelledby="offersDropdown">
-                        <li><a class="dropdown-item" href="#">New
-                            Arrivals</a></li>
-                        <li><a class="dropdown-item" href="#">Weekly
-                            Deals</a></li>
-                      </ul>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">Wallet</a>
-                    </li>
-                  </ul>
-                  <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                    <div class="d-flex flex-row justify-content-end gap-10">
-                      <span class="navlink-container">
-                        <li class="nav-item">
-                          <a class="nav-link" href="#">About Us</a>
-                        </li>
-                        <li class="nav-item">
-                          <a class="nav-link" href="#">Contact Us</a>
-                        </li>
-                        <div class="d-flex flex-row justify-content-end gap-2">
-                          <li class="nav-item dropdown">
-                            <div class="nav-link dropdown-toggle" role="button"
-                              id="accountDropdown" data-bs-toggle="dropdown"
-                              aria-expanded="false">
-                              <i class="bi bi-person-fill"></i>
-                            </div>
-                            <ul class="dropdown-menu dropdown-menu-end"
-                              aria-labelledby="accountDropdown">
-                              {{#if loggedIn}}
-                              <li><a class="dropdown-item"
-                                  href="/logout">Logout</a></li>
-                              {{else}}
-                              <li><a class="dropdown-item"
-                                  href="/login">Login</a></li>
-                              {{/if}}
-                            </ul>
-                          </li>
-                          <li class="nav-item">
-                            <a href="#" type="button" class="btn  btn-small">
-                              <i class="bi bi-heart-fill"></i>
-                            </a>
-                          </li>
-                          <li class="nav-item">
-                            <a href="#" type="button" class="btn  btn-small">
-                              <i class="bi bi-cart-fill"></i>
-                            </a>
-                          </li>
-                        </div>
-
-                      </div>
-                    </span>
-
-                  </div>
+                      <li><a class="dropdown-item"
+                          href="/productList?categoryId={{this._id}}">{{this.name}}</a></li>
+                      {{/each}}
+                    </ul>
+                  </li>
+                  <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#"
+                      id="offersDropdown"
+                      role="button" data-bs-toggle="dropdown"
+                      aria-expanded="false">
+                      Offers
+                    </a>
+                    <ul class="dropdown-menu"
+                      aria-labelledby="offersDropdown">
+                      <li><a class="dropdown-item" href="#">New
+                          Arrivals</a></li>
+                      <li><a class="dropdown-item" href="#">Weekly
+                          Deals</a></li>
+                    </ul>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="#">Wallet</a>
+                  </li>
                 </ul>
-              </div>
-            </div>
-          </div>
-        </nav>
-
-      </header>
-
-      <main>
-        {{{body}}}
-      </main>
-      <footer class="rectangle-parent">
-        <div class="rectangle"></div>
-        <div class="child-frame">
-          <!-- Footer content goes here -->
-          <div class="content-frame">
-            <a class="sub-frames" href="#">
-              <img
-                class="rectangle-shape-icon"
-                loading="lazy"
-                alt="organic"
-                src="/images/organic-store-white-logo.png" />
-            </a>
-            <div class="maecenas-mi-justo">
-              Maecenas mi justo, interdum at consectetur vel, tristique et arcu.
-              Ut quis eros blandit, ultrices diam in, elementum ex. Suspendisse
-              quis faucibus urna. Suspendisse pellentesque.
-            </div>
-          </div>
-          <div class="parent-frame">
-            <div class="links-frame">
-              <h3 class="quick-links">Quick Links</h3>
-              <div class="page-frames">
-                <a class="about" href="#">About</a>
-                <a class="cart" href="#">Cart</a>
-                <a class="checkout" href="#">Checkout</a>
-                <a class="contact" href="#">Contact</a>
-                <a class="home" href="#">Home</a>
-                <a class="my-account" href="#">My account</a>
-                <a class="shop" href="#">Shop</a>
-              </div>
-              <div class="footer-frame">
-                <h3 class="site-links">Site Links</h3>
-                <div class="policies-frame">
-                  <a class="privacy-policy" href="#">Privacy Policy</a>
-                  <a class="shipping-details" href="#">Shipping Details<av>
-                      <a class="offers-coupons" href="#">Offers Coupons</a>
-                      <a class="terms-conditions" href="#">Terms &
-                        Conditions</a>
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                  <div class="d-flex flex-row justify-content-end gap-10">
+                    <span class="navlink-container">
+                      <li class="nav-item">
+                        <a class="nav-link" href="#">About Us</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" href="#">Contact Us</a>
+                      </li>
+                      <div class="d-flex flex-row justify-content-end gap-2">
+                        <li class="nav-item dropdown">
+                          <div class="nav-link dropdown-toggle" role="button"
+                            id="accountDropdown" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            <span class="nav-user-img">
+                              <img
+                                style="width: 40px; height: 40px; border-radius: 50%;"
+                                src="/images/admin.jpg"
+                                alt="User name">
+                              <span class="online-dot"></span>
+                            </span>
+                          </div>
+                          {{#if userData}}
+                          <ul class="dropdown-menu dropdown-menu-end"
+                            aria-labelledby="accountDropdown">
+                            <li><a class="dropdown-item"
+                                href="##">{{userData.userName}}</a></li>
+                            <li><a class="dropdown-item" href="##">Account
+                                Settings</a></li>
+                            <li><a class="dropdown-item"
+                                href="/logout">Logout</a></li>
+                          </ul>
+                          {{else}}
+                          <ul class="dropdown-menu dropdown-menu-end"
+                            aria-labelledby="accountDropdown">
+                            <li><a class="dropdown-item"
+                                href="/login">LogIn</a></li>
+                          </ul>
+                          {{/if}}
+                        </li>
+                        <li class="nav-item">
+                          <a href="#" type="button" class="btn  btn-small">
+                            <i class="bi bi-heart-fill"></i>
+                          </a>
+                        </li>
+                        <li class="nav-item">
+                          <a href="/cart" type="button" class="btn  btn-small">
+                            <i class="bi bi-cart-fill"></i>
+                          </a>
+                          <!-- Display cart count or other information -->
+                          {{!-- <span>{{ userCart.items.length }}</span> --}}
+                        </li>
+                        <li>
+                        </li>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              </div>
-              <div class="shipping-details1">
-                <div class="offers-frame">
-                  <div class="coupons-frame">
-                    <h3><a class="download-our-mobile" href="#"> Download Our
-                        Mobile App</a> </h3>
-                    <div class="lorem-ipsum-dolor">
-                      Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                      Donec
-                      aliquam gravida sollicitudin. Praesent porta enim mi, non
-                      tincidunt libero interdum sit amet.
-                    </div>
-                  </div>
-                  <div class="link-text">
-                    <h3 class="quick-links1">Quick Links</h3>
-                    <div class="store-frame">
-                      <a class="know-more-about" href="#">Know More About Us</a>
-                      <a class="visit-store" href="#">Visit Store</a>
-                      <a class="lets-connect" href="#">Let’s Connect</a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="copyright-frame">
-              <!-- Copyright content goes here -->
-              <div class="rectangle1"></div>
-              <div class="copyright-2024">Copyright © 2024 | Organic Store</div>
-
-              <ul class="ms-auto mb-2 mb-lg-0">
-                <div class="d-flex flex-row justify-content-end gap-10">
-                  <button type="button" class="btn btn-small">
-                    <i class="bi bi-facebook"></i>
-                  </button>
-                  <button type="button" class="btn btn-small">
-                    <i class="bi bi-twitter-x"></i>
-                  </button>
-                  <button type="button" class="btn btn-small">
-                    <i class="bi bi-instagram"></i>
-                  </button>
-                  <button type="button" class="btn btn-small">
-                    <i class="bi bi-threads"></i>
-                  </button>
+                  </span>
                 </div>
               </ul>
             </div>
-          </footer>
+          </div>
+        </div>
+      </nav>
 
-          <script
-            src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-            integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
-            crossorigin="anonymous"></script>
-          <script
-            src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
-            integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
-            crossorigin="anonymous"></script>
-        </body>
-      </html>
+    </header>
+
+    <main>
+      {{{body}}}
+    </main>
+    <footer class="rectangle-parent">
+      <div class="rectangle"></div>
+      <div class="child-frame">
+        <!-- Footer content goes here -->
+        <div class="content-frame">
+          <a class="sub-frames" href="#">
+            <img
+              class="rectangle-shape-icon"
+              loading="lazy"
+              alt="organic"
+              src="/images/organic-store-white-logo.png" />
+          </a>
+          <div class="maecenas-mi-justo">
+            Maecenas mi justo, interdum at consectetur vel, tristique et arcu.
+            Ut quis eros blandit, ultrices diam in, elementum ex. Suspendisse
+            quis faucibus urna. Suspendisse pellentesque.
+          </div>
+        </div>
+        <div class="parent-frame">
+          <div class="links-frame">
+            <h3 class="quick-links">Quick Links</h3>
+            <div class="page-frames">
+              <a class="about" href="#">About</a>
+              <a class="cart" href="#">Cart</a>
+              <a class="checkout" href="#">Checkout</a>
+              <a class="contact" href="#">Contact</a>
+              <a class="home" href="#">Home</a>
+              <a class="my-account" href="#">My account</a>
+              <a class="shop" href="#">Shop</a>
+            </div>
+            <div class="footer-frame">
+              <h3 class="site-links">Site Links</h3>
+              <div class="policies-frame">
+                <a class="privacy-policy" href="#">Privacy Policy</a>
+                <a class="shipping-details" href="#">Shipping Details<av>
+                    <a class="offers-coupons" href="#">Offers Coupons</a>
+                    <a class="terms-conditions" href="#">Terms &
+                      Conditions</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="shipping-details1">
+              <div class="offers-frame">
+                <div class="coupons-frame">
+                  <h3><a class="download-our-mobile" href="#"> Download Our
+                      Mobile App</a> </h3>
+                  <div class="lorem-ipsum-dolor">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                    Donec
+                    aliquam gravida sollicitudin. Praesent porta enim mi, non
+                    tincidunt libero interdum sit amet.
+                  </div>
+                </div>
+                <div class="link-text">
+                  <h3 class="quick-links1">Quick Links</h3>
+                  <div class="store-frame">
+                    <a class="know-more-about" href="#">Know More About Us</a>
+                    <a class="visit-store" href="#">Visit Store</a>
+                    <a class="lets-connect" href="#">Let’s Connect</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="copyright-frame">
+            <!-- Copyright content goes here -->
+            <div class="rectangle1"></div>
+            <div class="copyright-2024">Copyright © 2024 | Organic Store</div>
+
+            <ul class="ms-auto mb-2 mb-lg-0">
+              <div class="d-flex flex-row justify-content-end gap-10">
+                <button type="button" class="btn btn-small">
+                  <i class="bi bi-facebook"></i>
+                </button>
+                <button type="button" class="btn btn-small">
+                  <i class="bi bi-twitter-x"></i>
+                </button>
+                <button type="button" class="btn btn-small">
+                  <i class="bi bi-instagram"></i>
+                </button>
+                <button type="button" class="btn btn-small">
+                  <i class="bi bi-threads"></i>
+                </button>
+              </div>
+            </ul>
+          </div>
+        </footer>
+
+        <script
+          src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+          integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+          crossorigin="anonymous"></script>
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
+          integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
+          crossorigin="anonymous"></script>
+      </body>
+    </html>

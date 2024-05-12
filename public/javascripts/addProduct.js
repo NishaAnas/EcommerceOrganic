@@ -22,6 +22,7 @@
         document.getElementById('container').innerHTML = image_show();
     }
 
+    
     function image_show() {
         var imageHTML = "";
         images.forEach(function (img, index) {
@@ -85,7 +86,7 @@
         }
     
         // Title validation
-        const titleRegex = /^[A-Za-z\s]+$/;
+        const titleRegex = /^[A-Za-z0-9\s]+$/;
         if (!title) {
             isValid = false;
             titleError.innerHTML = 'Title is required.';
@@ -95,7 +96,7 @@
         }
     
         // Description validation
-        const descriptionRegex = /^[A-Za-z0-9\s]+$/;
+        const descriptionRegex = /^[A-Za-z0-9.,\s]+$/;
         if (!description) {
             isValid = false;
             descriptionError.innerHTML = 'Description is required.';
@@ -128,4 +129,10 @@
             form.submit();
         }
     });
-    
+    const addAttributesButton = document.getElementById('add_atrubutes');
+
+if (addAttributesButton) {
+  addAttributesButton.addEventListener('click', () => {
+    $('#addAttributesModal').modal('show');
+  });
+}

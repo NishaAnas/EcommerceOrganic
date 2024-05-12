@@ -59,26 +59,6 @@
       </li>
       {{/each}}
     </ul>
-     {{!-- <!-- Pagination -->
-    <div class="pagination-container">
-        <ul class="pagination justify-content-center mt-5">
-            <!-- Previous page button -->
-            <li class="page-item {{if_eq currentPage 1 'disabled'}}">
-                <a href="/?page={{if_gt currentPage 1 (sub currentPage 1)}}" class="page-link">Previous</a>
-            </li>
-
-            <!-- Pagination buttons -->
-            {{#each pagination}}
-            <li class="page-item {{if_eq this currentPage 'active'}}">
-                <a href="/?page={{this}}" class="page-link">{{this}}</a>
-            </li>
-            {{/each}}
-
-            <!-- Next page button -->
-            <li class="page-item {{if_eq currentPage totalPages 'disabled'}}">
-                <a href="/?page={{if_lt currentPage totalPages (add currentPage 1)}}" class="page-link">Next</a>
-            </li>
-        </ul>
-    </div> --}}
-    {{!-- <script src="/javascripts/product.js"></script> --}}
+    
+    <script src="/javascripts/product.js"></script>
 </body>

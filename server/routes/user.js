@@ -98,6 +98,15 @@ router.get('/productDetails/:productId',prodController.productDetails)
 
 
 //GET Cart page
-router.get('/shoppingCart/:userId',cartController.showShoppingCart)
+router.get('/cart',cartController.showShoppingCart)
 
+//POST AddToCart
+router.post('/addToCart',cartController.addToCart)
+
+//Delete Cart Product
+router.post('/removeCartProduct/:_id',cartController.deleteCartProduct);
+
+//Empty Cart
+router.get('/emptyCart',cartController.getEmptyCart)
 module.exports = router;
+

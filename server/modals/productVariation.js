@@ -6,20 +6,23 @@ const productVariationSchema = new Schema({
     sku: {
         type: String,
         required: true,
-        unique: true // Ensures unique variation SKU within a product
+        unique: true 
     },
-    attributes: {
-        type: [{
-            name: {
-                type: String,
-                required: true
-            },
-            value: {
-                type: String,
-                required: true
-            }
-        }],
-        required: true // Array of objects describing variation details (e.g., size, color)
+    productId:{
+        type: Schema.Types.ObjectId,
+        ref: 'Product'
+    },
+    attributeName:{
+        type: String,
+        required: true
+    },
+    attributeValue: {
+        type: String,
+        required: true
+    },
+    images: {
+        type: [String],
+        required: true 
     },
     price: {
         type: Number,

@@ -36,10 +36,10 @@ const productSchema = new Schema({
       type: Boolean,
       default: false
     },
-    // variations: {
-    //   type: [productVariationSchema],
-    //   value:null// Array of embedded product variation documents
-    // }
-  });
+    variations: [{
+      type: Schema.Types.ObjectId,
+      value:'product_Variation' //Reference to the product variation collection
+    }]
+  },{timestamps:true});
   
   module.exports = mongoose.model('product', productSchema);

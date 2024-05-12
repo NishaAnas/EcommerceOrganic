@@ -1,21 +1,29 @@
-  function validateForm(event) {
-    event.preventDefault(); // Prevent default form submission behavior
+const email = document.getElementById("email");
+const email_error = document.getElementById("email_error");
 
-    var email = document.getElementById("email").value;
+const form = document.getElementById('forgotPassword');
 
-    // Email validation
-    var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      alert("Please enter a valid email address");
-      return false;
-    }
+form.addEventListener('submit',(e)=>{
+  e.preventDefault();
+  let isValid = true;
 
-    // Email length validation
-    if (email.length > 50) {
-      alert("Email address should not exceed 50 characters");
-      return false;
-    }
+  email_error.innerHTML = "";
+  const emailValue = email.value.trim();
 
-    // If all validations pass, allow form submission
-    document.querySelector("form").submit();
-  }
+   //validation of email Address
+   const email_regex = /^[a-z]{3,}@[a-z]+\.(com|in|org|net)$/;
+   if (emailValue.trim().length > 50 || emailValue.trim().length < 8) {
+     isValid = false;
+     email_error.innerHTML = "Enter valid email address"
+   }else
+    if(!email_regex.test(emailValue)){
+     isValid = false;
+   email_error.innerHTML = 'Enter a valid Email Address'
+ }
+
+ if(isValid){
+  form.submit();
+}
+
+});
+  

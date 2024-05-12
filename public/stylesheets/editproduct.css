@@ -56,3 +56,48 @@ body {
     font-weight: normal;
     cursor: pointer;
 }
+
+.Vactive {
+    color: black;
+    background-color: rgb(68, 226, 68);
+    padding: 5px; 
+    border-radius: 10px;
+  }
+  
+  .Vdeactive {
+    color: black;
+    background-color: rgb(203, 80, 80);
+    padding: 5px; 
+    border-radius: 8px;
+  }
+
+  .responsiveTable {
+    width:100%;
+  }
+  .col-1 {
+    width: 10%;
+  }
+  .col-2 {
+    width: 20%;
+  }
+  .col-3 {
+    width: 20%;
+  }
+  .col-4 {
+    width: 10%;
+  }
+  .col-5 {
+    width: 10%;
+  }
+  .col-6 {
+    width: 10%;
+  }
+  .col-7 {
+    width: 20%;
+  }
+  .col-8 {
+    width:20%;   
+  }
+  .actionButtons {
+    display: flex;
+  }

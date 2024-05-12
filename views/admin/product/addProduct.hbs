@@ -2,6 +2,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <body>
     <div class="container ">
+        
     <h1 class="text-center mb-4 ">Add New Product</h1>
     <div class="row ">
         <div class="col">
@@ -26,17 +27,16 @@
     {{/if}}
     <form id="addProductForm" action="/admin/addProduct" method="post"
         enctype="multipart/form-data">
-        <div class="d-flex flex-column align-items-stretch gap-4">
-            <div class="row mb-4">
-                <label for="product-sku" class="col-sm-2 col-form-label">Product
-                    SKU:</label>
+        <div class="row form-group mb-4 p-3 gap-4">
+            <div class="col">
+                <label for="product-sku" class="col-form-label">Product SKU:</label>
                 <div class="col-sm-10">
                     <input type="text" id="product-sku" name="sku"
                         class="form-control"  >
                     <span id="sku_error" style="color: red;"></span>
                 </div>
             </div>
-            <div class="row mb-4">
+            <div class="col">
                 <label for="product-title"
                     class="col-sm-2 col-form-label">Title:</label>
                 <div class="col-sm-10">
@@ -45,71 +45,60 @@
                     <span id="title_error" style="color: red;"></span>
                 </div>
             </div>
-             <div class="row mb-4">
-                <label for="product-description"
-                    class="col-sm-2 col-form-label">Description:</label>
-                <div class="col-sm-10">
-                    <textarea id="product-description" name="description" cols="20" rows="6" class="form-control" placeholder="Product Details"  ></textarea>
-            <span id="description_error" style="color: red;"></span>
-                </div>
-            </div>
-            <div>
-                <div class="row mb-4">
-                    <label for="product-price"
-                        class="col-sm-2 col-form-label">Price:</label>
+        </div>
+            <div class="row form-group mb-4 p-3 gap-4">
+                <div class="col">
+                    <label for="product-price" class="col-sm-2 col-form-label">Price:</label>
                     <div class="col-sm-10">
-                        <input type="number" id="product-price" name="price"
-                            class="form-control"  >
+                        <input type="number" id="product-price" name="price" class="form-control"  >
                         <span id="price_error" style="color: red;"></span>
                     </div>
                 </div>
-                <div class="row mb-4">
-                    <label for="product-category"
-                        class="col-sm-2 col-form-label">Category:</label>
+                <div class="col">
+                    <label for="product-category"class="col-sm-2 col-form-label">Category:</label>
                     <div class="col-sm-10">
-                        <select id="product-category" name="categoryId"
-                            class="form-select"  >
-                            {{#each categories}}
-                            <option value="{{this._id}}">{{this.name}}</option>
+                        <select id="product-category" name="categoryId"class="form-select"  >
+                            {{#each categories}}<option value="{{this._id}}">{{this.name}}</option>
                             {{/each}}
                         </select>
                         <span id="category_error" style="color: red;"></span>
                     </div>
-                        <div class="row mb-4 py-4">
-                            <label for="isActive"
-                        class="col-sm-2 col-form-check-label">isActive:</label>
-                    <div class="col-sm-10 form-check form-switch" style="padding-left: 4.5em;">
-                             <input class="form-check-input" name="isActive"  type="checkbox" role="switch" id="isActive" style="min-height: 70%; ">
-                    </div>
+                </div>
+            </div>
+            <div class="row form-group mb-4 p-3 gap-4">
+                <div class="col">
+                    <label for="isActive" class="col-sm-2 col-form-check-label">isActive:</label>
+                        <div class="col-sm-10 form-check form-switch" style="padding-left: 4.5em;">
+                            <input class="form-check-input" name="isActive"  type="checkbox" role="switch" id="isActive" style="min-height: 70%; ">
                         </div>
-                        <div class="container mt-3 w-100 py-4">
-                            <div class="card shadow-sm w-100">
-                                <div class="card-header d-flex justify-content-between">
-                                    <h4>Upload Images</h4>
-                                    <form action="#" class="form" id="form"> 
-                                    <input type="file" name="image" id="product-image" multiple class="d-none" onchange="image_select()" >
+                </div>
+            </div>
+            <div class="container mt-3 w-100 py-4">
+                <div class="card shadow-sm w-100">
+                    <div class="card-header d-flex justify-content-between">
+                        <h4>Upload Images</h4>
+                            <form action="#" class="form" id="form"> 
+                                <input type="file" name="image" id="product-image" multiple class="d-none" onchange="image_select()" >
                                     <button class="btn btn-sm btn-primary" type="button" onclick="document.getElementById('product-image').click()">
                                         Choose Images
                                     </button>
-                                    </form>
-                                </div>
-                                <div class="card-body d-flex flex-wrap justify-content-start" id="container">
-                                    
-                                </div>
-                            </div>
-                        </div>
-                        <span id="image_error" style="color: red;"></span>
-                        <div class="row">
-                            <div class="col-sm-10 offset-sm-2">
-                                <button type="submit" name="addProduct"
-                                    class="btn btn-primary p-3"
-                                    style="width: 100%; background-color: #6A9739;">Add
-                                    Product</button>
-                            </div>
+                            </form>
+                    </div>
+                    <div class="card-body d-flex flex-wrap justify-content-start" id="container">
+                        
                     </div>
                 </div>
-            </form>
             </div>
-            <script src="/javascripts/addProduct.js"></script>
-
+            <span id="image_error" style="color: red;"></span>
+                <div class="row">
+                    <div class="col-sm-10 offset-sm-2">
+                        <button type="submit" name="addProduct"class="btn btn-primary p-3"style="width: 100%; background-color: #6A9739;">Add
+                            Product</button>
+                    </div>
+                </div>
+        </div>
+    </form>
+</div>
 </body> 
+    <script src="/javascripts/addProduct.js"></script>
+    
