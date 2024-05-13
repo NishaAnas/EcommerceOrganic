@@ -21,18 +21,21 @@
                                         <figure class="itemside align-items-center">
                                             <div class="aside"><img src={{productImage}} class="img-sm"></div>
                                             <figcaption class="info"> <a href="#" class="title text-dark" data-abc="true">{{productName}}</a>
-                                                <p class="text-muted small">{{category}}<br>Quantity: {{quantity}}<br>Base Price:{{basePrice}}</p>
+                                                <p class="text-muted small">{{category}}<br>Quantity: <span class="quantity" id="productquantity-{{productId}}">{{quantity}}</span><br>Base Price:{{basePrice}}</p>
                                             </figcaption>
                                         </figure>
                                     </td>
-                                    <td> <select class="form-control">
-                                            <option {{#if (isEqual quantity 1)}} selected {{/if}}>1</option>
-                                            <option {{#if (isEqual quantity 2)}} selected {{/if}}>2</option>
-                                            <option {{#if (isEqual quantity 3)}} selected {{/if}}>3</option>
-                                            <option {{#if (isEqual quantity 4)}} selected {{/if}}>4</option>
+                                    <td> <select class="form-control quantity-select" data-product-id="{{productId}}">
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
                                         </select>
                                     <td>
-                                        <div class="price-wrap"> <var class="price">{{totalPrice}}</var> <small class="text-muted"> {{basePrice}} X {{quantity}} </small> </div>
+                                        <div class="price-wrap"> 
+                                            <var class="price" id="total-price-{{productId}}">{{totalPrice}}</var> 
+                                            <small class="text-muted"> {{basePrice}} X <span class="quantity" id="quantity-{{productId}}"  data-base-price="{{basePrice}}">{{quantity}}</span> </small> 
+                                        </div>
                                     </td>
                                     <td class="text-right d-none d-md-block">
                                         <form id="removeForm" method="POST" action="/removeCartProduct/{{productId}}">
@@ -62,11 +65,11 @@
                     <div class="card-body">
                         <dl class="dlist-align">
                             <dt>Total Quantity:</dt>
-                            <dd class="text-right ml-3"><strong>  {{totalQuantity}}</strong> </dd>
+                            <dd class="text-right ml-3"><strong class="total-quantity">{{totalQuantity}}</strong></dd>
                         </dl>
                         <dl class="dlist-align">
                             <dt>Total price:</dt>
-                            <dd class="text-right ml-3"><strong>  {{totalPriceOfAllProducts}}</strong></dd>
+                            <dd class="text-right ml-3"><strong class="total-price-of-all-products">{{totalPriceOfAllProducts}}</strong></dd>
                         </dl>
                         <dl class="dlist-align">
                             <dt>Discount:</dt>
@@ -74,7 +77,7 @@
                         </dl>
                         <dl class="dlist-align">
                             <dt>Total:</dt>
-                            <dd class="text-right text-dark b ml-3"><strong> {{totalPriceOfAllProducts}}</strong></dd>
+                            <dd class="text-right ml-3"><strong class="total-price-of-all-products">{{totalPriceOfAllProducts}}</strong></dd>
                         </dl>
                         <hr> <a href="#" class="btn btn-out btn-primary btn-square btn-main" data-abc="true"> Make Purchase </a>
                         <a href="#" class="btn btn-out btn-success btn-square btn-main mt-2" data-abc="true">Continue Shopping</a>
@@ -84,3 +87,5 @@
         </div>
     </div>
 </body>
+                    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                    <script src="/javascripts/shoppingCart.js"></script>

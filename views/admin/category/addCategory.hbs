@@ -22,8 +22,7 @@
             {{success}}
           </div>
           {{/if}} 
-          <form action="/admin/addcategory" method="post" id="addCategoryForm">
-
+          <form action="/admin/addcategory" method="post" id="addCategoryForm" enctype="multipart/form-data">
           <div class="row form-group mb-4 p-3 gap-4">
             <div class="col">
               <label for="category-name" class="col-sm-2 col-form-label">Category Name:</label>
@@ -52,6 +51,22 @@
                 </div>
               </div>
           </div>
+          <div class="container mt-3 w-100 py-4">
+                <div class="card shadow-sm w-100">
+                    <div class="card-header d-flex justify-content-between">
+                        <h4>Upload Images</h4>
+                            <form action="#" class="form" id="form"> 
+                                <input type="file" name="image" id="product-image" multiple class="d-none" onchange="image_select()" >
+                                    <button class="btn btn-sm btn-primary" type="button" onclick="document.getElementById('product-image').click()">
+                                        Choose Images
+                                    </button>
+                            </form>
+                    </div>
+                    <div class="card-body d-flex flex-wrap justify-content-start" id="container">
+                        
+                    </div>
+                </div>
+            </div>
     <div class="row">
         <div class="col-sm-10 offset-sm-2">
           <span id="form_error" style="color: red;" ></span>

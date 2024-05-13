@@ -52,11 +52,11 @@ try {
 
 //POST Add Product
 exports.postAddProduct= async(req,res)=>{
-const {sku,title, productDescription,price,categoryId,isActive } = req.body; 
+const {sku,title,name,price,categoryId,isActive } = req.body; 
 
 const existingProduct = await product.findOne({ title: req.body.title });
         
-        // If another product with the same name exists and has a different ID
+        // If another product with the same name exists
         if (existingProduct) {
             const existingProductName = existingProduct.title.toLowerCase().trim();
             const requestedProductName = req.body.title.toLowerCase().trim();
@@ -76,7 +76,7 @@ console.log(`sku:${sku},title:${title}, description:${productDescription},price:
 const newProduct = new product({
     sku:sku,
     title:title,
-    description:productDescription,
+    name:name,
     price:price,
     images:imagePaths,
     categoryId:categoryId,
@@ -112,7 +112,7 @@ try {
     const productVariations = await prodVariation.find({ productId: req.params._id, isDeleted: false}).lean();
     const productCategory = await category.find().lean();
     
-    res.render('admin/product/editProduct', { success: successMessage, error: errorMessage ,locals,productCategory, categoryName,  productDetailsViewing, productVariations, layout: 'adminlayout' });
+    res.render('admin/product/editProduct', { success: successMessage, error: errorMessage ,locals,productCategory,  productDetailsViewing, productVariations, layout: 'adminlayout' });
 } catch (error) {
     console.log(error)
     req.flash('error', 'Server Error');
@@ -154,6 +154,7 @@ console.log(imagePath);
 await product.findByIdAndUpdate(req.params._id, {
     sku: req.body.sku,
     title: req.body.producttitle,
+    name:req.body.productname,
     price: req.body.productPrice,
     categoryId: req.body.categoryId,
     description: req.body.productDetails,

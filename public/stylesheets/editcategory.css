@@ -38,3 +38,22 @@ body {
         flex-direction: column;
     }
 }
+
+.image-container{
+    height: 120px;
+    width: 200px;
+    border-radius: 6px;
+    overflow: hidden;
+}
+.image-container img{
+    height: 100px;
+    width: auto;
+    object-fit: cover;
+}
+.image-container span{
+    right: 20px;
+    color: black;
+    font-size: 28px;
+    font-weight: normal;
+    cursor: pointer;
+}

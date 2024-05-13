@@ -18,128 +18,86 @@
   </head>
   <body>
     <header>
-      <nav class="navbar navbar-expand-lg "
-        style="height: 6.5675rem; background-color: #6A9739;">
+      <nav class="navbar navbar-expand-lg "style="height: 6.5675rem; background-color: #6A9739;">
         <div class="container">
           <a class="navbar-brand" href="#">
-            <img src="/images/organic-store-white-logo.png" alt="Organic"
-              width="80" height="40">
+            <img src="/images/organic-store-white-logo.png" alt="Organic"width="80" height="40">
           </a>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-            data-bs-target="#navbarNavAltMarkup"
-            aria-controls="navbarNavAltMarkup" aria-expanded="false"
-            aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon">
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-              <div class="navbar-nav d-flex flex-row align-items-center">
-                <ul class="navbar-nav">
-                  <li class="nav-item">
-                    <a class="nav-link active" aria-current="page"
-                      href="/">Home</a>
-                  </li>
-                  <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#"
-                      id="shopDropdown"
-                      role="button" data-bs-toggle="dropdown"
-                      aria-expanded="false">
-                      Categories
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="shopDropdown">
-                      {{#each categories}}
-                      <li><a class="dropdown-item"
-                          href="/productList?categoryId={{this._id}}">{{this.name}}</a></li>
-                      {{/each}}
-                    </ul>
-                  </li>
-                  <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#"
-                      id="offersDropdown"
-                      role="button" data-bs-toggle="dropdown"
-                      aria-expanded="false">
-                      Offers
-                    </a>
-                    <ul class="dropdown-menu"
-                      aria-labelledby="offersDropdown">
-                      <li><a class="dropdown-item" href="#">New
-                          Arrivals</a></li>
-                      <li><a class="dropdown-item" href="#">Weekly
-                          Deals</a></li>
-                    </ul>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="#">Wallet</a>
-                  </li>
-                </ul>
-                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                  <div class="d-flex flex-row justify-content-end gap-10">
-                    <span class="navlink-container">
-                      <li class="nav-item">
-                        <a class="nav-link" href="#">About Us</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="#">Contact Us</a>
-                      </li>
-                      <div class="d-flex flex-row justify-content-end gap-2">
-                        <li class="nav-item dropdown">
-                          <div class="nav-link dropdown-toggle" role="button"
-                            id="accountDropdown" data-bs-toggle="dropdown"
-                            aria-expanded="false">
-                            <span class="nav-user-img">
-                              <img
-                                style="width: 40px; height: 40px; border-radius: 50%;"
-                                src="/images/admin.jpg"
-                                alt="User name">
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse"data-bs-target="#navbarNavAltMarkup"
+            aria-controls="navbarNavAltMarkup" aria-expanded="false"aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon">
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav d-flex flex-row align-items-center">
+              <ul class="navbar-nav">
+                <li class="nav-item">
+                  <a class="nav-link active" aria-current="page" href="/">Home</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link active" aria-current="page" href="/categories">Categories</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link active" aria-current="page" href="#">Offers</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">Wallet</a>
+                </li>
+              </ul>
+              <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                <div class="d-flex flex-row justify-content-end gap-10">
+                  <span class="navlink-container">
+                    <li class="nav-item">
+                      <a class="nav-link" href="#">About Us</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="#">Contact Us</a>
+                    </li>
+                    <div class="d-flex flex-row justify-content-end gap-2">
+                      <li class="nav-item dropdown">
+                        <div class="nav-link dropdown-toggle" role="button" id="accountDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                          <span class="nav-user-img">
+                            <img style="width: 40px; height: 40px; border-radius: 50%;" src="/images/admin.jpg" alt="User name">
                               <span class="online-dot"></span>
-                            </span>
-                          </div>
+                          </span>
+                        </div>
                           {{#if userData}}
-                          <ul class="dropdown-menu dropdown-menu-end"
-                            aria-labelledby="accountDropdown">
-                            <li><a class="dropdown-item"
-                                href="##">{{userData.userName}}</a></li>
-                            <li><a class="dropdown-item" href="##">Account
-                                Settings</a></li>
-                            <li><a class="dropdown-item"
-                                href="/logout">Logout</a></li>
-                          </ul>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown">
+                              <li><a class="dropdown-item" href="##">{{userData.userName}}</a></li>
+                              <li><a class="dropdown-item" href="##">Account Settings</a></li>
+                              <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                            </ul>
                           {{else}}
-                          <ul class="dropdown-menu dropdown-menu-end"
-                            aria-labelledby="accountDropdown">
-                            <li><a class="dropdown-item"
-                                href="/login">LogIn</a></li>
-                          </ul>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown">
+                              <li><a class="dropdown-item" href="/login">LogIn</a></li>
+                            </ul>
                           {{/if}}
-                        </li>
-                        <li class="nav-item">
-                          <a href="#" type="button" class="btn  btn-small">
-                            <i class="bi bi-heart-fill"></i>
-                          </a>
-                        </li>
-                        <li class="nav-item">
-                          <a href="/cart" type="button" class="btn  btn-small">
-                            <i class="bi bi-cart-fill"></i>
-                          </a>
+                      </li>
+                      <li class="nav-item">
+                        <a href="#" type="button" class="btn  btn-small">
+                          <i class="bi bi-heart-fill"></i>
+                        </a>
+                      </li>
+                      <li class="nav-item">
+                        <a href="/cart" type="button" class="btn  btn-small">
+                          <i class="bi bi-cart-fill"></i>
+                        </a>
                           <!-- Display cart count or other information -->
                           {{!-- <span>{{ userCart.items.length }}</span> --}}
-                        </li>
-                        <li>
-                        </li>
-                      </div>
+                      </li>
                     </div>
-                  </span>
-                </div>
-              </ul>
+                  </div>
+                </ul>
             </div>
-          </div>
         </div>
-      </nav>
+      </div>
+    </div>
+  </nav>
 
-    </header>
+  </header>
 
-    <main>
-      {{{body}}}
-    </main>
+<main>
+  {{{body}}}
+</main>
     <footer class="rectangle-parent">
       <div class="rectangle"></div>
       <div class="child-frame">
@@ -237,5 +195,4 @@
           src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
           integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy"
           crossorigin="anonymous"></script>
-      </body>
     </html>

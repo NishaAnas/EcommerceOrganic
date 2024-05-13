@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const user = require('../../modals/user');
 const category = require('../../modals/categories');
 const Product = require('../../modals/product');
+const prodVariation =require('../../modals/productVariation');
 const shoppingCart = require('../../modals/shoppingCart');
 const crypto = require('crypto');
 
@@ -147,5 +148,37 @@ exports.deleteCartProduct = async(req,res)=>{
         console.error('Server Error:', error);
         req.flash('error', 'Server Error');
         res.redirect('/cart');
+    }
+}
+
+//Update Cart Product
+exports.updateCartItem = async(req,res)=>{
+    try {
+        const { productId, quantity } = req.body;
+
+        // Find the product to get its price
+        const product = await Product.findById(productId);
+
+        // Get the current user's shopping cart
+        const userId = req.session.userLoggedInData.userId;
+
+        // Update the quantity and total price of the product in the shopping cart
+        const updatedCartItem = await shoppingCart.findOneAndUpdate(
+            { user: userId, 'items.product': productId },
+            { $set: { 'items.$.quantity': quantity, 'items.$.totalPrice': product.price * quantity } },
+            { new: true }
+        );
+        
+        if (updatedCartItem) {
+            // Calculate the new total price of all products
+            const totalQuantity = updatedCartItem.items.reduce((acc, item) => acc + item.quantity, 0);
+            const totalPriceOfAllProducts = updatedCartItem.items.reduce((acc, item) => acc + item.totalPrice, 0);
+
+            // Send the updated total price and quantity back to the client
+            res.json({ totalPriceOfAllProducts, totalQuantity });
+        }
+    } catch (error) {
+        console.error('Error updating cart item:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 }

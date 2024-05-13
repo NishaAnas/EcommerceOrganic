@@ -10,6 +10,10 @@ const categorySchema = new Schema({
     description:{
         type:String
     },
+    images: {
+        type: [String],
+        required: true // Array of image URLs
+      },
     isActive: {
         type: Boolean,
         default: true

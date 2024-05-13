@@ -27,7 +27,7 @@
     <ul class="responsive-table">
         <li class="table-header">
         <div class="col col-1">Product <br>SKU</div>
-        <div class="col col-2">Title</div>
+        <div class="col col-2">Name</div>
         <div class="col col-3">Category</div>
         <div class="col col-4">Price</div>
         <div class="col col-5">Images</div>
@@ -37,7 +37,7 @@
         {{#each Product}}
         <li class="table-row">
         <div class="col col-1" data-label="product-sku">{{this.sku}}</div>
-        <div class="col col-2" data-label="product_title">{{this.title}}</div>
+        <div class="col col-2" data-label="product_title">{{this.name}}</div>
         <div class="col col-3" data-label="product_categoryname">{{this.categoryName}}</div>
         <div class="col col-4" data-label="product-price">{{this.price}}</div>
         <div class="col col-5" data-label="product_image"><img style="width: 50px; height: 50px;" src="/{{this.images.[0]}}" alt="Product Image"></div>

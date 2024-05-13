@@ -88,12 +88,17 @@ router.post('/verifyOtp',authController.postVerifyotp)
 router.get('/logout',authController.getLogout)
 
 
+//GET category Page
+router.get('/categories',prodController.getCategories)
 
 //GET Product Listing Page
 router.get('/productList',prodController.productListing)
 
 //GET Product Details Page
-router.get('/productDetails/:productId',prodController.productDetails)
+router.get('/productDetails/:variantId',prodController.productDetails)
+
+//GET Product Plus Page
+router.get('/productPlus/:productId',prodController.getProductPlus)
 
 
 
@@ -108,5 +113,9 @@ router.post('/removeCartProduct/:_id',cartController.deleteCartProduct);
 
 //Empty Cart
 router.get('/emptyCart',cartController.getEmptyCart)
+
+//Update Cart Item
+router.post('/updateCartItem', cartController.updateCartItem);
+
 module.exports = router;
 

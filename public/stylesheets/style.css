@@ -10,8 +10,6 @@ li{
 }
 .dropdown-menu.show {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-gap: 10px;
   background-color: #fff; /* Set background color */
   font-size: 14px; /* Set font size */
 }

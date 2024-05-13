@@ -1,10 +1,7 @@
 const user = require('../../modals/user')
 const category = require('../../modals/categories')
-const product = require('../../modals/product')
-const admin = require ('../../modals/admin')
 const { upload, resizeImages } = require('../../config/multer');
 const mongoose = require('mongoose')
-const bcrypt = require('bcrypt')
 const path = require('path');
 
 //Get Category Management Page
@@ -16,7 +13,7 @@ exports.getCategoryPage = async (req, res) => {
             description: 'Organic'
         }
 
-        const Category = await category.find({isDeleted: false}).lean();
+        const Category = await category.find({ isDeleted: false }).lean();
         const successMessage = req.flash('success');
         const errorMessage = req.flash('error');
         res.render('admin/category/category', { locals, Category, layout: 'adminlayout', success: successMessage, error: errorMessage })
@@ -34,22 +31,27 @@ exports.getaddCategoryPage = (req, res) => {
     res.render('admin/category/addCategory', { layout: 'adminlayout', success: successMessage, error: errorMessage })
 }
 
+
 //POST Add Category Page
 exports.postaddCategory = async (req, res) => {
     try {
         const { name, description, isActive } = req.body;
-
         const existingCategory = await category.findOne({ name: req.body.name });
-        
+
         // If another category with the same name exists
-        if (existingCategory ) {
+        if (existingCategory) {
             req.flash('error', 'Category name already exists');
             return res.redirect(`/admin/category`);
         }
 
+        const imagePaths = req.resizedImages.map(relativeImagePath => {
+            return `uploads\\${path.basename(relativeImagePath)}`;
+        });
+
         const newCategory = new category({
             name,
             description,
+            images: imagePaths,
             isActive: isActive === 'on' ? true : false // Convert string to boolean
         });
         await category.create(newCategory);
@@ -75,7 +77,7 @@ exports.editCategory = async (req, res) => {
         const errorMessage = req.flash('error');
         const categoryDetailsViewing = await category.findOne({ _id: req.params._id }).lean();
         console.log(categoryDetailsViewing)
-        res.render('admin/category/editCategory', { locals, categoryDetailsViewing, layout: 'adminlayout' ,success: successMessage, error: errorMessage});
+        res.render('admin/category/editCategory', { locals, categoryDetailsViewing, layout: 'adminlayout', success: successMessage, error: errorMessage });
     } catch (error) {
         req.flash('error', 'Server Error');
         res.redirect('/admin/category');
@@ -89,18 +91,30 @@ exports.editPutcategory = async (req, res) => {
     console.log(req.body)
     try {
         const existingCategory = await category.findOne({ name: req.body.categoryName });
-        
+
         // If another category with the same name exists and has a different ID
         if (existingCategory && existingCategory._id.toString() !== req.params._id) {
             req.flash('error', 'Category name already exists');
             return res.redirect(`/admin/editCategory/${req.params._id}`);
         }
 
+        let imagePath = [];
+        if (req.resizedImages && req.resizedImages.length > 0) {
+            imagePath = req.resizedImages.map(relativeImagePath => {
+                return `uploads\\${path.basename(relativeImagePath)}`
+            })
+        } else {
+            const existingCategory = await category.findById(req.params._id);
+            imagePath = existingCategory.images;
+        }
+        console.log(imagePath);
+
         await category.findByIdAndUpdate(req.params._id, {
             name: req.body.categoryName,
             description: req.body.categoryDetails,
-            isActive: req.body.isActive==='on',
-            isDeleted: req.body.isDeleted==='on',
+            images: imagePath,
+            isActive: req.body.isActive === 'on',
+            isDeleted: req.body.isDeleted === 'on',
         })
 
         console.log('Category updated Successfully');
@@ -117,10 +131,10 @@ exports.editPutcategory = async (req, res) => {
 exports.markdeleteCategory = async (req, res) => {
     try {
         await category.findByIdAndUpdate(req.params._id, {
-            $set : {
+            $set: {
                 isActive: false,
                 isDeleted: true
-            } 
+            }
         })
         console.log('Category  marked as deleted Successfully');
         req.flash('success', 'Category deleted successfully');

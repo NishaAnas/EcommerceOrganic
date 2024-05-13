@@ -32,7 +32,7 @@ router.get('/',authController.getAdminhomePage )
 router.get('/addcategory',categoryController.getaddCategoryPage)
 
 //POST Add category page
-router.post('/addcategory',categoryController.postaddCategory)
+router.post('/addcategory', upload.array('image'), resizeImages , categoryController.postaddCategory)
 
 //GET Category mangement page
 router.get('/category',categoryController.getCategoryPage )
@@ -41,7 +41,7 @@ router.get('/category',categoryController.getCategoryPage )
 router.get('/editCategory/:_id',categoryController.editCategory);
 
 //  /* POST Edit Category page.(UPDATE) */
-router.put('/editCategory/:_id',categoryController.editPutcategory)
+router.put('/editCategory/:_id', upload.array('image'), resizeImages ,categoryController.editPutcategory)
 
 // /* POST Edit Category page.(Delete) */
 router.put('/deleteCategory/:_id', categoryController.markdeleteCategory);

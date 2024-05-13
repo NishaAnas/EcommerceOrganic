@@ -42,10 +42,13 @@ body {
       flex-basis: 30%;
     }
     .col-2 {
-      flex-basis: 40%;
+      flex-basis: 30%;
     }
     .col-3 {
-      flex-basis: 40%;
+      flex-basis: 30%;
+    }
+    .col-3 {
+      flex-basis: 30%;
     }
     
     @media all and (max-width: 767px) {

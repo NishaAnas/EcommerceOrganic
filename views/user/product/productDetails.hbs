@@ -1,12 +1,13 @@
 {{!< userLayout}}
 <link rel="stylesheet" href="/stylesheets/productDetails.css">
+<link rel="stylesheet" href="/stylesheets/productlisting.css">
 <body>
     <div class="container">
         <div class="row m-5 d-flex flex-row align-items-center justify-content-between">
             <div class="col-md-4 ">
                 <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
                     <div class="carousel-inner">
-                        {{#each productDetails.images}}
+                        {{#each variantDetails.images}}
                         <div class="carousel-item {{#if (isEqual @index 0)}}active{{/if}}">
                             <img src="/{{this}}" class="d-block w-100" alt="Product Image" style="width: 50%; height: 50%;">
                         </div>
@@ -22,7 +23,7 @@
                     </button>
                 </div>
                 <div class="row mt-5">
-                    {{#each productDetails.images}}
+                    {{#each variantDetails.images}}
                     <div class="col-3">
                         <img src="/{{this}}"  class="img-thumbnail" alt="Thumbnail" data-bs-target="#productCarousel" data-bs-slide-to="{{@index}}">
                     </div>
@@ -30,22 +31,30 @@
                 </div>
             </div>
             <div class="col-md-6 py-2 d-flex flex-column py-3 ">
-                <h2>{{productDetails.title}}</h2>
-                <p><b>Details:</b><br><br>{{productDetails.description}}</p>
-                <p><b>Price:</b>{{productDetails.price}} Rupees</p>
+                <h2>{{variantDetails.attributeValue}}</h2>
+                <p>{{productDetails.name}}  <b> : </b> {{productDetails.title}}</p>
+                <p><b>Price:</b>{{actualPrice}} Rupees</p>
                 <div class="cart-button mt-3 px-2 d-flex justify-content-around align-items-center pb-5">
                     <form action="/addToCart" method="POST">
                         <!-- Hidden input field to store the product ID -->
-                        <input type="hidden" name="productId" value="{{productDetails._id}}">
-                            <button class="btn btn-primary text-uppercase" type="submit">
-                                Add to Cart
-                            </button>
+                        <input type="hidden" name="productId" value="{{variantDetails._id}}">
+                            {{#if productInCart}}
+                                <!-- Render a disabled button with a message if the product is already in the cart -->
+                                <button class="btn btn-success  text-uppercase" type="submit" disabled >
+                                    Already Added to Cart
+                                </button>
+                            {{else}}
+                                <!-- Render the "Add to Cart" button if the product is not in the cart -->
+                                <button class="btn btn-success  text-uppercase" type="submit" >
+                                    Add to Cart
+                                </button>
+                            {{/if}}
                     </form>
-                    <button class="btn btn-primary  text-uppercase">
+                    <button class="btn btn-success  text-uppercase">
                         Add to Wishlist
                     </button>
                 </div>
-                <p><b>Stock:</b> {{stock}}</p>
+                <p><b>Stock:</b> {{variantDetails.stock}}</p>
                 <p><b>Rating:</b> {{rating}}</p>
                 <h3><b>Reviews</b></h3>
                 <ul>
@@ -59,28 +68,21 @@
         <hr>
         <h3>Related Products</h3>
         <div class="row">
-
-
-            {{#each relatedProducts}}
-                    <div class="col-md-4">
+                    {{#each relatedProducts}}
+	            <div class="col-md-4">
+                    <hr>
                         <a  class="prod_card" href="/productDetails/{{this._id}}" class="product-link">
-                            <div class="product py-4">
-                                <span class="off bg-success">-25% OFF</span>
-                                <div class="text-center"><img class="card-img" src="/{{this.images.[0]}}" alt="{{title}}" loading="lazy"></div>
-                                <div class="about text-center">
-                                    <h5>{{title}}</h5>
-                                    <span>Price: {{price}}</span>
+                            <div class="profile-card-2"><img src="/{{this.images.[0]}}" alt="{{title}}" loading="lazy" class="img img-responsive">
+                                <div class="profile-name">
+                                    {{name}}
                                 </div>
-                                <div class="cart-button mt-3 px-2 d-flex justify-content-between align-items-center">
-                                    <button class="btn btn-primary text-uppercase">Details</button>
-                                    <div class="add">
-                                        <span class="product_fav"><i class="bi bi-heart"></i></i></span> <span class="product_fav"><i class="bi bi-cart3"></i></i></span>
-                                    </div>
+                                <div class="profile-username">
+                                    Min Price: {{price}}
                                 </div>
                             </div>
-                        </a> 
-                    </div>
-                    {{/each}}
+                        </a>
+                </div>
+            {{/each}}
         </div>
             </div>
         </div>

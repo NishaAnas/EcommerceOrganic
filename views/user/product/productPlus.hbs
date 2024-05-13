@@ -25,19 +25,19 @@
 
         <div class="container py-5">
         <h4 class="text-center">
-            <strong>{{Category.name}}</strong>
+            <strong>Shop For</strong>
         </h4>
         <div class="row">
-            {{#each products}}
+            {{#each productList}}
 	            <div class="col-md-4">
                     <hr>
-                        <a  class="prod_card" href="/productPlus/{{this._id}}" class="product-link">
-                            <div class="profile-card-2"><img src="/{{this.images.[0]}}" alt="{{title}}" loading="lazy" class="img img-responsive">
+                        <a  class="prod_card" href="/productDetails/{{this._id}}" class="product-link">
+                            <div class="profile-card-2"><img src="/{{this.images.[0]}}" alt="{{attributeName}}" loading="lazy" class="img img-responsive">
                                 <div class="profile-name">
-                                    {{name}}
+                                    {{attributeValue}}
                                 </div>
                                 <div class="profile-username">
-                                    Min Price: {{price}}
+                                     Buy At: {{price}}
                                 </div>
                             </div>
                         </a>
