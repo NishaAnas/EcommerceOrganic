@@ -5,6 +5,7 @@ var authController = require('../controller/user/authenticationController.js');
 var prodController = require('../controller/user/productController.js');
 var cartController = require('../controller/user/cartController.js');
 var orderController = require('../controller/user/orderController.js');
+var accountController = require('../controller/user/accountController.js');
 const passport = require('passport');
 require('../config/passport.js');
 
@@ -116,6 +117,10 @@ router.get('/emptyCart',cartController.getEmptyCart)
 
 //Update Cart Item
 router.post('/updateCartItem', cartController.updateCartItem);
+
+
+//Get User Account Page
+router.get('/profileDetails',accountController.getProfilePage);
 
 module.exports = router;
 

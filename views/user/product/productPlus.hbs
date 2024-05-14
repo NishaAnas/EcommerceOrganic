@@ -1,6 +1,16 @@
 <link rel="stylesheet" href="/stylesheets/productlisting.css">
 
 <main>
+    {{#if error}}
+            <div id="flash-message" class="alert alert-danger" role="alert">
+            {{error}}
+            </div>
+            {{/if}}
+            {{#if success}}
+            <div id="flash-message" class="alert alert-success" role="alert">
+            {{success}}
+            </div>
+            {{/if}}
     <div class="container m-3 d-flex flex-column  p-3">
         <div class="d-flex align-itmes-center justify-content-between">
             <div class="search">

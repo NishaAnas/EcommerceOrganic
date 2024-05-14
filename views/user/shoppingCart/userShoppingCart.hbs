@@ -1,5 +1,15 @@
 <link rel="stylesheet" href="stylesheets/shoppingcart.css">
 <body>
+    {{#if error}}
+            <div id="flash-message" class="alert alert-danger" role="alert">
+            {{error}}
+            </div>
+            {{/if}}
+            {{#if success}}
+            <div id="flash-message" class="alert alert-success" role="alert">
+            {{success}}
+            </div>
+            {{/if}}
     <div class="container py-5">
         <div class="row">
             <aside class="col-lg-9">
@@ -21,11 +31,12 @@
                                         <figure class="itemside align-items-center">
                                             <div class="aside"><img src={{productImage}} class="img-sm"></div>
                                             <figcaption class="info"> <a href="#" class="title text-dark" data-abc="true">{{productName}}</a>
-                                                <p class="text-muted small">{{category}}<br>Quantity: <span class="quantity" id="productquantity-{{productId}}">{{quantity}}</span><br>Base Price:{{basePrice}}</p>
+                                                <p class="text-muted small">{{category}}<br>{{baseProduct}}<br>
+                                                Quantity: <span class="quantity" id="productquantity-{{variantId}}">{{quantity}}</span><br>Base Price:{{totalPrice}}</p>
                                             </figcaption>
                                         </figure>
                                     </td>
-                                    <td> <select class="form-control quantity-select" data-product-id="{{productId}}">
+                                    <td> <select class="form-control quantity-select" data-variant-id="{{variantId}}" style="width: 50%;">
                                             <option value="1">1</option>
                                             <option value="2">2</option>
                                             <option value="3">3</option>
@@ -33,15 +44,15 @@
                                         </select>
                                     <td>
                                         <div class="price-wrap"> 
-                                            <var class="price" id="total-price-{{productId}}">{{totalPrice}}</var> 
-                                            <small class="text-muted"> {{basePrice}} X <span class="quantity" id="quantity-{{productId}}"  data-base-price="{{basePrice}}">{{quantity}}</span> </small> 
+                                            <var class="price" id="total-price-{{variantId}}">{{totalPrice}}<br></var> 
+                                            <small class="text-muted"> {{totalPrice}} X <span class="quantity" id="quantity-{{variantId}}"  data-base-price="{{basePrice}}">{{quantity}}</span> </small> 
                                         </div>
                                     </td>
                                     <td class="text-right d-none d-md-block">
-                                        <form id="removeForm" method="POST" action="/removeCartProduct/{{productId}}">
-                                        <a data-original-title="Save to Wishlist" title="" href="" class="btn btn-light" data-toggle="tooltip" data-abc="true"> 
+                                        <form id="removeForm" method="POST" action="/removeCartProduct/{{variantId}}">
+                                        <a data-original-title="Save to Wishlist" title="" href="" class="btn btn-info" data-toggle="tooltip" data-abc="true"> 
                                         <i class="bi bi-heart"></i></a>
-                                        <button type="submit" class="btn btn-light" data-abc="true"> Remove</button> 
+                                        <button type="submit" class="btn btn-light" data-abc="true"><i class="bi bi-x"></i></button> 
                                         </form>
                                     </td>
                                 </tr>
@@ -74,7 +85,7 @@
                         <dl class="dlist-align">
                             <dt>Discount:</dt>
                             <dd class="text-right text-danger ml-3">- 00.00</dd>
-                        </dl>
+                        </dl> 
                         <dl class="dlist-align">
                             <dt>Total:</dt>
                             <dd class="text-right ml-3"><strong class="total-price-of-all-products">{{totalPriceOfAllProducts}}</strong></dd>

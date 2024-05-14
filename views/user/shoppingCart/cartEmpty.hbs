@@ -1,5 +1,15 @@
 <link rel="stylesheet" href="stylesheets/shoppingcart.css">
 <body>
+    {{#if error}}
+            <div id="flash-message" class="alert alert-danger" role="alert">
+            {{error}}
+            </div>
+            {{/if}}
+            {{#if success}}
+            <div id="flash-message" class="alert alert-success" role="alert">
+            {{success}}
+            </div>
+            {{/if}}
     <div class="container py-5">
         <div class="row d-flex align-items-center justify-content-center">
             <aside class="col-lg-7">

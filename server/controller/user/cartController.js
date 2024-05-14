@@ -21,12 +21,18 @@ exports.showShoppingCart = async(req,res)=>{
     const successMessage = req.flash('success');
     const errorMessage = req.flash('error');
     try {
+
+        // Check if the user is logged in
+        if (!req.session.userLoggedInData || !req.session.userLoggedInData.userloggedIn) {
+            req.flash('error', 'To access cart, please LogIn first.');
+            return res.redirect('/login');
+        }
+
         const userId = req.session.userLoggedInData.userId;
         const cart = await shoppingCart.findOne({ user: userId });
-        console.log(cart.items.length);
+        //console.log(cart.items.length);
 
         const userData = req.session.userLoggedInData;
-        const categories = await category.find({}).lean();
 
         if (!cart || cart.items.length === 0) {
             req.flash('error', 'Cart Empty');
@@ -34,15 +40,17 @@ exports.showShoppingCart = async(req,res)=>{
         }
 
         const cartitems = await Promise.all(cart.items.map(async (item)=>{
-            const products = await Product.findById(item.product);
-            const categories = await category.findById(products.categoryId);
-            const image = products.images.length > 0 ? products.images[0] : '';
+            const variant = await prodVariation.findById(item.product);
+            const baseProduct = await Product.findById(variant.productId)
+            const categories = await category.findById(baseProduct.categoryId);
+            const image = variant.images.length > 0 ? variant.images[0] : '';
 
             return{
-                productId:products._id,
-                productName:products.title,
+                variantId:variant._id,
+                productName:variant.attributeValue,
+                baseProduct:baseProduct.title,
                 category:categories.name,
-                basePrice:products.price,
+                basePrice:baseProduct.price,
                 productImage:image,
                 quantity: item.quantity,
                 totalPrice: item.totalPrice
@@ -54,7 +62,7 @@ exports.showShoppingCart = async(req,res)=>{
         console.log(totalQuantity);
         console.log(totalPriceOfAllProducts);
 
-        res.render('user/shoppingCart/userShoppingCart' , {cartitems,totalQuantity,totalPriceOfAllProducts, categories, userData, success: successMessage, error: errorMessage})
+        res.render('user/shoppingCart/userShoppingCart' , {cartitems,totalQuantity,totalPriceOfAllProducts, userData, success: successMessage, error: errorMessage})
     } catch (error) {
         console.error('Error fetching cart:', error);
         req.flash('error', 'Server Error');
@@ -71,15 +79,16 @@ exports.addToCart = async(req,res)=>{
             const refererUrl = req.headers.referer || '/';
 
             // Parse the URL to extract the productId
-            const productId = refererUrl.split('/').pop();
+            const variantId = refererUrl.split('/').pop();
             //console.log('Product ID:', productId);
             req.session.returnTo = refererUrl;
-            req.session.productId = productId;
+            req.session.variantId = variantId;
 
             return res.redirect('/login');
         }
         const userId = req.session.userLoggedInData.userId;
-        const { productId } = req.body;
+        const variantId = req.body.variantId;
+        //console.log(variantId);
 
         // Check if the user already has a shopping cart
         let existingShoppingCart = await shoppingCart.findOne({ user: userId });
@@ -88,45 +97,52 @@ exports.addToCart = async(req,res)=>{
         if (!existingShoppingCart) {
             existingShoppingCart = await shoppingCart.create({ user: userId, items: [] });
         }
-        // Find the product to get its price
-        const product = await Product.findById(productId);
+        // Find the product Variant to get its price
+        const variant = await prodVariation.findById(variantId);
+        //console.log(variant)
+
+        // Find the base product to get its price
+        const baseProduct = await Product.findById(variant.productId);
+        console.log(baseProduct)
+
+        // Calculate the total price
+        const totalPrice = baseProduct.price + variant.price;
+        console.log(totalPrice)
         
         // Check if the item already exists in the cart
-        const existingItemIndex = existingShoppingCart.items.findIndex(item => item.product.equals(productId));
+        const existingItemIndex = existingShoppingCart.items.findIndex(item => item.product.equals(variantId));
 
         if (existingItemIndex !== -1) {
             // If the item already exists,
             req.flash('error', 'This item is already in your cart.');
             console.log(' Items present')
         } else {
-            // If the item doesn't exist, create a new cart item
+             // If the item doesn't exist, create a new cart item
             await shoppingCart.findOneAndUpdate(
                 { user: userId },
-                { $push: { items: { product: productId, quantity: 1, totalPrice: product.price } } }
+                { $push: { items: { product: variantId, quantity: 1, totalPrice: totalPrice } } }
             );
             console.log('Items not Present')
         }
 
         console.log('Product added to cart successfully')
         req.flash('success', 'Product added to cart successfully');
-        res.redirect(`/productDetails/${productId}`); // Redirect to the product Details page
+        res.redirect(`/productDetails/${variantId}`); // Redirect to the product Details page
 
     }catch(error){
         console.log(error);
         console.error('Error adding product to cart:', error);
         req.flash('error', 'Server Error');
-        res.redirect('/productDetails/' + req.body.productId); // Redirect back to the product details page
+        res.redirect('/' ); // Redirect back to the Home page
     }
 }
 
 exports.deleteCartProduct = async(req,res)=>{
     try {
-        const productId = req.params._id;
-        const categories = await category.find({}).lean();
-        const userData = req.session.userLoggedInData;
+        const variantId = req.params._id;
         const updatedCart = await shoppingCart.findOneAndUpdate(
-            { 'items.product': productId }, // Filter criteria
-            { $pull: { items: { product: productId } } } // Pull the item with the given productId from the items array
+            { 'items.product': variantId }, // Filter criteria
+            { $pull: { items: { product: variantId } } } // Pull the item with the given productId from the items array
         );
         console.log(`removed cart:${updatedCart}`)
         if (updatedCart) {
@@ -154,18 +170,26 @@ exports.deleteCartProduct = async(req,res)=>{
 //Update Cart Product
 exports.updateCartItem = async(req,res)=>{
     try {
-        const { productId, quantity } = req.body;
+        const { variantId, quantity } = req.body;
 
         // Find the product to get its price
-        const product = await Product.findById(productId);
+        const variant = await prodVariation.findById(variantId);
+
+        // Find the base product to get its price
+        const baseProduct = await Product.findById(variant.productId);
+        console.log(baseProduct)
+
+        // Calculate the total price
+        const totalPrice = baseProduct.price + variant.price;
+        //console.log(totalPrice)
 
         // Get the current user's shopping cart
         const userId = req.session.userLoggedInData.userId;
 
         // Update the quantity and total price of the product in the shopping cart
         const updatedCartItem = await shoppingCart.findOneAndUpdate(
-            { user: userId, 'items.product': productId },
-            { $set: { 'items.$.quantity': quantity, 'items.$.totalPrice': product.price * quantity } },
+            { user: userId, 'items.product': variantId },
+            { $set: { 'items.$.quantity': quantity, 'items.$.totalPrice': totalPrice * quantity } },
             { new: true }
         );
         

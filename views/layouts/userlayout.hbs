@@ -34,7 +34,7 @@
                   <a class="nav-link active" aria-current="page" href="/">Home</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link active" aria-current="page" href="/categories">Categories</a>
+                  <a class="nav-link active" aria-current="page" href="/categories">Shop</a>
                 </li>
                 <li class="nav-item">
                   <a class="nav-link active" aria-current="page" href="#">Offers</a>
@@ -52,7 +52,7 @@
                     <li class="nav-item">
                       <a class="nav-link" href="#">Contact Us</a>
                     </li>
-                    <div class="d-flex flex-row justify-content-end gap-2">
+                    <div class="d-flex flex-row justify-content-end gap-2 dropdown-wrapper">
                       <li class="nav-item dropdown">
                         <div class="nav-link dropdown-toggle" role="button" id="accountDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                           <span class="nav-user-img">
@@ -61,14 +61,14 @@
                           </span>
                         </div>
                           {{#if userData}}
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown">
-                              <li><a class="dropdown-item" href="##">{{userData.userName}}</a></li>
-                              <li><a class="dropdown-item" href="##">Account Settings</a></li>
-                              <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                            <ul class="dropdown-menu dropdown profile-dropdown" aria-labelledby="accountDropdown">
+                              <li><a class="dropdown-item profile" href="/profileDetails"><i class="bi bi-person-fill px-3"></i> My Profile</a></li>
+                              <li><a class="dropdown-item danger" href="/logout"><i class="bi bi-box-arrow-left px-3"></i>Logout</a></li>
                             </ul>
                           {{else}}
-                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown">
-                              <li><a class="dropdown-item" href="/login">LogIn</a></li>
+                            <ul class="dropdown-menu profile-dropdown" aria-labelledby="accountDropdown">
+                              <li><a class="dropdown-item profile" href="/login"><i class="bi bi-box-arrow-in-right px-3"></i>LogIn</a></li>
+                              <li><a class="dropdown-item profile" href="/signup"><i class="bi bi-paperclip px-3"></i>SignUp</a></li>
                             </ul>
                           {{/if}}
                       </li>

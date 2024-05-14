@@ -246,9 +246,9 @@ exports.postLogin = async (req, res) => {
          //check for Cart Redirection
          const return_url = req.session.returnTo;
          if(return_url){
-            const productId = req.session.productId
-            console.log(productId);
-            res.redirect(`/productDetails/${productId}`)
+            const variantId = req.session.variantId
+            delete req.session.variantId;
+            res.redirect(`/productDetails/${variantId}`)
          }else{
             return res.redirect(`/`);
          }

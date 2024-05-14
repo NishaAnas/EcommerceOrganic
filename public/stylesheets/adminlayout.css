@@ -593,9 +593,6 @@ input:enabled:read-write:-webkit-any(:focus, :hover)::-webkit-calendar-picker-in
     display: block;
 }
 
-
-
-
 .main-nav .nav-user-wrapper .users-item-dropdown a.danger {
 	color: #f26464
 }
