@@ -11,7 +11,30 @@ const crypto = require('crypto')
 exports.getCategories = async (req, res) => {
    const successMessage = req.flash('success');
    const errorMessage = req.flash('error')
-   const categories = await category.find({}).lean();
+
+   // Get search and sort parameters from the query string
+   const { search, sort } = req.query;
+
+   // Build the query object
+   let query = {};
+   if (search) {
+      const normalizedSearch = search.trim().replace(/\s+/g, ' ').toLowerCase();
+      query.name = { $regex: new RegExp(normalizedSearch, 'i') }; // Case-insensitive search
+   }
+
+   // Fetch categories based on the query
+   let categories = await category.find(query).lean();
+
+   // Sort the categories if a sort parameter is provided
+   if (sort) {
+      if (sort === 'asc') {
+         categories = categories.sort((a, b) => a.name.localeCompare(b.name));
+      } else if (sort === 'desc') {
+         categories = categories.sort((a, b) => b.name.localeCompare(a.name));
+      }
+   }
+
+   //const categories = await category.find({}).lean();
    const userData = req.session.userLoggedInData;
    res.render('user/product/categorylisting', { categories, userData, success: successMessage, error: errorMessage });
 }
@@ -26,11 +49,39 @@ exports.productListing = async (req, res) => {
    try {
       const userData = req.session.userLoggedInData;
       const categories = await category.find({}).lean();
-      const categoryId = req.query.categoryId;
+      const categoryId = req.params._id;
       if (!categoryId) {
          res.redirect('/?error=Error in fetching Category Id')
       }
-      const products = await product.find({ categoryId }).lean();
+
+      // Get search and sort parameters from the query string
+      const { search, sort } = req.query;
+
+      // Build the query object
+      let query = { categoryId };
+      if (search) {
+          // Normalize search input to handle spaces and case
+         const normalizedSearch = search.trim().replace(/\s+/g, ' ').toLowerCase();
+          query.name = { $regex: new RegExp(normalizedSearch, 'i') }; // Case-insensitive search
+      }
+
+      // Fetch products based on the query
+      let products = await product.find(query).lean();
+
+      // Sort the products if a sort parameter is provided
+      if (sort) {
+         if (sort === 'asc') {
+            products = products.sort((a, b) => a.name.localeCompare(b.name));
+         } else if (sort === 'desc') {
+            products = products.sort((a, b) => b.name.localeCompare(a.name));
+         } else if (sort === 'price-low-high') {
+            products = products.sort((a, b) => a.price - b.price);
+         } else if (sort === 'price-high-low') {
+            products = products.sort((a, b) => b.price - a.price);
+         }
+      }
+      
+      //const products = await product.find({ categoryId }).lean();
       const Category = await category.findById(categoryId).lean();
       res.render('user/product/productListing', { products, categories, Category, userData, success: successMessage, error: errorMessage });
    } catch (error) {
@@ -105,14 +156,39 @@ exports.getProductPlus = async (req, res) => {
       const userData = req.session.userLoggedInData;
       const productId = req.params.productId;
       const baseProduct = await product.findById(productId).lean()
-      console.log(baseProduct.price);
+      console.log(baseProduct);
+      
+      const categories = await category.findById(baseProduct.categoryId);
+      //console.log(categories.name);
+      const { search, sort } = req.query;
 
-      const productList = await prodVariation.find({ productId: req.params.productId }).lean();
+        let query = { productId };
+
+        if (search) {
+            const normalizedSearch = search.trim().replace(/\s+/g, ' ').toLowerCase();
+            query.attributeValue = { $regex: new RegExp(normalizedSearch, 'i') };
+        }
+
+        let productList = await prodVariation.find(query).lean();
+
+        if (sort) {
+            if (sort === 'asc') {
+                productList = productList.sort((a, b) => a.attributeValue.localeCompare(b.attributeValue));
+            } else if (sort === 'desc') {
+                productList = productList.sort((a, b) => b.attributeValue.localeCompare(a.attributeValue));
+            } else if (sort === 'price-low-high') {
+                productList = productList.sort((a, b) => a.price - b.price);
+            } else if (sort === 'price-high-low') {
+                productList = productList.sort((a, b) => b.price - a.price);
+            }
+        }
+
+      //const productList = await prodVariation.find({ productId: req.params.productId }).lean();
       productList.forEach(variation => {
          variation.price = baseProduct.price + variation.price; // Assuming the base price is stored in the 'price' field of the product document
       });
-      console.log(productList);
-      res.render('user/product/productPlus', { productList, userData, success: successMessage, error: errorMessage })
+      //console.log(productList);
+      res.render('user/product/productPlus', {categoryName:categories.name, categoryId:categories._id,baseProduct, productId,productList, userData, success: successMessage, error: errorMessage })
    } catch (error) {
       console.error(error);
       req.flash('error', 'Server Error');

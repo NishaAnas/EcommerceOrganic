@@ -1,0 +1,226 @@
+<link rel="stylesheet" href="/stylesheets/profiledetails.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<body>
+    <div class="container">
+        <div
+            class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2">Address Management</h1>
+            <div class="btn-toolbar mb-2 mb-md-0">
+                <div class="btn-group me-2">
+                    <button class="btn btn-sm btn-outline-secondary"  id="add_address" data-bs-toggle="modal" data-bs-target="#addAddressModal">
+                        <i class="bi bi-plus"></i>Add New Address</button>
+                </div>
+            </div>
+        </div>
+        <div class="col py-3">
+            <div class="row">
+                <div class="col">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a
+                                    href="/">Home</a></li>
+                            <li
+                                class="breadcrumb-item active">Address Management</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="col text-end fw-lighter">
+                    <b>User Name:</b> {{userDetails.userName}}
+                </div>
+            </div>
+        </div>
+        {{#if error}}
+            <div class="alert alert-danger">
+                {{error}}
+            </div>
+            {{/if}}
+            {{#if success}}
+            <div class="alert alert-success">
+                {{success}}
+            </div>
+            {{/if}}
+    <body>
+    <div class="container py-5">
+        <div class="row">
+            {{#each userAddresses}}
+        <div class="col-md-6 mb-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{name}}</h5>
+                    <p class="card-text">
+                       <b>Street: </b> {{street}} ,
+                       <b>Area: </b> {{area}}<br>
+                       <b>City: </b>{{city}} , 
+                       <b>State: </b>  {{state}}<br>
+                       <b>Country: </b>{{country}} , 
+                       <b>Pincode: </b>{{pincode}}
+                    </p>
+                     <div class="form-check">
+                        <input class="form-check-input" type="radio" name="defaultAddress" id="defaultAddress{{@index}}" {{#if isDefault}}checked{{/if}} data-address-id="{{_id}}">
+                        <label class="form-check-label" for="defaultAddress{{@index}}">
+                            Use as default address
+                        </label>
+                    </div>
+                    <button type="button" class="btn  mt-2" data-bs-toggle="modal" data-bs-target="#editAddressModal{{_id}}">
+                        <i class="bi bi-pencil"></i> 
+                    </button>
+                    <form action="/deleteAddress/{{_id}}?_method=PUT" method="POST" class="d-inline-block">
+                        <button type="submit" class="btn  mt-2 ">
+                            <i class="bi bi-trash"></i> 
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {{/each}}
+        </div>
+    </div>
+
+    <!-- Add Address Modal -->
+    <div class="modal fade" id="addAddressModal" tabindex="-1" aria-labelledby="addAddressModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addAddressModalLabel">Add New Address</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addAddressForm" action="/addAddress" method="POST">
+                    <div class="row mb-4 py-4">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="name" class="form-label">Name</label>
+                                <input type="text" class="form-control" id="uname" name="uname" required>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="street" class="form-label">Street</label>
+                                <input type="text" class="form-control" id="street" name="street" >
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-6 py-4">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label for="city" class="form-label">City</label>
+                                <input type="text" class="form-control" id="city" name="city" value="{{city}}" disabled >
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label for="area" class="form-label">Area</label>
+                                <input type="text" class="form-control" id="area" name="area" readonly >
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label for="pincode" class="form-label">Pincode</label>
+                                <input type="text" class="form-control" id="pincode" name="pincode" list="pincodeList">
+                                    <datalist id="pincodeList">
+                                        {{#each pincodes}}
+                                            <option value="{{this.pincode}}" data-area="{{this.area}}">{{this.pincode}}</option>
+                                        {{/each}}
+                                    </datalist>
+                                <span id="pincode_error" style="color: red;"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-4 py-4">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="state" class="form-label">State</label>
+                                <input type="text" class="form-control" id="state" name="state" value="{{state}}" disabled>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="country" class="form-label">Country</label>
+                                <input type="text" class="form-control" id="country" name="country" value="{{country}}" disabled>
+                            </div>
+                        </div>
+                    </div>
+                        <button type="submit" form="addAddressForm" class="btn btn-primary">Add Address</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Address Modal -->
+   {{#each userAddresses}}
+<div class="modal fade" id="editAddressModal{{_id}}" tabindex="-1" aria-labelledby="editAddressModalLabel{{_id}}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editAddressModalLabel{{_id}}">Edit Address</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editAddressForm{{_id}}"action="/editAddress/{{_id}}?_method=PUT"method="POST">
+                    <div class="row mb-4 py-4">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="name{{_id}}" class="form-label">Name</label>
+                                <input type="text" class="form-control" id="name{{_id}}" name="name" value="{{name}}" required>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="street{{_id}}" class="form-label">Street</label>
+                                <input type="text" class="form-control" id="street{{_id}}" name="street" value="{{street}}" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4 py-4">
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label for="area{{_id}}" class="form-label">Area</label>
+                                <input type="text" class="form-control" id="area{{_id}}" name="area" value="{{area}}" readonly>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label for="city{{_id}}" class="form-label">City</label>
+                                <input type="text" class="form-control" id="city{{_id}}" name="city" value="{{city}}" disabled>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="form-group">
+                                <label for="pincode{{_id}}" class="form-label">Pincode</label>
+                                <input type="text" class="form-control" id="pincode{{_id}}" name="pincode" value="{{pincode}}" list="pincodeList{{_id}}" required>
+                                <datalist id="pincodeList{{_id}}">
+                                    {{#each ../pincodes}}
+                                        <option value="{{this.pincode}}" data-area="{{this.area}}">{{this.pincode}}</option>
+                                    {{/each}}
+                                </datalist>
+                                <span id="pincode_error{{_id}}" style="color: red;"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4 py-4">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="state{{_id}}" class="form-label">State</label>
+                                <input type="text" class="form-control" id="state{{_id}}" name="state" value="{{state}}" disabled>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                                <label for="country{{_id}}" class="form-label">Country</label>
+                                <input type="text" class="form-control" id="country{{_id}}" name="country" value="{{country}}" disabled>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" form="editAddressForm{{_id}}" class="btn btn-primary">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{{/each}}
+<script src="/javascripts/manageAddress.js"></script>
+</body>

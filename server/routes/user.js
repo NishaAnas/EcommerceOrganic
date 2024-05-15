@@ -6,6 +6,7 @@ var prodController = require('../controller/user/productController.js');
 var cartController = require('../controller/user/cartController.js');
 var orderController = require('../controller/user/orderController.js');
 var accountController = require('../controller/user/accountController.js');
+var checkoutController = require('../controller/user/checkoutController.js');
 const passport = require('passport');
 require('../config/passport.js');
 
@@ -93,7 +94,7 @@ router.get('/logout',authController.getLogout)
 router.get('/categories',prodController.getCategories)
 
 //GET Product Listing Page
-router.get('/productList',prodController.productListing)
+router.get('/productList/:_id',prodController.productListing)
 
 //GET Product Details Page
 router.get('/productDetails/:variantId',prodController.productDetails)
@@ -119,8 +120,59 @@ router.get('/emptyCart',cartController.getEmptyCart)
 router.post('/updateCartItem', cartController.updateCartItem);
 
 
+
 //Get User Account Page
 router.get('/profileDetails',accountController.getProfilePage);
+
+//Edit Profile Information
+router.put('/editProfile/:_id',accountController.editProfileInformation);
+
+//Change Password
+router.post('/changePassword/:_id',accountController.changePassword);
+
+//Addres Management Page
+router.get('/addressManagement',accountController.getmanageAccount);
+
+//add Address to th edatabase
+router.post('/addAddress',accountController.addAddress);
+
+//update default value of address
+router.post('/updateDefaultAddress',accountController.updateDefaultAddress);
+
+//Edit Address in Address management page
+router.put('/editAddress/:_id',accountController.editAddress);
+
+//Delete Address in Address management Page
+router.put('/deleteAddress/:_id',accountController.deleteAddress)
+
+
+//Get Address managemnt of checkout page
+router.get('/checkaddressManagement',checkoutController.getaddressPage);
+
+//add Address to the database(for Checkout)
+router.post('/checkaddAddress',accountController.addAddress);
+
+//update default value of address(for Checkout)
+router.post('/checkupdateDefaultAddress',accountController.updateDefaultAddress);
+
+//Edit Address in Address management page(for Checkout)
+router.put('/ckeckeditAddress/:_id',accountController.editAddress);
+
+//Delete Address in Address management Page(for Checkout)
+router.put('/checkdeleteAddress/:_id',accountController.deleteAddress)
+
+
+//GET Checkout Page
+router.get('/checkout',checkoutController.getcheckOut);
+
+//GET Order Conformation Page
+router.get('/orderconformation',checkoutController.getOrderConformation);
+
+//GET Order Details Page
+router.get('/orderDetails',checkoutController.getOrderDetails);
+
+//Get Order History page
+router.get('/orderhistory',checkoutController.getOrderHistory);
 
 module.exports = router;
 

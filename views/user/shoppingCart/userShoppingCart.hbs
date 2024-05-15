@@ -50,9 +50,9 @@
                                     </td>
                                     <td class="text-right d-none d-md-block">
                                         <form id="removeForm" method="POST" action="/removeCartProduct/{{variantId}}">
-                                        <a data-original-title="Save to Wishlist" title="" href="" class="btn btn-info" data-toggle="tooltip" data-abc="true"> 
-                                        <i class="bi bi-heart"></i></a>
-                                        <button type="submit" class="btn btn-light" data-abc="true"><i class="bi bi-x"></i></button> 
+                                        <a data-original-title="Save to Wishlist" title="" href="" class="btn btn-secondary" data-toggle="tooltip" data-abc="true"> 
+                                        <i class="bi bi-heart px-1"></i></a>
+                                        <button type="submit" class="btn btn-danger " data-abc="true"><i class="bi bi-x px-1"></i></button> 
                                         </form>
                                     </td>
                                 </tr>
@@ -90,8 +90,8 @@
                             <dt>Total:</dt>
                             <dd class="text-right ml-3"><strong class="total-price-of-all-products">{{totalPriceOfAllProducts}}</strong></dd>
                         </dl>
-                        <hr> <a href="#" class="btn btn-out btn-primary btn-square btn-main" data-abc="true"> Make Purchase </a>
-                        <a href="#" class="btn btn-out btn-success btn-square btn-main mt-2" data-abc="true">Continue Shopping</a>
+                        <hr> <a href="/checkaddressManagement" class="btn btn-out btn-primary btn-square btn-main" data-abc="true"> Make Purchase </a>
+                        <a href="/" class="btn btn-out btn-success btn-square btn-main mt-2" data-abc="true">Continue Shopping</a>
                     </div>
                 </div>
             </aside>

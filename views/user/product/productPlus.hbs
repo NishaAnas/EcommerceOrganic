@@ -1,5 +1,4 @@
 <link rel="stylesheet" href="/stylesheets/productlisting.css">
-
 <main>
     {{#if error}}
             <div id="flash-message" class="alert alert-danger" role="alert">
@@ -11,28 +10,50 @@
             {{success}}
             </div>
             {{/if}}
-    <div class="container m-3 d-flex flex-column  p-3">
-        <div class="d-flex align-itmes-center justify-content-between">
+    <div class="container m-3 d-flex flex-column p-3">
+        <div class="d-flex align-items-center justify-content-between">
             <div class="search">
-                <input type="text" class="search-input" placeholder="search..." name="">
-                <a href="#" class="search-icon">
+                <input list="productSuggestions" type="text" class="search-input" id="search-input" placeholder="search..." name="">
+                <datalist id="productSuggestions">
+                    {{#each productList}}
+                        <option value="{{this.attributeValue}}"></option>
+                    {{/each}}
+                </datalist>
+                <a href="#" class="search-icon" id="search-button">
                     <i class="bi bi-search"></i>
                 </a>
             </div>
-            <div class="dropdown sort-dropdown" >
-                <button class="btn  dropdown-toggle dropdown-btn" style="background-color: #6A9739;" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <div class="dropdown sort-dropdown">
+                <button class="btn dropdown-toggle dropdown-btn" style="background-color: #6A9739;" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                     Sort By
                 </button>
                 <ul class="dropdown-menu list-dropdown item-dropdown">
-                    <li><a class="dropdown-item" href="#">Aa-Zz</a></li>
-                    <li><a class="dropdown-item" href="#">Zz-Aa</a></li>
-                    <li><a class="dropdown-item" href="#">price low-high</a></li>
-                    <li><a class="dropdown-item" href="#">price high-low</a></li>
+                    <li><a class="dropdown-item sort-option" href="#" data-sort="asc">Aa-Zz</a></li>
+                    <li><a class="dropdown-item sort-option" href="#" data-sort="desc">Zz-Aa</a></li>
+                    <li><a class="dropdown-item sort-option" href="#" data-sort="price-low-high">price low-high</a></li>
+                    <li><a class="dropdown-item sort-option" href="#" data-sort="price-high-low">price high-low</a></li>
                 </ul>
             </div>
         </div>
     </div>
-
+        <div class="col px-5">
+            <div class="row">
+                <div class="col">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a
+                                    href="/">Home</a></li>
+                                    <li class="breadcrumb-item"><a
+                                    href="/categories">Categories</a></li>
+                                    <li class="breadcrumb-item"><a
+                                    href="/productList/{{categoryId}}">{{categoryName}}</a></li>
+                            <li
+                                class="breadcrumb-item active">{{baseProduct.name}}</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
         <div class="container py-5">
         <h4 class="text-center">
             <strong>Shop For</strong>
@@ -47,7 +68,7 @@
                                     {{attributeValue}}
                                 </div>
                                 <div class="profile-username">
-                                     Buy At: {{price}}
+                                    Buy At: {{price}}
                                 </div>
                             </div>
                         </a>
@@ -58,8 +79,7 @@
     </div>
     
 </main>
-
-
-
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="/javascripts/productplus.js"></script>
 
 

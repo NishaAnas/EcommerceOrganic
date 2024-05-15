@@ -88,12 +88,12 @@ try {
   await product.create(newProduct);
   console.log('Product added successfully');
   console.log('Product Added:', newProduct);
-  req.flash('success', 'Server Error ');
+  req.flash('success', 'Added Successfully ');
     res.redirect('/admin/product');
   
 } catch (error) {
   console.log(error);
-  req.flash('error', 'Product adding Failed ');
+  req.flash('error', 'server Error ');
 res.redirect(`/admin/product`);
 }
 }

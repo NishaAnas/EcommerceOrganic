@@ -62,7 +62,15 @@ exports.showShoppingCart = async(req,res)=>{
         console.log(totalQuantity);
         console.log(totalPriceOfAllProducts);
 
-        res.render('user/shoppingCart/userShoppingCart' , {cartitems,totalQuantity,totalPriceOfAllProducts, userData, success: successMessage, error: errorMessage})
+        res.render('user/shoppingCart/userShoppingCart' , {
+            cartitems,
+            totalQuantity,
+            totalPriceOfAllProducts,
+            quantity:cartitems.quantity, 
+            userData, 
+            success: successMessage, 
+            error: errorMessage
+        })
     } catch (error) {
         console.error('Error fetching cart:', error);
         req.flash('error', 'Server Error');
@@ -124,7 +132,6 @@ exports.addToCart = async(req,res)=>{
             );
             console.log('Items not Present')
         }
-
         console.log('Product added to cart successfully')
         req.flash('success', 'Product added to cart successfully');
         res.redirect(`/productDetails/${variantId}`); // Redirect to the product Details page

@@ -101,7 +101,6 @@
       conformPassword_error.innerHTML = "Not Matching With the Password"
     }
 
-
       //validation of Phone Number
       const phoneRegex = /^[1-9]\d{9}$/;
       if(phoneNumberValue.length < 10 || !phoneRegex.test(phoneNumberValue)){
