@@ -1,9 +1,9 @@
-<link rel="stylesheet" href="/stylesheets/product.css">
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <body>
-    <div class="container">
-    <h2>Product Management <small>Organic</small></h2>
+    <div class="container mt-5">
+        <h2>Product Management <small>Organic</small></h2>
 
         {{#if error}}
         <div class="alert alert-danger">
@@ -15,50 +15,53 @@
             {{success}}
         </div>
         {{/if}}
-        <div class="d-flex flex-row align-items-baseline justify-content-end">
-    <!-- Add Category Button -->
-    <div class="btn-group me-2"><a href="/admin/addProduct"class="btn btn-sm mb-4"
-    style=" background-color: #6A9739; color: white;">+ Add Product</a>
-    </div>
-    </div>
-    </div>
-        
-        <!-- Product List -->
-    <ul class="responsive-table">
-        <li class="table-header">
-        <div class="col col-1">Product <br>SKU</div>
-        <div class="col col-2">Name</div>
-        <div class="col col-3">Category</div>
-        <div class="col col-4">Price</div>
-        <div class="col col-5">Images</div>
-        <div class="col col-6">Active</div>
-        <div class="col col-7">Actions</div>
-        </li>
-        {{#each Product}}
-        <li class="table-row">
-        <div class="col col-1" data-label="product-sku">{{this.sku}}</div>
-        <div class="col col-2" data-label="product_title">{{this.name}}</div>
-        <div class="col col-3" data-label="product_categoryname">{{this.categoryName}}</div>
-        <div class="col col-4" data-label="product-price">{{this.price}}</div>
-        <div class="col col-5" data-label="product_image"><img style="width: 50px; height: 50px;" src="/{{this.images.[0]}}" alt="Product Image"></div>
-        <div class="col col-6" data-label="active"><label
-            class="{{#if this.isActive}}active{{else}}deactive{{/if}}">
-            {{#if this.isActive}}Active{{else}}Deactive{{/if}}
-          </label>
+        <div class="d-flex justify-content-end mb-3">
+            <!-- Add Product Button -->
+            <a href="/admin/addProduct" class="btn btn-sm btn-success">+ Add Product</a>
         </div>
-        <div class="col col-7 d-flex flex-row justify-content-left gap-2">
-          <button type="button" id="editButton">
-            <a href="/admin/editProduct/{{this._id}}">
-              <i class="bi bi-pencil"></i></a></button>
-              <form action="/admin/deleteProduct/{{this._id}}?_method=PUT" method="POST" id="deleteform">
-              <button type="submit" class="deleteButton">
-              <i class="bi bi-trash"></i>
-              </button>
-              </form>
-          </div>
-      </li>
-      {{/each}}
-    </ul>
+
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Product SKU</th>
+                        <th>Name</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Images</th>
+                        <th>Active</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each Product}}
+                    <tr>
+                        <td>{{this.sku}}</td>
+                        <td>{{this.name}}</td>
+                        <td>{{this.categoryName}}</td>
+                        <td>{{this.price}}</td>
+                        <td><img src="/{{this.images.[0]}}" alt="Product Image" class="img-fluid" style="width: 50px; height: 50px;"></td>
+                        <td>
+                            <span class="{{#if this.isActive}}text-success{{else}}text-danger{{/if}}">
+                                {{#if this.isActive}}Active{{else}}Deactive{{/if}}
+                            </span>
+                        </td>
+                        <td class="d-flex justify-content-start">
+                            <a href="/admin/editProduct/{{this._id}}" class="btn btn-sm btn-primary mr-2">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <form action="/admin/deleteProduct/{{this._id}}?_method=PUT" method="POST" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-danger">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+    </div>
     
     <script src="/javascripts/product.js"></script>
 </body>

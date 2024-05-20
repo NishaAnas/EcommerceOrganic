@@ -7,6 +7,7 @@ const prodVariation =require('../../modals/productVariation');
 const shoppingCart = require('../../modals/shoppingCart');
 const address =require('../../modals/address');
 const pincode = require('../../modals/pincode');
+const order = require('../../modals/order');
 const crypto = require('crypto');
 
 
@@ -244,5 +245,48 @@ exports.deleteAddress = async(req,res)=>{
         console.log(error);
         req.flash('error', 'An error occurred while deleting the address. Please try again.');
         res.redirect('/addressManagement');
+    }
+}
+
+
+//GET Order Details
+exports.getOrderDetails = async(req,res)=>{
+    const successMessage = req.flash('success');
+        const errorMessage = req.flash('error');
+        const userId = req.session.userLoggedInData.userId;
+         // Check if the user is logged in
+        if (!req.session.userLoggedInData || !req.session.userLoggedInData.userloggedIn) {
+            req.flash('error', 'To access Account, please LogIn first.');
+            return res.redirect('/login');
+        }
+        const orderDetails = await order.find({userId:userId}).lean();
+        //console.log(orderDetails)
+
+        res.render('user/Account/orderDetails',{
+            orderDetails,
+            layout:'userAccountLayout', 
+            success: successMessage, 
+            error: errorMessage
+        });
+}
+
+//Cancel Order
+exports.cancelOrder = async(req,res)=>{
+    try{
+        const { orderId } = req.body;
+        
+        const updatedOrder = await order.findOneAndUpdate(
+            { _id: orderId },
+            { orderStatus: 'Cancelled' },
+            { new: true }
+        );
+
+        if (!updatedOrder) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+        res.status(200).json({ message: 'Order canceled successfully', order: updatedOrder });
+    }catch(error){
+        console.log(error);
+        res.status(500).json({ message: 'Server error', error });
     }
 }

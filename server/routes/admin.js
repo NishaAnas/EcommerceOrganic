@@ -5,6 +5,7 @@ var authController = require('../controller/admin/authenticationController.js');
 var prodController = require('../controller/admin/productController.js');
 var categoryController = require('../controller/admin/categoryController.js');
 var userController = require('../controller/admin/userController.js');
+var orderController = require('../controller/admin/orderController.js');
 const { upload, resizeImages } = require('../config/multer');
 const path = require('path');
 
@@ -93,6 +94,16 @@ router.get('/editUser/:_id',userController.getEditUser)
 
 //PUT Edit User Page
 router.put('/editUser/:_id',userController.putEditUser)
+
+
+//GET order Management Page
+router.get('/ordermanage',orderController.getOrdermanager);
+
+// Route to change order status
+router.post('/changeOrderStatus', orderController.changeOrderStatus);
+
+// Route to cancel an order
+router.post('/ordersCancel', orderController.cancelOrder);
 
 
 module.exports = router;

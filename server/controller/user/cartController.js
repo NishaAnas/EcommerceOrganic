@@ -51,6 +51,7 @@ exports.showShoppingCart = async(req,res)=>{
                 baseProduct:baseProduct.title,
                 category:categories.name,
                 basePrice:baseProduct.price,
+                actualPrice:variant.price+baseProduct.price,
                 productImage:image,
                 quantity: item.quantity,
                 totalPrice: item.totalPrice
@@ -59,8 +60,15 @@ exports.showShoppingCart = async(req,res)=>{
 
         const totalQuantity = cart.items.reduce((acc, item) => acc + item.quantity, 0);
         const totalPriceOfAllProducts = cartitems.reduce((acc, item) => acc + item.totalPrice, 0);
-        console.log(totalQuantity);
-        console.log(totalPriceOfAllProducts);
+       // console.log(totalQuantity);
+       // console.log(totalPriceOfAllProducts);
+
+         // Store cart details in the session for checkout page
+        req.session.cartDetails = {
+            cartitems,
+            totalQuantity,
+            totalPriceOfAllProducts
+        };
 
         res.render('user/shoppingCart/userShoppingCart' , {
             cartitems,
@@ -187,8 +195,9 @@ exports.updateCartItem = async(req,res)=>{
         console.log(baseProduct)
 
         // Calculate the total price
-        const totalPrice = baseProduct.price + variant.price;
+        const actualPrice = baseProduct.price + variant.price;
         //console.log(totalPrice)
+        const prodtotalPrice = actualPrice*quantity;
 
         // Get the current user's shopping cart
         const userId = req.session.userLoggedInData.userId;
@@ -196,7 +205,7 @@ exports.updateCartItem = async(req,res)=>{
         // Update the quantity and total price of the product in the shopping cart
         const updatedCartItem = await shoppingCart.findOneAndUpdate(
             { user: userId, 'items.product': variantId },
-            { $set: { 'items.$.quantity': quantity, 'items.$.totalPrice': totalPrice * quantity } },
+            { $set: { 'items.$.quantity': quantity, 'items.$.totalPrice': prodtotalPrice} },
             { new: true }
         );
         
@@ -206,7 +215,7 @@ exports.updateCartItem = async(req,res)=>{
             const totalPriceOfAllProducts = updatedCartItem.items.reduce((acc, item) => acc + item.totalPrice, 0);
 
             // Send the updated total price and quantity back to the client
-            res.json({ totalPriceOfAllProducts, totalQuantity });
+            res.json({ totalPriceOfAllProducts, totalQuantity ,prodtotalPrice});
         }
     } catch (error) {
         console.error('Error updating cart item:', error);

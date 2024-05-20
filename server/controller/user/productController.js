@@ -7,13 +7,14 @@ const prodVariation = require('../../modals/productVariation');
 const shoppingCart = require('../../modals/shoppingCart');
 const crypto = require('crypto')
 
-//Get Category Page
+// Get Category Page
 exports.getCategories = async (req, res) => {
    const successMessage = req.flash('success');
-   const errorMessage = req.flash('error')
+   const errorMessage = req.flash('error');
+   const ITEMS_PER_PAGE = 3;
 
    // Get search and sort parameters from the query string
-   const { search, sort } = req.query;
+   const { search, sort, page } = req.query;
 
    // Build the query object
    let query = {};
@@ -22,8 +23,15 @@ exports.getCategories = async (req, res) => {
       query.name = { $regex: new RegExp(normalizedSearch, 'i') }; // Case-insensitive search
    }
 
-   // Fetch categories based on the query
-   let categories = await category.find(query).lean();
+   // Calculate skip value for pagination
+   const currentPage = parseInt(page) || 1;
+   const skip = (currentPage - 1) * ITEMS_PER_PAGE;
+
+   // Fetch categories based on the query with pagination
+   let categories = await category.find(query)
+                                 .skip(skip)
+                                 .limit(ITEMS_PER_PAGE)
+                                 .lean();
 
    // Sort the categories if a sort parameter is provided
    if (sort) {
@@ -34,10 +42,24 @@ exports.getCategories = async (req, res) => {
       }
    }
 
+   // Get total count of categories for pagination
+   const totalCategoriesCount = await category.countDocuments(query);
+
+   // Calculate total pages for pagination
+   const totalPages = Math.ceil(totalCategoriesCount / ITEMS_PER_PAGE);
+
    //const categories = await category.find({}).lean();
    const userData = req.session.userLoggedInData;
-   res.render('user/product/categorylisting', { categories, userData, success: successMessage, error: errorMessage });
-}
+   res.render('user/product/categorylisting', { 
+      categories,
+      userData, 
+      success: successMessage, 
+      error: errorMessage,
+      currentPage,
+      totalPages
+   });
+};
+
 
 
 
@@ -119,8 +141,8 @@ exports.productDetails = async (req, res) => {
       for (const variant of sixRandomVariants) {
          const baseProductDetails = await product.findById(variant.productId).lean();
          variant.price = baseProductDetails.price + variant.price;
-     }
-     
+   }
+
 
       // Dummy data for stock, rating, and reviews
       const rating = 4.5;

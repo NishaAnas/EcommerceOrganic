@@ -1,1 +1,284 @@
-<h1>checkout checkout page</h1>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Checkout</h1>
+        <form id="checkoutForm">
+            <div class="container d-flex flex-row ">
+                <div class="container d-flex flex-column ">
+                    <!-- Address Section -->
+                    <div class="card mb-4 position-relative">
+                        <div class="card-header">
+                            <h2 class="h5 d-inline">Shipping Address</h2>
+                            <a href="/addressManagement"
+                                class="btn btn-secondary btn-sm position-absolute"
+                                style="top: 10px; right: 10px;">
+                                <i class="bi bi-pencil"></i> Change
+                            </a>
+                        </div>
+                        <div class="card-body">
+                            <p>Default Address</p>
+                            {{#if defaultAddress}}
+                            <p id="default-address"><b>Name
+                                    :</b>{{defaultAddress.name}} ,<br><b>Area :
+                                </b>{{defaultAddress.area}} , <b>Street :
+                                </b>{{defaultAddress.street}} , <b>City :
+                                </b>{{defaultAddress.city}} ,<br>
+                                <b>State : </b>{{defaultAddress.state}} ,
+                                <b>Country : </b>{{defaultAddress.country}}
+                                ,<br>
+                                <b>pincode : </b>{{defaultAddress.pincode}}</p>
+                            {{else}}
+                            <p id="default-address">No Default Address</p>
+                            {{/if}}
+                        </div>
+                    </div>
+
+                    <!-- Delivery Options Section -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h2 class="h5">Delivery Options</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="radio"
+                                    name="deliveryOption" value="express"
+                                    id="delivery-fastest" checked>
+                                <label
+                                    class="form-check-label d-flex justify-content-between align-items-center w-100"
+                                    for="delivery-fastest">
+                                    <span>
+                                        Express Delivery
+                                        <small
+                                            class="d-block text-primary">Delivered
+                                            within 3 hours</small>
+                                    </span>
+                                    <span class="text-muted">₹100</span>
+                                </label>
+                            </div>
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="radio"
+                                    name="deliveryOption" value="standard"
+                                    id="delivery-normal">
+                                <label
+                                    class="form-check-label d-flex justify-content-between align-items-center w-100"
+                                    for="delivery-normal">
+                                    <span>
+                                        Standard Delivery
+                                        <small
+                                            class="d-block text-primary">Delivered
+                                            within 12 hrs</small>
+                                    </span>
+                                    <span class="text-muted">₹40</span>
+                                </label>
+                            </div>
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="radio"
+                                    name="deliveryOption" value="normal"
+                                    id="delivery-other">
+                                <label
+                                    class="form-check-label d-flex justify-content-between align-items-center w-100"
+                                    for="delivery-other">
+                                    <span>
+                                        Normal Delivery
+                                        <small
+                                            class="d-block text-primary">Delivered
+                                            within 24 hrs (based on Available
+                                            slots <br> Express/
+                                            Standard)</small>
+                                    </span>
+                                    <span class="text-muted">₹60</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Details Section -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h2 class="h5">Payment Details</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="radio"
+                                    name="paymentOption" value="paypal"
+                                    id="payment-paypal">
+                                <label class="form-check-label"
+                                    for="payment-paypal">
+                                    PayPal
+                                </label>
+                            </div>
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="radio"
+                                    name="paymentOption" value="razorpay"
+                                    id="payment-razorpay">
+                                <label class="form-check-label"
+                                    for="payment-razorpay">
+                                    Razorpay
+                                </label>
+                            </div>
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="radio"
+                                    name="paymentOption" value="wallet"
+                                    id="payment-wallet">
+                                <label class="form-check-label"
+                                    for="payment-wallet">
+                                    Wallet
+                                </label>
+                            </div>
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="radio"
+                                    name="paymentOption" value="card"
+                                    id="payment-card">
+                                <label class="form-check-label"
+                                    for="payment-card">
+                                    Credit Card/Debit Card
+                                </label>
+                                <a href="#" id="enter-card-details"
+                                    class="d-block text-primary"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#card-details-modal"
+                                    style="display: none;">Enter card
+                                    details</a>
+                            </div>
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="radio"
+                                    name="paymentOption" value="netbanking"
+                                    id="payment-netbanking">
+                                <label class="form-check-label"
+                                    for="payment-netbanking">
+                                    Net Banking
+                                    <select class="form-control mt-2">
+                                        <option value>Select Bank</option>
+                                        <option value="bank1">Bank 1</option>
+                                        <option value="bank2">Bank 2</option>
+                                        <option value="bank3">Bank 3</option>
+                                    </select>
+                                </label>
+                            </div>
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="radio"
+                                    name="paymentOption" value="cod"
+                                    id="payment-cod" checked>
+                                <label class="form-check-label"
+                                    for="payment-cod">
+                                    Cash on Delivery
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="container d-flex flex-column">
+                    <!-- Cart Summary Section -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h2 class="h5">Cart Summary</h2>
+                        </div>
+                        <div class="card-body">
+                            <ul id="cart-summary" class="list-group mb-3">
+                                {{#each cartitems}}
+                                <li
+                                    class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <img src="{{productImage}}"
+                                            alt="{{productName}}"
+                                            class="img-sm mr-3"
+                                            style="width: 20%;">
+                                        <div class="p-1 small">
+                                            <h6
+                                                class="my-0">{{productName}}</h6>
+                                            <small
+                                                class="text-muted">{{category}}
+                                                - {{baseProduct}}</small>
+                                            <br>
+                                            <small class="text-muted">Base
+                                                Price: ₹{{actualPrice}}</small>
+                                            <br>
+                                            <small class="text-muted">Quantity:
+                                                {{quantity}}</small>
+                                        </div>
+                                    </div>
+                                    <span
+                                        class="text-muted">₹{{totalPrice}}</span>
+                                </li>
+                                {{/each}}
+                            </ul>
+                            <p>Total Products: <span
+                                    id="total-quantity">{{totalQuantity}}</span></p>
+                            <p>Total Price: ₹<span
+                                    id="total-price">{{totalPriceOfAllProducts}}</span></p>
+                            <p>Delivery Price: ₹<span
+                                    id="delivery-price"></span></p>
+                            <hr>
+                            <p>Grand Total: ₹<span id="grand-total"></span></p>
+                        </div>
+                    </div>
+                    <div class="container">
+                        <button type="submit" form="checkoutForm"
+                            id="place-order"
+                            class="btn btn-primary btn-block">Place
+                            Order</button>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+        <!-- Card Details Modal -->
+        <div class="modal fade" id="card-details-modal" tabindex="-1"
+            aria-labelledby="cardDetailsModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="cardDetailsModalLabel">Enter
+                            Card Details</h5>
+                        <button type="button" class="close"
+                            data-bs-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="form-group">
+                                <label for="card-number">Card Number</label>
+                                <input type="text" class="form-control"
+                                    id="card-number"
+                                    placeholder="Enter card number">
+                            </div>
+                            <div class="form-group">
+                                <label for="expiry-date">Expiry Date</label>
+                                <input type="text" class="form-control"
+                                    id="expiry-date" placeholder="MM/YY">
+                            </div>
+                            <div class="form-group">
+                                <label for="cvv">CVV</label>
+                                <input type="text" class="form-control" id="cvv"
+                                    placeholder="Enter CVV">
+                            </div>
+                            <div class="form-group">
+                                <label>Card Type</label>
+                                <div>
+                                    <img src="/images/visa.jpeg" alt="Visa"
+                                        class="img-fluid" style="width: 50px;">
+                                    <img src="/images/mastercard.png"
+                                        alt="MasterCard" class="img-fluid"
+                                        style="width: 50px;">
+                                    <img src="/images/americanexpress.jpeg"
+                                        alt="American Express" class="img-fluid"
+                                        style="width: 50px;">
+                                    <img src="/images/rupay.png" alt="Rupay"
+                                        class="img-fluid" style="width: 50px;">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary"
+                            id="save-card-details">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="/javascripts/checkout.js"></script>
+
+    </body>

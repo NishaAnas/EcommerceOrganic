@@ -58,6 +58,23 @@ app.use(methodOverride('_method'));
 const isEqual = function (value1, value2) {
   return value1 === value2;
 }
+const range = function(start,end) {
+  let result = [];
+  for (let i = start; i <= end; i++) {
+      result.push(i);
+  }
+  return result;
+}
+const greaterThan = function(a,b) {
+  return a > b;
+}
+const subtract = function(a,b) {
+  return a-b;
+}
+const add = function(a,b) {
+  return a+b;
+}
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.engine('hbs', hbs.engine({ // use hbs.engine() instead of hbs()
@@ -67,6 +84,10 @@ app.engine('hbs', hbs.engine({ // use hbs.engine() instead of hbs()
   partialsDir: __dirname + '/views/partials/',
   helpers: {
     isEqual: isEqual,
+    gt:greaterThan,
+    range:range,
+    subtract:subtract,
+    add:add
   }
 }));
 

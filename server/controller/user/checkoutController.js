@@ -3,205 +3,198 @@ const bcrypt = require('bcrypt');
 const user = require('../../modals/user');
 const category = require('../../modals/categories');
 const Product = require('../../modals/product');
-const prodVariation =require('../../modals/productVariation');
+const prodVariation = require('../../modals/productVariation');
 const shoppingCart = require('../../modals/shoppingCart');
-const address =require('../../modals/address');
+const address = require('../../modals/address');
 const pincode = require('../../modals/pincode');
+const order = require('../../modals/order');
 const crypto = require('crypto');
 
 
 //Get Address managemnt of checkout page
-exports.getaddressPage = async(req,res)=>{
-    try {
-        const successMessage = req.flash('success');
-        const errorMessage = req.flash('error');
-        const country = 'India';
-        const state = 'Kerala';
-        const city = 'Thiruvananthapuram';
+exports.getaddressPage = async (req, res) => {
 
+    try {
         if (!req.session.userLoggedInData || !req.session.userLoggedInData.userloggedIn) {
             req.flash('error', 'To access the checkout, please log in first.');
             return res.redirect('/login');
         }
-
-
         const userId = req.session.userLoggedInData.userId;
-        const cart = await shoppingCart.findOne({ user: userId });
-
         const userData = req.session.userLoggedInData;
-        const pincodes = await pincode.find().lean();
-        const pincodeList = pincodes.map(p => ({ pincode: p.pincode, area: p.area }));
-        const userDetails = await user.findById(userId).lean();
-        const userAddresses = await address.find({ userId }).lean();
+        const Address = await address.findOne({ userId: userId, isDefault: true });
+        console.log(Address);
 
-        // Initialize total quantity and total price variables
-        let totalQuantity = 0;
-        let totalPriceOfAllProducts = 0;
-
-        // Calculate total quantity and total price if cart is found
-        if (cart) {
-            totalQuantity = cart.items.reduce((acc, item) => acc + item.quantity, 0);
-            totalPriceOfAllProducts = cart.items.reduce((acc, item) => acc + item.totalPrice, 0);
-        }
-
-        res.render('user/checkout/addressManagement', {
-            userDetails,
-            userAddresses,
-            userData,
-            country,
-            state,
-            city,
-            pincodes,
-            pincodeList,
-            totalQuantity,
-            totalPriceOfAllProducts, 
-            success: successMessage,
-            error: errorMessage
-        });
+        res.render('user/checkout/addressManagement', { Address, userData ,layout:'checkoutlayout'});
     } catch (error) {
         console.log(error);
-        req.flash('error', 'Server Error');
-        res.redirect('/');
-    }
-}
-// Add Address to the database (for Checkout)
-exports.addAddress = async (req, res) => {
-    try {
-        const userId = req.session.userLoggedInData.userId;
-
-        const newAddress = new address({
-            userId: userId,
-            name: req.body.uname,
-            street: req.body.street,
-            pincode: req.body.pincode,
-            area: req.body.area,
-            city: req.body.city,
-            state: req.body.state,
-            country: req.body.country
-        });
-        await address.create(newAddress);
-        req.flash('success', 'Address added successfully.');
-        res.redirect('/checkaddressManagement');
-    } catch (error) {
-        console.log(error);
-        req.flash('error', 'Server Error');
-        res.redirect('/checkaddressManagement');
-    }
-};
-
-
-//Update Default Address(check out)
-exports.updateDefaultAddress = async(req,res)=>{
-    try {
-        const { addressId } = req.body;
-
-        // Find the address by ID
-        const Address = await address.findById(addressId);
-        if (!Address) {
-            return res.status(404).json({ 
-                success: false, 
-                message: 'Address not found' 
-            });
-        }
-
-        // Set all addresses to not default
-        await address.updateMany({ userId: Address.userId }, { isDefault: false });
-
-        // Set the selected address to default using findOneAndUpdate
-        await address.findOneAndUpdate(
-            { _id: addressId },
-            { isDefault: true },
-            { new: true } // This option returns the modified document
-        );
-
-        res.json({ success: true });
-        console.log(`success`);
-    } catch (error) {
-        console.error('Error updating default address:', error);
-        res.status(500).json({ success: false, message: 'Internal server error' });
+        res.render('user/checkout/addressManagement');
     }
 }
 
-// Edit Address (for Checkout)
-exports.editAddress = async (req, res) => {
-    try {
-        const addressId = req.params._id;
-        const { name, street, area, pincode } = req.body;
-
-        const updatedAddress = await Address.findByIdAndUpdate(addressId, {
-            name,
-            street,
-            area,
-            pincode
-        }, { new: true });
-
-        if (updatedAddress) {
-            req.flash('success', 'Address updated successfully.');
-        } else {
-            req.flash('error', 'Failed to update address. Please try again.');
-        }
-
-        res.redirect('/checkaddressManagement');
-    } catch (error) {
-        console.log(error);
-        req.flash('error', 'An error occurred while updating the address. Please try again.');
-        res.redirect('/checkaddressManagement');
-    }
-};
-
-// Delete Address (for Checkout)
-exports.deleteAddress = async (req, res) => {
-    try {
-        const addressId = req.params._id;
-        const deletedAddress = await Address.findByIdAndDelete(addressId);
-
-        if (deletedAddress) {
-            req.flash('success', 'Address deleted successfully.');
-        } else {
-            req.flash('error', 'Failed to delete address. Please try again.');
-        }
-
-        res.redirect('/checkaddressManagement');
-    } catch (error) {
-        console.log(error);
-        req.flash('error', 'An error occurred while deleting the address. Please try again.');
-        res.redirect('/checkaddressManagement');
-    }
-};
 
 //GET Checkout Page
-exports.getcheckOut = async(req,res)=>{
+exports.getcheckOut = async (req, res) => {
     const successMessage = req.flash('success');
     const errorMessage = req.flash('error');
     const userData = req.session.userLoggedInData;
+    try {
+        if (!req.session.userLoggedInData || !req.session.userLoggedInData.userloggedIn) {
+            req.flash('error', 'To access the checkout, please log in first.');
+            return res.redirect('/login');
+        }
+        const userId = req.session.userLoggedInData.userId;
+        const addressRecord = await address.findOne({ userId: userId, isDefault: true });
+        const defaultAddress = addressRecord ? addressRecord.toObject() : null;
+        //console.log(defaultAddress);
 
-    return res.render('user/checkout/checkout',{userData, success: successMessage, error: errorMessage });
+        //save shipping address to session
+        req.session.addressDetails = defaultAddress;
+
+        // Retrieve cart details from the session
+        const cartDetails = req.session.cartDetails;
+
+        if (!cartDetails) {
+            req.flash('error', 'Your cart is empty.');
+            return res.redirect('/shoppingCart');
+        }
+        //console.log(cartDetails);
+
+        return res.render('user/checkout/checkout', {
+            userData,
+            defaultAddress,
+            cartitems: cartDetails.cartitems,
+            totalQuantity: cartDetails.totalQuantity,
+            totalPriceOfAllProducts: cartDetails.totalPriceOfAllProducts,
+            success: successMessage,
+            error: errorMessage,
+            layout:'checkoutlayout'
+        });
+    } catch (error) {
+        console.log(error)
+    }
 }
 
-//GET Order Conformation Page
-exports.getOrderConformation = async(req,res)=>{
-    const successMessage = req.flash('success');
-    const errorMessage = req.flash('error');
+//POST Checkout (Place Order)
+exports.placeOrder = async (req, res) => {
+    //console.log(req.body);
     const userData = req.session.userLoggedInData;
+    const shippingAddress = req.session.addressDetails;
+    const cartDetails = req.session.cartDetails;
+    const { deliveryOption, paymentOption } = req.body;
 
-    return res.render('user/checkout/orderconformation',{userData, success: successMessage, error: errorMessage });
+    if (!cartDetails) {
+        req.flash('error', 'Your cart is empty.');
+        return res.redirect('/shoppingCart');
+    }
+
+    try {
+        // Create payment details based on user selection
+        const payment = {
+            method: paymentOption, // e.g., 'cod', 'credit_card'
+            status: paymentOption === 'cod' ? 'Pending' : 'Paid', // COD is 'Pending', others are 'Paid'
+            transactionId: null // Default to null
+        };
+
+        // Create delivery details based on user selection
+        const delivery = {
+            method: deliveryOption, // e.g., 'standard', 'express'
+            status: 'Pending' // Initial status is 'Pending'
+        };
+
+        // Create order items from cart details
+        const items = cartDetails.cartitems.map(item => ({
+            productId: item.variantId,
+            quantity: item.quantity,
+            price: item.actualPrice
+        }));
+
+        // Create the order object to be saved in the database
+        const Order = new order({
+            userId: userData.userId,
+            items: items,
+            totalAmount: cartDetails.totalPriceOfAllProducts,
+            address: shippingAddress._id,
+            payment: payment,
+            delivery: delivery,
+            orderStatus: 'Pending'
+        });
+
+        // Save the order to the database
+        const newOrder = await order.create(Order);
+
+        // Update the stock of each item
+        for (const item of items) {
+            await prodVariation.updateOne(
+                { _id: item.productId },
+                { $inc: { stock: -item.quantity } }
+            );
+        }
+
+        // Delete the cart document from the database
+        await shoppingCart.deleteOne({ user: userData.userId });
+
+        // Clear the cart session  and address session after placing the order
+        req.session.cartDetails = null;
+        req.session.addressDetails = null;
+
+        // Respond with a success message
+        res.status(200).json({ message: 'Order placed successfully', orderId: newOrder._id });
+    } catch (error) {
+        console.error('Error placing order:', error);
+        res.status(500).json({ error: 'An error occurred while placing the order. Please try again.' });
+    }
+
 }
-
 
 //GET Order Details Page
-exports.getOrderDetails = async(req,res)=>{
+exports.getOrderDetails = async (req, res) => {
     const successMessage = req.flash('success');
     const errorMessage = req.flash('error');
     const userData = req.session.userLoggedInData;
+    const orderId = req.params._id;
+    console.log(orderId);
 
-    return res.render('user/checkout/orderdetails',{userData, success: successMessage, error: errorMessage });
-}
+    if (!mongoose.Types.ObjectId.isValid(orderId)) {
+        req.flash('error', 'Invalid order ID.');
+        return res.redirect('/orders'); // Redirect to orders list or appropriate page
+    }
 
-//Get Order History page
-exports.getOrderHistory = async(req,res)=>{
-    const successMessage = req.flash('success');
-    const errorMessage = req.flash('error');
-    const userData = req.session.userLoggedInData;
+    try {
+        // Fetch order details and populate address and product details
+        const orderDetails = await order.findById(orderId)
+            .populate('address')
+            .populate({
+                path: 'items.productId',
+                model: 'productVariation'
+            });
 
-    return res.render('user/checkout/orderhistory',{userData, success: successMessage, error: errorMessage });
+        // Combine product details with image URLs
+        const itemsWithImages = orderDetails.items.map(item => {
+            const product = item.productId.toObject();
+            const images = product.images; // Assuming images is an array of URLs
+            return {
+                ...item.toObject(),
+                productId: product._id,
+                attributeName: product.attributeName,
+                attributeValue: product.attributeValue,
+                price: product.price,
+                stock: product.stock,
+                isActive: product.isActive,
+                isDeleted: product.isDeleted,
+                images: images
+            };
+        });
+
+        // Combine order details with items including images
+        const orderWithItemsAndImages = {
+            ...orderDetails.toObject(),
+            items: itemsWithImages
+        };
+
+        console.log(orderWithItemsAndImages.items);
+
+        return res.render('user/checkout/orderdetails', { order: orderWithItemsAndImages, userData, success: successMessage, error: errorMessage });
+    } catch (error) {
+        console.log(error)
+    }
 }

@@ -10,7 +10,7 @@ const productVariationSchema = new Schema({
     },
     productId:{
         type: Schema.Types.ObjectId,
-        ref: 'Product'
+        ref: 'product'
     },
     attributeName:{
         type: String,

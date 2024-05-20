@@ -4,7 +4,6 @@ var router = express.Router();
 var authController = require('../controller/user/authenticationController.js');
 var prodController = require('../controller/user/productController.js');
 var cartController = require('../controller/user/cartController.js');
-var orderController = require('../controller/user/orderController.js');
 var accountController = require('../controller/user/accountController.js');
 var checkoutController = require('../controller/user/checkoutController.js');
 const passport = require('passport');
@@ -145,34 +144,28 @@ router.put('/editAddress/:_id',accountController.editAddress);
 //Delete Address in Address management Page
 router.put('/deleteAddress/:_id',accountController.deleteAddress)
 
+//GET order details page 
+router.get('/acctorderDetails',accountController.getOrderDetails);
+
+//Cancel Order
+router.post('/cancelOrder', accountController.cancelOrder);
+
+
 
 //Get Address managemnt of checkout page
 router.get('/checkaddressManagement',checkoutController.getaddressPage);
 
-//add Address to the database(for Checkout)
-router.post('/checkaddAddress',accountController.addAddress);
-
-//update default value of address(for Checkout)
-router.post('/checkupdateDefaultAddress',accountController.updateDefaultAddress);
-
-//Edit Address in Address management page(for Checkout)
-router.put('/ckeckeditAddress/:_id',accountController.editAddress);
-
-//Delete Address in Address management Page(for Checkout)
-router.put('/checkdeleteAddress/:_id',accountController.deleteAddress)
-
-
 //GET Checkout Page
 router.get('/checkout',checkoutController.getcheckOut);
 
-//GET Order Conformation Page
-router.get('/orderconformation',checkoutController.getOrderConformation);
+//Post checkout (Place Order)
+router.post('/placeOrder', checkoutController.placeOrder);
 
 //GET Order Details Page
-router.get('/orderDetails',checkoutController.getOrderDetails);
+router.get('/orderDetails/:_id',checkoutController.getOrderDetails);
 
-//Get Order History page
-router.get('/orderhistory',checkoutController.getOrderHistory);
+//Cancel order
+// router.post('/cancelOrdercheckout',checkoutController.cancelOrder)
 
 module.exports = router;
 

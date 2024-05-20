@@ -30,7 +30,7 @@ const productSchema = new Schema({
     },
     categoryId: {
       type: Schema.Types.ObjectId,
-      ref: 'Category' // Reference to the Category collection
+      ref: 'category' // Reference to the Category collection
     },
     isActive: {
       type: Boolean,
@@ -42,7 +42,7 @@ const productSchema = new Schema({
     },
     variations: [{
       type: Schema.Types.ObjectId,
-      value:'product_Variation' //Reference to the product variation collection
+      value:'productVariation' //Reference to the product variation collection
     }]
   },{timestamps:true});
   

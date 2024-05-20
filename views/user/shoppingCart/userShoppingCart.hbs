@@ -28,24 +28,26 @@
                                 {{#each cartitems}}
                                 <tr>
                                     <td>
+                                        <a href="/productDetails/{{variantId}}">
                                         <figure class="itemside align-items-center">
                                             <div class="aside"><img src={{productImage}} class="img-sm"></div>
                                             <figcaption class="info"> <a href="#" class="title text-dark" data-abc="true">{{productName}}</a>
                                                 <p class="text-muted small">{{category}}<br>{{baseProduct}}<br>
-                                                Quantity: <span class="quantity" id="productquantity-{{variantId}}">{{quantity}}</span><br>Base Price:{{totalPrice}}</p>
+                                                Quantity: <span class="quantity" id="productquantity-{{variantId}}">{{quantity}}</span><br>Base Price:{{actualPrice}}</p>
                                             </figcaption>
                                         </figure>
+                                        </a>
                                     </td>
                                     <td> <select class="form-control quantity-select" data-variant-id="{{variantId}}" style="width: 50%;">
-                                            <option value="1">1</option>
-                                            <option value="2">2</option>
-                                            <option value="3">3</option>
-                                            <option value="4">4</option>
+                                            <option value="1" {{#if (isEqual quantity 1)}}selected{{/if}}>1</option>
+                                            <option value="2" {{#if (isEqual quantity 2)}}selected{{/if}}>2</option>
+                                            <option value="3" {{#if (isEqual quantity 3)}}selected{{/if}}>3</option>
+                                            <option value="4" {{#if (isEqual quantity 4)}}selected{{/if}}>4</option>
                                         </select>
                                     <td>
                                         <div class="price-wrap"> 
                                             <var class="price" id="total-price-{{variantId}}">{{totalPrice}}<br></var> 
-                                            <small class="text-muted"> {{totalPrice}} X <span class="quantity" id="quantity-{{variantId}}"  data-base-price="{{basePrice}}">{{quantity}}</span> </small> 
+                                            <small class="text-muted"> {{actualPrice}} X <span class="quantity" id="quantity-{{variantId}}"  data-base-price="{{basePrice}}">{{quantity}}</span> </small> 
                                         </div>
                                     </td>
                                     <td class="text-right d-none d-md-block">
@@ -90,7 +92,7 @@
                             <dt>Total:</dt>
                             <dd class="text-right ml-3"><strong class="total-price-of-all-products">{{totalPriceOfAllProducts}}</strong></dd>
                         </dl>
-                        <hr> <a href="/checkaddressManagement" class="btn btn-out btn-primary btn-square btn-main" data-abc="true"> Make Purchase </a>
+                        <hr> <a href="/checkout" class="btn btn-out btn-primary btn-square btn-main" data-abc="true"> Make Purchase </a>
                         <a href="/" class="btn btn-out btn-success btn-square btn-main mt-2" data-abc="true">Continue Shopping</a>
                     </div>
                 </div>

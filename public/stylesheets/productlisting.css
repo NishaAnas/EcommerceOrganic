@@ -34,24 +34,6 @@ body {
     transition: all linear 0.25s;
 }
 
-.profile-card-2 .profile-icons {
-    position: absolute;
-    bottom: 30px;
-    right: 30px;
-    color: #FFF;
-    transition: all linear 0.25s;
-}
-
-.profile-card-2 .profile-username {
-    position: absolute;
-    bottom: 50px;
-    left: 30px;
-    color: #0c0c0c;
-    font-size: 18px;
-    transition: all linear 0.25s;
-    z-index: 2;
-}
-
 
 .profile-card-2:hover img {
     filter: grayscale(100%);
@@ -60,11 +42,6 @@ body {
 .profile-card-2:hover .profile-name {
     bottom: 80px;
 }
-
-.profile-card-2:hover .profile-username {
-    bottom: 60px;
-}
-
 
 
 .search{
@@ -120,12 +97,6 @@ a:link{
 }
 
 
-
-
-
-
-
-
 .drp-btn{
     width: 200px;
     display: flex;
@@ -136,25 +107,18 @@ a:link{
     font-weight: 600;
 }
 .drp-btn:focus{
-
     box-shadow: none !important;
-
 }
 
-
 .drp-btn::after {
-
     display: none;
-
 }
 
 .upper-dropdown{
-
     width: 200px;
-        border: 2px solid #F44336;
-        padding: 0rem 0;
-            transform: translate3d(0px, 50px, 0px) !important;
-
+    border: 2px solid #F44336;
+    padding: 0rem 0;
+    transform: translate3d(0px, 50px, 0px) !important;
 }
 
 .dropdown-list:focus, .dropdown-list:hover {
@@ -167,5 +131,80 @@ a:link{
     display: block;
     width: 100%;
     padding: 12px;
-
     }
+
+    .pagination-outer {
+        text-align: center;
+        margin-top: 20px;
+    }
+    
+    .pagination {
+        display: inline-flex;
+        position: relative;
+        
+        padding: 0;
+    }
+    
+    .pagination:before {
+        content: "";
+        width: 100%;
+        height: 2px;
+        background: #e8e8e8;
+        position: absolute;
+        top: 50%;
+        left: 0;
+        
+    }
+    
+    .pagination li {
+        margin: 0 5px;
+    }
+    
+    .pagination li a.page-link {
+        display: block;
+        padding: 5px 15px;
+        background: #f8f8f8;
+        border: 1px solid #e8e8e8;
+        border-radius: 5px;
+        box-shadow: 0 8px 6px -9px #5b5f5f;
+        font-size: 17px;
+        color: #686c6c;
+       
+    }
+    
+    .pagination li:first-child a.page-link {
+        margin-right: 30px;
+    }
+    
+    .pagination li:last-child a.page-link {
+        margin-left: 30px;
+    }
+    
+    .pagination li.active a.page-link,
+    .pagination li a.page-link:hover {
+        background: #85b83d;
+        border-color: #739d46;
+        color: #fff;
+    }
+    
+    .pagination li.disabled a.page-link {
+        pointer-events: none;
+        background: #e8e8e8;
+        color: #b8b8b8;
+    }
+    
+    @media only screen and (max-width: 479px) {
+        .pagination {
+            display: block;
+            overflow: auto;
+        }
+    
+        .pagination:before {
+            display: none;
+        }
+    
+        .pagination li {
+            display: inline-block;
+        }
+    }
+    

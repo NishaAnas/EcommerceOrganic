@@ -1,0 +1,124 @@
+<body>
+    <div class="container mt-5">
+        <h2>Order Management <small>Organic</small></h2>
+
+        {{#if success}}
+        <div class="alert alert-success">
+            {{success}}
+        </div>
+        {{/if}}
+        {{#if error}}
+        <div class="alert alert-danger">
+            {{error}}
+        </div>
+        {{/if}}
+
+        {{!-- <div class="d-flex justify-content-end mb-3">
+            <!-- Add Order Button -->
+            <a href="/admin/addOrder" class="btn btn-sm btn-success">+ Add Order</a>
+        </div> --}}
+
+        <div class="table-responsive" style="font-size: 75%;">
+            <table class="table table-bordered">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Ordered Date</th>
+                        <th>User</th>
+                        <th>Total Amount</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each Orders}}
+                    <tr>
+                        <td>{{this._id}}</td>
+                        <td>{{this.orderDate}}</td>
+                        <td>{{this.userId.email}}</td>
+            <td>${{this.totalAmount}}</td>
+            <td>
+                <select class="order-status" data-order-id="{{this._id}}">
+                    <option value="Pending" {{#if (isEqual this.orderStatus 'Pending')}}selected{{/if}}>Pending</option>
+                    <option value="Confirmed" {{#if (isEqual this.orderStatus 'Confirmed')}}selected{{/if}}>Confirmed</option>
+                    <option value="Processing" {{#if (isEqual this.orderStatus 'Processing')}}selected{{/if}}>Processing</option>
+                    <option value="Completed" {{#if (isEqual this.orderStatus 'Completed')}}selected{{/if}}>Completed</option>
+                    <option value="Cancelled" {{#if (isEqual this.orderStatus 'Cancelled')}}selected{{/if}}>Cancelled</option>
+                </select>
+            </td>
+            <td>
+                <button class="btn btn-danger btn-sm cancel-order" data-order-id="{{this._id}}">Cancel Order</button>
+            </td>
+        </tr>
+        {{/each}}
+    </tbody>
+</table>
+<script>
+    $(document).ready(function() {
+    // Change order status
+    $('.order-status').change(function() {
+        const orderId = $(this).data('order-id');
+        const newStatus = $(this).val();
+
+        $.ajax({
+            url: '/admin/changeOrderStatus',
+            type: 'POST',
+            data: {
+                orderId: orderId,
+                status: newStatus
+            },
+            success: function(response) {
+                Swal.fire({
+                    icon: 'success',
+                    text: 'Order status updated successfully.'
+                });
+            },
+            error: function(error) {
+                Swal.fire({
+                    icon: 'error',
+                    text: 'Failed to update order status.'
+                });
+            }
+        });
+    });
+
+    // Cancel order
+    $('.cancel-order').click(function() {
+        const orderId = $(this).data('order-id');
+
+        Swal.fire({
+            icon: 'warning',
+            title: 'Are you sure?',
+            text: 'Are you sure you want to cancel this order?',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, cancel it!',
+            cancelButtonText: 'No, keep it'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/admin/ordersCancel',
+                    type: 'POST',
+                    data: {
+                        orderId: orderId
+                    },
+                    success: function(response) {
+                        Swal.fire({
+                            icon: 'success',
+                            text: 'Order cancelled successfully.'
+                        }).then(() => {
+                            location.reload(); // Refresh the page to reflect the changes
+                        });
+                    },
+                    error: function(error) {
+                        Swal.fire({
+                            icon: 'error',
+                            text: 'Failed to cancel order.'
+                        });
+                    }
+                });
+            }
+        });
+    });
+});
+</script>
+    </body>

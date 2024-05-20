@@ -1,0 +1,36 @@
+<link rel="stylesheet" href="/stylesheets/accorderDetails.css">
+<body>
+    <div class="container">
+        <h1>User Account - Orders</h1>
+        <div class="orders-list">
+            {{#each orderDetails}}
+            <a href="/orderDetails/{{ this._id }}" class="order-card">
+            <div class="order-card">
+                <div class="row">
+                    <div class="col">Order Id:</div>
+                    <div class="col">{{ this._id }}</div>
+                </div>
+                <div class="row">
+                    <div class="col">Order Date:</div>
+                    <div class="col">{{ this.orderDate }}</div>
+                </div>
+                <div class="row">
+                    <div class="col">Total Amount:</div>
+                    <div class="col">₹{{ this.totalAmount }}</div>
+                </div>
+                <div class="row">
+                    <div class="col">Delivery Status:</div>
+                    <div class="col">{{ this.orderStatus }}</div>
+                </div>
+            </div>
+        </a>
+            {{#if (isEqual this.orderStatus "Cancelled")}}
+                <button class="cancel-button-diasbled" disabled>Cancelled</button>
+                {{else}}
+                <button class="cancel-button" data-orderid="{{ this._id }}">Cancel Order</button>
+                {{/if}}
+            {{/each}}
+        </div>
+    </div>
+    <script src="/javascripts/orderDetails.js"></script>
+</body>

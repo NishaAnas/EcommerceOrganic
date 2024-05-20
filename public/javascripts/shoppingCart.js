@@ -18,7 +18,7 @@ $(document).ready(function() {
                 // Update the total price and quantity display
                 $('#quantity-' + variantId).text(quantity);
                 $('#productquantity-' + variantId).text(quantity);
-                $('#total-price-' + variantId).text(totalPrice.toFixed(2));
+                $('#total-price-' + variantId).text(response.prodtotalPrice.toFixed(2));
 
                 $('#total-price-of-all-products').text(response.totalPriceOfAllProducts.toFixed(2));
 

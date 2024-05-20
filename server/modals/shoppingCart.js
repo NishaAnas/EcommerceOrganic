@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 const cartItemSchema = new Schema({
     product: {
         type: Schema.Types.ObjectId,
-        ref: 'variation',
+        ref: 'productVariation',
         required: true
     },
     quantity: {
@@ -22,7 +22,7 @@ const cartItemSchema = new Schema({
 const shoppingCartSchema = new Schema({
     user: {
         type: Schema.Types.ObjectId,
-        ref: 'User',
+        ref: 'user',
         required: true
     },
     items: [cartItemSchema], // Embedding CartItem schema within ShoppingCart schema
