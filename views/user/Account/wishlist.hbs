@@ -1,0 +1,46 @@
+<link rel="stylesheet" href="/stylesheets/wishlist.css">
+<body>
+    {{#if error}}
+    <div id="flash-message" class="alert alert-danger" role="alert">
+        {{error}}
+    </div>
+    {{/if}}
+    {{#if success}}
+    <div id="flash-message" class="alert alert-success" role="alert">
+        {{success}}
+    </div>
+    {{/if}}
+
+    <div class="container py-5">
+        <h1>My Wishlist</h1>
+
+        <div class="row">
+            <div class="col-md-4">
+                {{#each wishlist}}
+                <div class="profile-card-2"><img src="/{{this.images.[0]}}"
+                        class="img img-responsive">
+                    <div class="profile-name">{{attributeValue}}</div>
+                    <div class="profile-username">Buy At: {{totalPrice}}</div>
+                    <div class="profileicons">
+                        <form action="#" method="POST" class="d-inline">
+                            <input type="hidden" name="variantId"
+                                value="{{this._id}}">
+                            {{#if (gt this.stock 0)}}
+                            <button type="submit" class="btn btn-success"><i
+                                    class="bi bi-cart"></i></button>
+                            {{else}}
+                            <button type="button" class="btn btn-secondary"
+                                disabled><i class="bi bi-cart-x-fill"></button>
+                                {{/if}}
+                            </form>
+                                <button type="submit" class="btn btn-danger remove-button" data-variantid="{{this._id}}">
+                                    <i class="bi bi-trash"></i></button>
+                            
+                        </div>
+                    </div>
+                    {{/each}}
+                </div>
+            </div>
+        </div>
+        <script src="/javascripts/wishlist.js"></script>
+    </body>

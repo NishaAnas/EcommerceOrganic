@@ -6,6 +6,7 @@ var prodController = require('../controller/user/productController.js');
 var cartController = require('../controller/user/cartController.js');
 var accountController = require('../controller/user/accountController.js');
 var checkoutController = require('../controller/user/checkoutController.js');
+var wishlistController = require('../controller/user/wishlistController.js');
 const passport = require('passport');
 require('../config/passport.js');
 
@@ -130,7 +131,7 @@ router.put('/editProfile/:_id',accountController.editProfileInformation);
 router.post('/changePassword/:_id',accountController.changePassword);
 
 //Addres Management Page
-router.get('/addressManagement',accountController.getmanageAccount);
+router.get('/addressManagement',accountController.getmanageAddess);
 
 //add Address to th edatabase
 router.post('/addAddress',accountController.addAddress);
@@ -153,7 +154,7 @@ router.post('/cancelOrder', accountController.cancelOrder);
 
 
 //Get Address managemnt of checkout page
-router.get('/checkaddressManagement',checkoutController.getaddressPage);
+//router.get('/checkaddressManagement',checkoutController.getaddressPage);
 
 //GET Checkout Page
 router.get('/checkout',checkoutController.getcheckOut);
@@ -164,8 +165,18 @@ router.post('/placeOrder', checkoutController.placeOrder);
 //GET Order Details Page
 router.get('/orderDetails/:_id',checkoutController.getOrderDetails);
 
-//Cancel order
-// router.post('/cancelOrdercheckout',checkoutController.cancelOrder)
+
+//GET Empty Wishlist
+router.get('/emptyWishlist',wishlistController.getEmptyWishlist)
+
+//GET Wishlist page
+router.get('/wishlist',wishlistController.getWislist)
+
+//Add Product to wishlist
+router.post('/addToWishlist',wishlistController.addToWishlist)
+
+//Remove from Wishlist
+router.post('/removeFromWishlist',wishlistController.removefromWishlist)
 
 module.exports = router;
 

@@ -68,6 +68,9 @@ const range = function(start,end) {
 const greaterThan = function(a,b) {
   return a > b;
 }
+const lessThan = function(a,b) {
+  return a < b;
+}
 const subtract = function(a,b) {
   return a-b;
 }
@@ -85,6 +88,7 @@ app.engine('hbs', hbs.engine({ // use hbs.engine() instead of hbs()
   helpers: {
     isEqual: isEqual,
     gt:greaterThan,
+    lt:lessThan,
     range:range,
     subtract:subtract,
     add:add

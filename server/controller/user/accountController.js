@@ -1,15 +1,9 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const user = require('../../modals/user');
-const category = require('../../modals/categories');
-const Product = require('../../modals/product');
-const prodVariation =require('../../modals/productVariation');
-const shoppingCart = require('../../modals/shoppingCart');
 const address =require('../../modals/address');
 const pincode = require('../../modals/pincode');
 const order = require('../../modals/order');
-const crypto = require('crypto');
-
 
 //show Profile Details Page
 exports.getProfilePage = async(req,res)=>{
@@ -38,6 +32,7 @@ exports.getProfilePage = async(req,res)=>{
         console.log(error)
     }
 }
+
 
 //Edit Profile Information
 exports.editProfileInformation = async(req,res)=>{
@@ -104,8 +99,8 @@ exports.changePassword = async(req,res)=>{
     }
 }
 
-//Get Account Mangement Page
-exports.getmanageAccount = async(req,res)=>{
+//Get Address Mangement Page
+exports.getmanageAddess = async(req,res)=>{
     try {
         const successMessage = req.flash('success');
         const errorMessage = req.flash('error');
@@ -158,7 +153,7 @@ exports.addAddress = async(req,res)=>{
             pincode: req.body.pincode,
             area: req.body.area
         });
-       await address.create(newAddress);
+        await address.create(newAddress);
         req.flash('success', 'Address added Successfully ');
         res.redirect('/checkaddressManagement');
 
@@ -213,7 +208,8 @@ exports.editAddress = async (req, res) => {
             street,
             area,
             pincode,
-        }, { new: true });
+        }, 
+        { new: true });
 
         if (updatedAddress) {
             req.flash('success', 'Address updated successfully.');
@@ -248,7 +244,6 @@ exports.deleteAddress = async(req,res)=>{
     }
 }
 
-
 //GET Order Details
 exports.getOrderDetails = async(req,res)=>{
     const successMessage = req.flash('success');
@@ -259,13 +254,25 @@ exports.getOrderDetails = async(req,res)=>{
             req.flash('error', 'To access Account, please LogIn first.');
             return res.redirect('/login');
         }
-        const orderDetails = await order.find({userId:userId}).lean();
-        //console.log(orderDetails)
+        // Get page and limit from query parameters, default to page 1 and limit 5
+            const page = parseInt(req.query.page) || 1;
+            const limit = 5;
 
+    // Fetch orders with pagination
+    const orderDetails = await order.find({ userId: userId })
+                                    .skip((page - 1) * limit)
+                                    .limit(limit)
+                                    .sort({ orderDate: -1 })
+                                    .lean();
+
+    // Total orders count
+    const totalOrders = await order.countDocuments({ userId: userId });
         res.render('user/Account/orderDetails',{
             orderDetails,
-            layout:'userAccountLayout', 
-            success: successMessage, 
+            currentPage: page,
+            totalPages: Math.ceil(totalOrders / limit),
+            layout: 'userAccountLayout',
+            success: successMessage,
             error: errorMessage
         });
 }

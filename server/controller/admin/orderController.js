@@ -15,6 +15,7 @@ exports.getOrdermanager = async(req,res)=>{
         const Orders = await order.find({})
             .populate('userId', 'email') 
             .populate('items.productId') 
+            .sort({ orderDate: -1 })
             .lean();
         
             console.log(Orders);
@@ -28,9 +29,7 @@ exports.getOrdermanager = async(req,res)=>{
 exports.changeOrderStatus = async (req, res) => {
     try {
         const { orderId, status } = req.body;
-
-        await order.findByIdAndUpdate(orderId, { orderStatus: status });
-        
+        await order.findByIdAndUpdate(orderId, { orderStatus: status });     
         res.status(200).json({ message: 'Order status updated successfully.' });
     } catch (error) {
         res.status(500).json({ message: 'Failed to update order status.' });

@@ -1,3 +1,25 @@
+//Update Area According to pincode
+document.addEventListener('DOMContentLoaded', function() {
+    const pincodeInputAdd = document.getElementById('pincode');
+    const areaInputAdd = document.getElementById('area');
+    const pincodeErrorAdd = document.getElementById('pincode_error');
+
+    pincodeInputAdd.addEventListener('input', function() {
+        updateAreaAndValidatePincode(this, areaInputAdd, pincodeErrorAdd);
+    });
+
+    document.querySelectorAll('[id^="pincode"]').forEach(function(pincodeInput) {
+        const id = pincodeInput.id.replace('pincode', '');//set id as the remaining name other than pincode
+        const areaInput = document.getElementById(`area${id}`);
+        const pincodeError = document.getElementById(`pincode_error${id}`);
+
+        pincodeInput.addEventListener('input', function() {
+            updateAreaAndValidatePincode(this, areaInput, pincodeError);
+        });
+    });
+});
+
+//checking for area and pincode fond or not
 function updateAreaAndValidatePincode(input, areaElement, pincodeErrorElement) {
     const datalist = input.list;
     const options = datalist.options;
@@ -19,29 +41,9 @@ function updateAreaAndValidatePincode(input, areaElement, pincodeErrorElement) {
     }
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    const pincodeInputAdd = document.getElementById('pincode');
-    const areaInputAdd = document.getElementById('area');
-    const pincodeErrorAdd = document.getElementById('pincode_error');
-
-    pincodeInputAdd.addEventListener('input', function() {
-        updateAreaAndValidatePincode(this, areaInputAdd, pincodeErrorAdd);
-    });
-
-    document.querySelectorAll('[id^="pincode"]').forEach(function(pincodeInput) {
-        const id = pincodeInput.id.replace('pincode', '');
-        const areaInput = document.getElementById(`area${id}`);
-        const pincodeError = document.getElementById(`pincode_error${id}`);
-
-        pincodeInput.addEventListener('input', function() {
-            updateAreaAndValidatePincode(this, areaInput, pincodeError);
-        });
-    });
-});
 
 
-
-//To cahange Default Address
+//To change Default Address
 document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('input[name="defaultAddress"]').forEach(radio => {
         radio.addEventListener('change', function () {

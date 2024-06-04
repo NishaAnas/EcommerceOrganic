@@ -12,7 +12,7 @@
                 </div>
                 <div class="row">
                     <div class="col">Order Date:</div>
-                    <div class="col">{{ this.orderDate }}</div>
+                    <div class="col order-date">{{ this.orderDate }}</div>
                 </div>
                 <div class="row">
                     <div class="col">Total Amount:</div>
@@ -31,6 +31,20 @@
                 {{/if}}
             {{/each}}
         </div>
+        <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+            {{#if (gt currentPage 1)}}
+                <li class="page-item">
+                    <button class="page-link" onclick="changePage({{subtract currentPage 1}})">Previous</button>
+                </li>
+            {{/if}}
+            {{#if (lt currentPage totalPages)}}
+                <li class="page-item">
+                    <button class="page-link" onclick="changePage({{add currentPage 1}})">Next</button>
+                </li>
+            {{/if}}
+        </ul>
+    </nav>
     </div>
     <script src="/javascripts/orderDetails.js"></script>
 </body>

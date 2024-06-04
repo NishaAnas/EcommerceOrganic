@@ -44,12 +44,21 @@
                     <h2>{{variantDetails.attributeValue}}</h2> 
                     <span style="font-size: 12px;">{{categoryName}}</span>
                 </div>
-                <p>Product Details  <b> : </b> {{productDetails.title}}</p>
+                <p><b>Product Details   : </b> {{productDetails.title}}</p>
                 <p><b>Price:</b>{{actualPrice}} Rupees</p>
                 <div class="d-flex align-items-baseline gap-4">
-                    <p><b>Stock:</b> {{variantDetails.stock}}</p>
-                    <p><b>Rating:</b> {{rating}}</p>
+                    <!-- Display the stock details dynamically -->
+                        {{#if (gt variantDetails.stock 0)}}
+                            {{#if (gt variantDetails.stock 10)}}
+                                <p class="text-success">In Stock</p>
+                            {{else}}
+                                <p class="text-danger">Only {{variantDetails.stock}} left</p>
+                            {{/if}}
+                        {{else}}
+                            <p class="text-info">Sorry, Out of Stock</p>
+                        {{/if}}
                 </div>
+                <p><b>Rating:</b> {{rating}}</p>
                 <h3><b>Reviews</b></h3>
                 <ul>
                     {{#each reviews}}
@@ -61,23 +70,36 @@
                     <form action="/addToCart" method="POST">
                         <!-- Hidden input field to store the product ID -->
                         <input type="hidden" name="variantId" value="{{variantDetails._id}}">
-                            {{#if productInCart}}
-                                <!-- Render a disabled button with a message if the product is already in the cart -->
-                                <button class="btn btn-success  text-uppercase" type="submit" disabled >
-                                    Already Added to Cart
-                                </button>
-                            {{else}}
-                                <!-- Render the "Add to Cart" button if the product is not in the cart -->
-                                <button class="btn btn-success  text-uppercase" type="submit" >
-                                    Add to Cart
-                                </button>
-                            {{/if}}
+                            <!-- Disable the "Add to Cart" button if out of stock -->
+                                {{#if (gt variantDetails.stock 0)}}
+                                    {{#if productInCart}}
+                                        <!-- Render a disabled button with a message if the product is already in the cart -->
+                                            <button class="btn btn-success  text-uppercase" type="submit" disabled >
+                                            Already Added to Cart
+                                            </button>
+                                    {{else}}
+                                    <!-- Render the "Add to Cart" button if the product is not in the cart -->
+                                        <button class="btn btn-success  text-uppercase" type="submit" >
+                                            Add to Cart
+                                        </button>
+                                    {{/if}}
+                                    {{else}}
+                                        <!-- Render a disabled "Out of Stock" button -->
+                                        <button class="btn btn-danger  text-uppercase" type="button" disabled>
+                                        Out of Stock
+                                        </button>
+                                    {{/if}}
                     </form>
-                    <button class="btn btn-success  text-uppercase">
-                        Add to Wishlist
-                    </button>
+                    <form action="/addToWishlist" method="POST">
+                    <input type="hidden" name="variantId" value="{{variantDetails._id}}">
+                    {{#if productInWishlist}}
+                    <button class="btn btn-success  text-uppercase" disabled>Already in Wishlist</button>
+                    {{else}}
+                    <button class="btn btn-success  text-uppercase">Add to Wishlist</button>
+                    {{/if}}
+                    </form>
+                    
                 </div>
-              
             </div>
         </div> 
 

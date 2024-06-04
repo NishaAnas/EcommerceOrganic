@@ -4,18 +4,12 @@ const otpGenerator = require('otp-generator');
 const twilio = require('twilio');
 const user = require('../../modals/user.js')
 const category = require('../../modals/categories.js');
-//const product = require('../modals/product')
-//const passport = require('passport');
 const nodemailer = require("nodemailer");
 const crypto = require('crypto')
 
-
-
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
-const twilioPhonenumber = process.env.TWILIO_PHONE_NUMBER
-
-
+const twilioPhonenumber = process.env.TWILIO_PHONE_NUMBER;
 const twilioClient = new twilio(accountSid, authToken)
 
 
@@ -279,15 +273,18 @@ exports.postForgotPassword = async (req, res) => {
          req.flash('error', 'Email not found');
          return res.redirect('/forgotPassword');
       }
-      req.session.emailId =email;
+      req.session.email =email;
+      const UserId = User._id;
+      //console.log(req.session.email);
+      //console.log(UserId);
       // Generate a unique reset password token
       const resetToken = crypto.randomBytes(20).toString('hex');
-      // Save the reset token and its expiration time in the user document
-      //user.resetPasswordToken = resetToken;
       const expirytime = Date.now() + 3600000; // Token expires in 1 hour
-      //user.resetPasswordExpires = Date.now() + 3600000; // Token expires in 1 hour
-      await user.updateOne({_id:User._id},{$set:{resetPasswordToken:resetToken,resetPasswordExpires:expirytime}})
-      //await user.create(User);
+       // Save the reset token and its expiration time in the user document
+       //console.log(resetToken);
+       //console.log(expirytime);
+      await user.updateOne({_id:UserId},{$set:{resetPasswordToken:resetToken,resetPasswordExpires:expirytime}})
+
       // Send an email with the reset password link
       const resetPasswordLink = `http://localhost:3000/resetPassword?token=${resetToken}`;
       await sendResetPasswordEmail(email, resetPasswordLink);
@@ -336,29 +333,31 @@ exports.resetPassword = (req, res) => {
    const success = req.flash('success');
 
    const emailId = req.session.emailId;
+   req.session.resetToken = req.query.token;
+   //console.log(req.session.resetToken);
    res.render('user/Authentication/resetPassword' , {email : emailId , layout:'athenticationlayout',success, error});
 }
 
 //POST Reset Password page
 exports.postResetPassword = async (req, res) => {
    const  newPassword = req.body.password;
-   const token = req.query.token; 
-   console.log(req.body)
-   console.log(token)
+   const token = req.session.resetToken; 
+   //console.log(req.body)
+   //console.log(token)
 
    try {
       // Find the user with the reset password token
       const existingUser = await user.findOne({ resetPasswordToken: token });
       if (!existingUser) {
-         console.log('Invalid or expired token')
+         //console.log('Invalid or expired token')
          req.flash('error', 'Invalid or expired token');
          return res.redirect('/resetPassword');
       }
 
       // Hash password
       const newhashedPassword = await bcrypt.hash(newPassword, 10);
-       
-      console.log(newhashedPassword)
+
+      //console.log(newhashedPassword)
       
       await user.updateOne({_id:existingUser._id},{$set:{hashedPassword:newhashedPassword,resetPasswordToken:undefined,resetPasswordExpires:undefined}})
       console.log('Password reset successful')

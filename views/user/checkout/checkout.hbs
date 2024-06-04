@@ -1,4 +1,4 @@
-<body>
+<main>
     <div class="container mt-5">
         <h1 class="mb-4">Checkout</h1>
         <form id="checkoutForm">
@@ -15,7 +15,7 @@
                             </a>
                         </div>
                         <div class="card-body">
-                            <p>Default Address</p>
+                            <p><b>Default Address</b></p>
                             {{#if defaultAddress}}
                             <p id="default-address"><b>Name
                                     :</b>{{defaultAddress.name}} ,<br><b>Area :
@@ -31,7 +31,6 @@
                             {{/if}}
                         </div>
                     </div>
-
                     <!-- Delivery Options Section -->
                     <div class="card mb-4">
                         <div class="card-header">
@@ -176,47 +175,33 @@
                         <div class="card-body">
                             <ul id="cart-summary" class="list-group mb-3">
                                 {{#each cartitems}}
-                                <li
-                                    class="list-group-item d-flex justify-content-between align-items-center">
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
                                     <div class="d-flex align-items-center">
-                                        <img src="{{productImage}}"
-                                            alt="{{productName}}"
-                                            class="img-sm mr-3"
+                                        <img src="{{productImage}}" alt="{{productName}}" class="img-sm mr-3"
                                             style="width: 20%;">
                                         <div class="p-1 small">
-                                            <h6
-                                                class="my-0">{{productName}}</h6>
-                                            <small
-                                                class="text-muted">{{category}}
-                                                - {{baseProduct}}</small>
+                                            <h6 class="my-0">{{productName}}</h6>
+                                            <small class="text-muted">{{category}} - {{baseProduct}}</small>
                                             <br>
-                                            <small class="text-muted">Base
-                                                Price: ₹{{actualPrice}}</small>
+                                            <small class="text-muted">Base Price: ₹{{actualPrice}}</small>
                                             <br>
-                                            <small class="text-muted">Quantity:
-                                                {{quantity}}</small>
+                                            <small class="text-muted">Quantity: {{quantity}}</small>
                                         </div>
                                     </div>
-                                    <span
-                                        class="text-muted">₹{{totalPrice}}</span>
+                                    <span class="text-muted">₹{{totalPrice}}</span>
                                 </li>
                                 {{/each}}
                             </ul>
-                            <p>Total Products: <span
-                                    id="total-quantity">{{totalQuantity}}</span></p>
-                            <p>Total Price: ₹<span
-                                    id="total-price">{{totalPriceOfAllProducts}}</span></p>
-                            <p>Delivery Price: ₹<span
-                                    id="delivery-price"></span></p>
+                            <p>Total Products: <span id="total-quantity">{{totalQuantity}}</span></p>
+                            <p>Total Price: ₹<span id="total-price">{{totalPriceOfAllProducts}}</span></p>
+                            <p>Delivery Price: ₹<span id="delivery-price"></span></p>
                             <hr>
                             <p>Grand Total: ₹<span id="grand-total"></span></p>
                         </div>
                     </div>
                     <div class="container">
                         <button type="submit" form="checkoutForm"
-                            id="place-order"
-                            class="btn btn-primary btn-block">Place
-                            Order</button>
+                            id="place-order" class="btn btn-primary btn-block">Place Order</button>
                     </div>
                 </div>
 
@@ -281,4 +266,4 @@
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="/javascripts/checkout.js"></script>
 
-    </body>
+    </main>

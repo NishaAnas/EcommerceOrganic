@@ -1,6 +1,4 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
-const user = require('../../modals/user');
 const category = require('../../modals/categories');
 const Product = require('../../modals/product');
 const prodVariation =require('../../modals/productVariation');
@@ -13,7 +11,11 @@ exports.getEmptyCart = async(req,res)=>{
     const errorMessage = req.flash('error');
     const userData = req.session.userLoggedInData;
     const categories = await category.find({}).lean();
-    return res.render('user/shoppingCart/cartEmpty',{categories,userData, success: successMessage, error: errorMessage });
+    return res.render('user/shoppingCart/cartEmpty',{
+        categories,
+        userData, 
+        success: successMessage, 
+        error: errorMessage });
 }
 
 //Show Shopping Cart
@@ -29,10 +31,9 @@ exports.showShoppingCart = async(req,res)=>{
         }
 
         const userId = req.session.userLoggedInData.userId;
+        const userData = req.session.userLoggedInData;
         const cart = await shoppingCart.findOne({ user: userId });
         //console.log(cart.items.length);
-
-        const userData = req.session.userLoggedInData;
 
         if (!cart || cart.items.length === 0) {
             req.flash('error', 'Cart Empty');

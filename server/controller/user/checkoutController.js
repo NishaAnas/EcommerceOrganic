@@ -1,17 +1,12 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
-const user = require('../../modals/user');
-const category = require('../../modals/categories');
-const Product = require('../../modals/product');
 const prodVariation = require('../../modals/productVariation');
 const shoppingCart = require('../../modals/shoppingCart');
 const address = require('../../modals/address');
-const pincode = require('../../modals/pincode');
 const order = require('../../modals/order');
 const crypto = require('crypto');
 
 
-//Get Address managemnt of checkout page
+// //Get Address managemnt of checkout page
 exports.getaddressPage = async (req, res) => {
 
     try {
@@ -24,10 +19,15 @@ exports.getaddressPage = async (req, res) => {
         const Address = await address.findOne({ userId: userId, isDefault: true });
         console.log(Address);
 
-        res.render('user/checkout/addressManagement', { Address, userData ,layout:'checkoutlayout'});
+        res.render('user/checkout/addressManagement', { 
+            Address, 
+            userData ,
+            layout:'checkoutlayout'
+        });
     } catch (error) {
         console.log(error);
-        res.render('user/checkout/addressManagement');
+        req.flash('error', 'Server Error');
+        res.redirect('/')
     }
 }
 
@@ -70,7 +70,9 @@ exports.getcheckOut = async (req, res) => {
             layout:'checkoutlayout'
         });
     } catch (error) {
-        console.log(error)
+        console.log(error);
+        req.flash('error', 'Server Error');
+        res.redirect('/')
     }
 }
 
@@ -123,11 +125,31 @@ exports.placeOrder = async (req, res) => {
         const newOrder = await order.create(Order);
 
         // Update the stock of each item
+        // for (const item of items) {
+        //     await prodVariation.updateOne(
+        //         { _id: item.productId },
+        //         { $inc: { stock: -item.quantity } }
+        //     );
+        // }
+
+        // Update the stock of each item and check if stock is 0 to deactivate the product
         for (const item of items) {
+            const productVariant = await prodVariation.findById(item.productId);
+            const newStock = productVariant.stock - item.quantity;
+            
+            // Update the stock
             await prodVariation.updateOne(
                 { _id: item.productId },
-                { $inc: { stock: -item.quantity } }
+                { $set: { stock: newStock } }
             );
+
+            // If stock is 0, set isActive to false
+            if (newStock <= 0) {
+                await prodVariation.updateOne(
+                    { _id: item.productId },
+                    { $set: { isActive: false } }
+                );
+            }
         }
 
         // Delete the cart document from the database
@@ -138,7 +160,10 @@ exports.placeOrder = async (req, res) => {
         req.session.addressDetails = null;
 
         // Respond with a success message
-        res.status(200).json({ message: 'Order placed successfully', orderId: newOrder._id });
+        res.status(200).json({ 
+            message: 'Order placed successfully', 
+            orderId: newOrder._id 
+        });
     } catch (error) {
         console.error('Error placing order:', error);
         res.status(500).json({ error: 'An error occurred while placing the order. Please try again.' });
@@ -156,7 +181,7 @@ exports.getOrderDetails = async (req, res) => {
 
     if (!mongoose.Types.ObjectId.isValid(orderId)) {
         req.flash('error', 'Invalid order ID.');
-        return res.redirect('/orders'); // Redirect to orders list or appropriate page
+        return res.redirect('/'); // Redirect Home page 
     }
 
     try {
@@ -171,7 +196,7 @@ exports.getOrderDetails = async (req, res) => {
         // Combine product details with image URLs
         const itemsWithImages = orderDetails.items.map(item => {
             const product = item.productId.toObject();
-            const images = product.images; // Assuming images is an array of URLs
+            const images = product.images; //images is an array of URLs
             return {
                 ...item.toObject(),
                 productId: product._id,
@@ -191,10 +216,17 @@ exports.getOrderDetails = async (req, res) => {
             items: itemsWithImages
         };
 
-        console.log(orderWithItemsAndImages.items);
+        //console.log(orderWithItemsAndImages.items);
 
-        return res.render('user/checkout/orderdetails', { order: orderWithItemsAndImages, userData, success: successMessage, error: errorMessage });
+        return res.render('user/checkout/orderdetails', { 
+            order: orderWithItemsAndImages, 
+            userData, 
+            success: successMessage, 
+            error: errorMessage 
+        });
     } catch (error) {
-        console.log(error)
+        console.log(error);
+        req.flash('error', 'Server Error');
+        res.redirect('/')
     }
 }

@@ -38,3 +38,21 @@ $(document).ready(function(){
         });
     });
 });
+//Pagination page change
+function changePage(page) {
+    window.location.href = `/acctorderDetails?page=${page}`;
+}
+ // Format the order dates
+$(document).ready(function(){
+    $('.order-date').each(function(){
+        var date = new Date($(this).text());
+        var formattedDate = date.toLocaleString('en-GB', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        }).replace(',', ' at');
+        $(this).text(formattedDate);
+    });
+});

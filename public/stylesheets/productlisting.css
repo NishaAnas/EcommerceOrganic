@@ -34,6 +34,17 @@ body {
     transition: all linear 0.25s;
 }
 
+.profile-card-2 .profile-username {
+    position: absolute;
+    left: 30px;
+    bottom: 50px;
+    font-size: 20px;
+    color: #050505;
+    text-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
+    font-weight: lighter;
+    transition: all linear 0.25s;
+}
+
 
 .profile-card-2:hover img {
     filter: grayscale(100%);
@@ -41,6 +52,9 @@ body {
 
 .profile-card-2:hover .profile-name {
     bottom: 80px;
+}
+.profile-card-2:hover .profile-username {
+    bottom: 60px;
 }
 
 
