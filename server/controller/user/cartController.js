@@ -3,6 +3,7 @@ const category = require('../../modals/categories');
 const Product = require('../../modals/product');
 const prodVariation =require('../../modals/productVariation');
 const shoppingCart = require('../../modals/shoppingCart');
+const wishlist = require('../../modals/wishlist');
 const crypto = require('crypto');
 
 //Show Empty Cart
@@ -48,6 +49,7 @@ exports.showShoppingCart = async(req,res)=>{
 
             return{
                 variantId:variant._id,
+                stock:variant.stock,
                 productName:variant.attributeValue,
                 baseProduct:baseProduct.title,
                 category:categories.name,
@@ -58,6 +60,7 @@ exports.showShoppingCart = async(req,res)=>{
                 totalPrice: item.totalPrice
             }
         }))
+        //console.log(cartitems);
 
         const totalQuantity = cart.items.reduce((acc, item) => acc + item.quantity, 0);
         const totalPriceOfAllProducts = cartitems.reduce((acc, item) => acc + item.totalPrice, 0);
@@ -118,6 +121,12 @@ exports.addToCart = async(req,res)=>{
         const variant = await prodVariation.findById(variantId);
         //console.log(variant)
 
+        //Check for stock to add product to the cart
+        if (!variant || variant.stock <= 0) {
+            req.flash('error', 'The product is out of stock.');
+            return res.redirect(`/productDetails/${variantId}`);
+        }
+
         // Find the base product to get its price
         const baseProduct = await Product.findById(variant.productId);
         console.log(baseProduct)
@@ -156,6 +165,7 @@ exports.addToCart = async(req,res)=>{
 exports.deleteCartProduct = async(req,res)=>{
     try {
         const variantId = req.params._id;
+         console.log(variantId);
         const updatedCart = await shoppingCart.findOneAndUpdate(
             { 'items.product': variantId }, // Filter criteria
             { $pull: { items: { product: variantId } } } // Pull the item with the given productId from the items array
@@ -191,6 +201,10 @@ exports.updateCartItem = async(req,res)=>{
         // Find the product to get its price
         const variant = await prodVariation.findById(variantId);
 
+        //Check for available stock
+        if (!variant || variant.stock < quantity) {
+            return res.status(400).json({ error: 'Insufficient stock available.' });
+        }
         // Find the base product to get its price
         const baseProduct = await Product.findById(variant.productId);
         console.log(baseProduct)
@@ -221,5 +235,48 @@ exports.updateCartItem = async(req,res)=>{
     } catch (error) {
         console.error('Error updating cart item:', error);
         res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
+
+//Add Items from cart to wishlist
+exports.addtoWishlist = async(req,res)=>{
+    try {
+        const userId = req.session.userLoggedInData.userId;
+        const variantId = req.body.variantId;
+        
+        console.log(req.body.variantId);
+        // Check if the user already has a wishlist
+        let existingWishlist = await wishlist.findOne({ userId: userId });
+
+        if (!existingWishlist) {
+            // If the user doesn't have a wishlist, create a new one with the product
+            await wishlist.create({
+                userId: userId,
+                products: [{ product: variantId }]
+            });
+            req.flash('success', 'Product added to wishlist successfully');
+        } else {
+            // Check if the item already exists in the wishlist
+            const existingItem = existingWishlist.products.find(item => item.product.equals(variantId));
+
+            console.log(existingItem);
+            if (existingItem) {
+                req.flash('error', 'This item is already in your wishlist.');
+            } else {
+                // If the item doesn't exist, add it to the wishlist using an update query
+                await wishlist.updateOne(
+                    { userId: userId },
+                    { $push: { products: { product: variantId } } }
+                );
+                req.flash('success', 'Product added to wishlist successfully');
+            }
+        }
+
+        res.redirect(`/cart`); 
+
+    } catch (error) {
+        console.error('Error adding product to wishlist:', error);
+        req.flash('error', 'Server Error');
+        res.redirect('/'); 
     }
 }

@@ -119,6 +119,9 @@ router.get('/emptyCart',cartController.getEmptyCart)
 //Update Cart Item
 router.post('/updateCartItem', cartController.updateCartItem);
 
+//Add Items from cart to wishlist
+router.post('/addcartToWishlist',cartController.addtoWishlist)
+
 
 
 //Get User Account Page
@@ -177,6 +180,9 @@ router.post('/addToWishlist',wishlistController.addToWishlist)
 
 //Remove from Wishlist
 router.post('/removeFromWishlist',wishlistController.removefromWishlist)
+
+//Add to cart From wishlist
+router.post('/addToCartWishlist',wishlistController.wishAddtoCart)
 
 module.exports = router;
 

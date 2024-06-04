@@ -31,8 +31,14 @@
                                         <a href="/productDetails/{{variantId}}">
                                         <figure class="itemside align-items-center">
                                             <div class="aside"><img src={{productImage}} class="img-sm"></div>
-                                            <figcaption class="info"> <a href="#" class="title text-dark" data-abc="true">{{productName}}</a>
+                                            <figcaption class="info"> <a href="/productDetails/{{variantId}}" class="title text-dark" data-abc="true">{{productName}}</a>
                                                 <p class="text-muted small">{{category}}<br>{{baseProduct}}<br>
+                                                Stock: {{#if (lt stock 5)}}
+                                                            <span class="stock text-danger small">{{stock}} left</span>
+                                                        {{else}}
+                                                            <span class="stock text-success small">In Stock</span>
+                                                        {{/if}}
+                                                        <br>
                                                 Quantity: <span class="quantity" id="productquantity-{{variantId}}">{{quantity}}</span><br>Base Price:{{actualPrice}}</p>
                                             </figcaption>
                                         </figure>
@@ -44,18 +50,27 @@
                                             <option value="3" {{#if (isEqual quantity 3)}}selected{{/if}}>3</option>
                                             <option value="4" {{#if (isEqual quantity 4)}}selected{{/if}}>4</option>
                                         </select>
+                                        <span id="stock-error-{{variantId}}" class="text-danger"></span>
                                     <td>
                                         <div class="price-wrap"> 
                                             <var class="price" id="total-price-{{variantId}}">{{totalPrice}}<br></var> 
                                             <small class="text-muted"> {{actualPrice}} X <span class="quantity" id="quantity-{{variantId}}"  data-base-price="{{basePrice}}">{{quantity}}</span> </small> 
                                         </div>
                                     </td>
-                                    <td class="text-right d-none d-md-block">
-                                        <form id="removeForm" method="POST" action="/removeCartProduct/{{variantId}}">
-                                        <a data-original-title="Save to Wishlist" title="" href="" class="btn btn-secondary" data-toggle="tooltip" data-abc="true"> 
-                                        <i class="bi bi-heart px-1"></i></a>
-                                        <button type="submit" class="btn btn-danger " data-abc="true"><i class="bi bi-x px-1"></i></button> 
+                                    <td class="text-right d-none d-md-block ">
+                                        <div class="d-flex justify-content-around">
+                                        <form id="wishlistForm" method="POST" action="/addcartToWishlist">
+                                        <input type="hidden" name="variantId" value="{{variantId}}">
+                                        <button type="submit" class="btn btn-secondary " data-abc="true">
+                                            <i class="bi bi-heart px-1"></i>
+                                        </button> 
                                         </form>
+                                        <form id="removeForm" method="POST" action="/removeCartProduct/{{variantId}}">
+                                        <button type="submit" class="btn btn-danger " data-abc="true">
+                                            <i class="bi bi-trash px-1"></i>
+                                        </button> 
+                                        </form>
+                                        </div>
                                     </td>
                                 </tr>
                                 {{/each}}

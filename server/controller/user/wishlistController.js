@@ -154,3 +154,61 @@ exports.removefromWishlist = async(req,res)=>{
         res.status(500).json({ error: 'Internal server error' });
     }
 }
+
+//Add Products from Wishlist to cart
+exports.wishAddtoCart = async(req,res)=>{
+    try{
+        // Check if the user is logged in
+        if (!req.session.userLoggedInData || !req.session.userLoggedInData.userloggedIn) {
+            req.flash('error', 'To add items to the cart, please log in first.');
+            return res.redirect('/login');
+        }
+        const userId = req.session.userLoggedInData.userId;
+        const variantId = req.body.variantId;
+        //console.log(variantId);
+
+        // Check if the user already has a shopping cart
+        let existingShoppingCart = await shoppingCart.findOne({ user: userId });
+
+        // If the user doesn't have a shopping cart, create a new one
+        if (!existingShoppingCart) {
+            existingShoppingCart = await shoppingCart.create({ user: userId, items: [] });
+        }
+        // Find the product Variant to get its price
+        const variant = await prodVariation.findById(variantId);
+        //console.log(variant)
+
+        // Find the base product to get its price
+        const baseProduct = await Product.findById(variant.productId);
+        console.log(baseProduct)
+
+        // Calculate the total price
+        const totalPrice = baseProduct.price + variant.price;
+        console.log(totalPrice)
+        
+        // Check if the item already exists in the cart
+        const existingItemIndex = existingShoppingCart.items.findIndex(item => item.product.equals(variantId));
+
+        if (existingItemIndex !== -1) {
+            // If the item already exists,
+            req.flash('error', 'This item is already in your cart.');
+            console.log(' Items present')
+        } else {
+             // If the item doesn't exist, create a new cart item
+            await shoppingCart.findOneAndUpdate(
+                { user: userId },
+                { $push: { items: { product: variantId, quantity: 1, totalPrice: totalPrice } } }
+            );
+            console.log('Items not Present')
+        }
+        console.log('Product added to cart successfully')
+        req.flash('success', 'Product added to cart successfully');
+        res.redirect(`/wishlist`); // Redirect to the Wishlist page
+
+    }catch(error){
+        console.log(error);
+        console.error('Error adding product to cart:', error);
+        req.flash('error', 'Server Error');
+        res.redirect('/' ); // Redirect back to the Home page
+    }
+}

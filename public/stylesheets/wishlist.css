@@ -5,76 +5,50 @@ body {
 
 .container {
     max-width: 1200px;
+    margin: auto;
 }
+
 .profile-card-2 {
-    max-width: 300px;
+    max-width: 100%;
     background-color: #FFF;
     box-shadow: 0px 0px 25px rgba(0, 0, 0, 0.1);
     background-position: center;
     overflow: hidden;
     position: relative;
-    margin: 10px auto;
+    margin: 20px auto;
     cursor: pointer;
     border-radius: 10px;
+    transition: transform 0.2s;
 }
-a,
-a:hover,
-a:focus {
-    color: inherit;
+
+.profile-card-2:hover {
+    transform: scale(1.05);
 }
 
 .profile-card-2 img {
+    width: 100%;
+    height: auto;
     transition: all linear 0.25s;
-    opacity: 60%;
+    opacity: 80%;
+    border-bottom: 1px solid #ddd;
 }
 
 .profile-card-2 .profile-name {
-    position: absolute;
-    left: 30px;
-    bottom: 70px;
-    font-size: 30px;
+    padding: 20px;
+    font-size: 20px;
     color: #050505;
-    text-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
     font-weight: bold;
     transition: all linear 0.25s;
     z-index: 2;
 }
 
 .profile-card-2 .profile-username {
-    position: absolute;
-    left: 30px;
-    bottom: 50px;
-    font-size: 20px;
-    color: #050505;
-    text-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
-    font-weight: lighter;
-    transition: all linear 0.25s;
+    padding: 0 20px 20px 20px;
+    font-size: 16px;
+    color: #000000;
+    z-index: 2;
 }
 
-
-.profile-card-2:hover img {
-    filter: grayscale(10%);
-}
-
-.profile-card-2 .profileicons {
-    position: absolute;
-    bottom: 30px;
-    right: 30px;
-    color: #FFF;
-    
-}
-
-.profile-card-2 .profileicons .bi {
-    margin: 5px;
-}
-
-.profile-card-2:hover .profile-name {
-    bottom: 80px;
-}
-
-.profile-card-2:hover .profile-username {
-    bottom: 60px;
-}
-.profile-card-2:hover .profileicons {
-    right: 40px;
+.profile-card-2 .profileicons .btn {
+    width: 48%;
 }
