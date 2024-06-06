@@ -5,6 +5,11 @@ const paymentSchema = require('./payement');
 const deliverySchema = require('./delivery');
 
 const orderSchema = new Schema({
+    newOrderId:{
+        type: String,
+        required: true,
+        unique: true
+    },
     userId: {
         type: Schema.Types.ObjectId,
         required: true,

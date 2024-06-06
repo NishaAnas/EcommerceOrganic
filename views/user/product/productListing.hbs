@@ -1,67 +1,183 @@
 <link rel="stylesheet" href="/stylesheets/productlisting.css">
-<main>
-    {{#if error}}
-            <div id="flash-message" class="alert alert-danger" role="alert">
+<style>
+        .sidebar {
+            width: 250px;
+            position: absolute;
+            height: 200%;
+            background-color: #ffffff;
+            padding: 20px;
+            overflow-y: auto;
+            font-weight: 100px;
+            color: black;
+        }
+        .content {
+            margin-left: 270px;
+            padding: 20px;
+        }
+        .price-range {
+            width: 100%;
+        }
+        .filter-section {
+            margin-bottom: 20px;
+            margin-top: 20px;
+        }
+        .search-section{
+            margin-bottom: 60px;
+            color: black;
+        }
+        .filter-header {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        {{#if error}}
+        <div id="flash-message" class="alert alert-danger" role="alert">
             {{error}}
-            </div>
-            {{/if}}
-            {{#if success}}
-            <div id="flash-message" class="alert alert-success" role="alert">
+        </div>
+        {{/if}}
+        {{#if success}}
+        <div id="flash-message" class="alert alert-success" role="alert">
             {{success}}
-            </div>
-            {{/if}}
-    <div class="container m-3 d-flex flex-column p-3">
-        <div class="d-flex align-items-center justify-content-between">
-            <div class="search">
-                <input list="productSuggestions" type="text" class="search-input" id="search-input" placeholder="search..." name="">
+        </div>
+        {{/if}}
+        
+        <div class="sidebar">
+            <h4></h4>
+            <form id="filter-form" method="GET" action="/productList/{{Category._id}}"></form>
+            {{#each categories}}
+            <input type="hidden" class="selected-category" name="selectedCategories[]" value="{{this._id}}">
+            {{/each}}
+
+            <div class="search-section">
+                <input list="productSuggestions" type="text" class="search-input" id="search-input" placeholder="Search..." style="width: 50%; color: black;">
                 <datalist id="productSuggestions">
                     {{#each products}}
-                        <option value="{{this.name}}"></option>
+                    <option value="{{this.name}}"></option>
                     {{/each}}
                 </datalist>
-                <a href="#" class="search-icon" id="search-button">
-                    <i class="bi bi-search"></i>
-                </a>
+                <button class="btn btn-primary  btn-small mt-2" id="search-button" style="width: 30%;">
+                    <i class="bi bi-search"></i></button>
             </div>
-            <div class="dropdown sort-dropdown">
-                <button class="btn dropdown-toggle dropdown-btn" style="background-color: #6A9739;" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    Sort By
-                </button>
-                <ul class="dropdown-menu list-dropdown item-dropdown">
-                    <li><a class="dropdown-item sort-option" href="#" data-sort="asc">Aa-Zz</a></li>
-                    <li><a class="dropdown-item sort-option" href="#" data-sort="desc">Zz-Aa</a></li>
-                    <li><a class="dropdown-item sort-option" href="#" data-sort="price-low-high">price low-high</a></li>
-                    <li><a class="dropdown-item sort-option" href="#" data-sort="price-high-low">price high-low</a></li>
-                </ul>
-            </div>
-        </div>
-    </div>
-            <div class="col px-5">
-            <div class="row">
-                <div class="col">
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a
-                                    href="/">Home</a></li>
-                                    <li class="breadcrumb-item"><a
-                                    href="/categories">Categories</a></li>
-                            <li
-                                class="breadcrumb-item active">{{Category.name}}</li>
-                        </ol>
-                    </nav>
+            <h4>Filters</h4>
+            <div class="filter-section">
+                <h5 class="filter-header" data-toggle="collapse" data-target="#categoryFilter">Categories</h5>
+                <div id="categoryFilter" class="collapse">
+                    {{#each categories}}
+                        <input type="checkbox" class="category-checkbox" id="cat{{@index}}" name="category" value="{{this._id}}">
+                        <label for="cat{{@index}}">{{this.name}}</label><br>
+                        {{/each}}
                 </div>
             </div>
+            <div class="filter-section">
+                <h5 class="filter-header" data-toggle="collapse" data-target="#priceFilter">Price Range</h5>
+                <div id="priceFilter" class="collapse">
+                    <input type="range" class="price-range" id="priceRange" min="0" max="1000" step="10">
+                    <p>Price: Rs<span id="priceValue">250</span></p>
+                </div>
+            </div>
+            <div class="filter-section">
+                <h5 class="filter-header" data-toggle="collapse" data-target="#featuredFilter">Featured Products</h5>
+                <div id="featuredFilter" class="collapse">
+                    <input type="checkbox" id="featured" name="featured">
+                    <label for="featured">Featured products</label>
+                </div>
+            </div>
+            <div class="filter-section">
+                <h5 class="filter-header" data-toggle="collapse" data-target="#offersFilter">Offers</h5>
+                <div id="offersFilter" class="collapse">
+                    <input type="checkbox" id="offers" name="offers">
+                    <label for="offers">Offers</label>
+                </div>
+            </div>
+            <div class="filter-section">
+                <h5 class="filter-header" data-toggle="collapse" data-target="#discountFilter">Discount</h5>
+                <div id="discountFilter" class="collapse">
+                    <input type="checkbox" id="discount" name="discount">
+                    <label for="discount">10% Discount</label><br>
+                    <input type="checkbox" id="discount" name="discount">
+                    <label for="discount">20% Discount</label><br>
+                    <input type="checkbox" id="discount" name="discount">
+                    <label for="discount">30% Discount</label><br>
+                    <input type="checkbox" id="discount" name="discount">
+                    <label for="discount">40% Discount</label>
+                </div>
+            </div>
+            <div class="filter-section">
+                <h5 class="filter-header" data-toggle="collapse" data-target="#sortFilter">Sort</h5>
+                <div id="sortFilter" class="collapse">
+                    <input type="checkbox" id="sort" value="name_asc">
+                    <label for="sort">Name (A-Z)</label><br>
+                    <input type="checkbox" id="sort" value="name_desc">
+                    <label for="sort">Name (Z-A)</label><br>
+                    <input type="checkbox" id="sort" value="price_asc">
+                    <label for="sort">Price (Low-High)</label><br>
+                    <input type="checkbox" id="sort" value="price_desc">
+                    <label for="sort">Price (High-Low)</label>
+                </div>
+            </div>
+            <div class="filter-section">
+                <h5 class="filter-header" data-toggle="collapse" data-target="#bestSellersFilter">Best Sellers</h5>
+                <div id="bestSellersFilter" class="collapse">
+                    <input type="checkbox" id="bestSellers" name="bestSellers">
+                    <label for="bestSellers">Best sellers</label>
+                </div>
+            </div>
+            <div class="filter-section">
+                <button class="btn btn-secondary" id="reset-filters" type="button">Reset</button>
+                <button class="btn btn-primary" id="apply-filters" type="submit" form="filter-form">Apply</button>
+            </div>
+            </form>
         </div>
-        <div class="container py-5">
-        <h4 class="text-center">
-            <strong>{{Category.name}}</strong>
-        </h4>
-        <div class="row">
-            {{#each products}}
-	            <div class="col-md-4">
-                    <hr>
-                        <a  class="prod_card" href="/productPlus/{{this._id}}" class="product-link">
-                            <div class="profile-card-2"><img src="/{{this.images.[0]}}" alt="{{title}}" loading="lazy" class="img img-responsive">
+
+        <div class="content">
+            <div class="container m-3 d-flex flex-column p-3">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div class="dropdown sort-dropdown d-flex flex-end">
+                        <button class="btn dropdown-toggle dropdown-btn" style="background-color: #6A9739;" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Sort By
+                        </button>
+                        <ul class="dropdown-menu list-dropdown item-dropdown">
+                            <li><a class="dropdown-item sort-option" href="#" data-sort="asc">Aa-Zz</a></li>
+                            <li><a class="dropdown-item sort-option" href="#" data-sort="desc">Zz-Aa</a></li>
+                            <li><a class="dropdown-item sort-option" href="#" data-sort="price-low-high">price low-high</a></li>
+                            <li><a class="dropdown-item sort-option" href="#" data-sort="price-high-low">price high-low</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col px-5">
+                <div class="row">
+                    <div class="col">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="/">Home</a></li>
+                                <li class="breadcrumb-item"><a href="/categories">Categories</a></li>
+                                <li class="breadcrumb-item active">{{Category.name}}</li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <div class="container py-5">
+                <h4 class="text-center">
+        <strong id="category-name">{{Category.name}}</strong>
+        <span id="new-category-name" style="display: none;">{{Category.name}}</span>
+    </h4>
+    <div class="selected-categories" style="display: hidden;">
+        Selected Categories:
+        {{#each selectedCategoriesNames}}
+            <span>{{this.name}} / </span> 
+        {{/each}}
+    </div>
+                <div class="row" id="product-list">
+                    {{#each products}}
+                    <div class="col-md-4">
+                        <hr>
+                        <a class="prod_card" href="/productPlus/{{this._id}}" class="product-link">
+                            <div class="profile-card-2">
+                                <img src="/{{this.images.[0]}}" alt="{{title}}" loading="lazy" class="img img-responsive">
                                 <div class="profile-name">
                                     {{name}}
                                 </div>
@@ -70,14 +186,40 @@
                                 </div>
                             </div>
                         </a>
+                    </div>
+                    {{/each}}
                 </div>
-            {{/each}}
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-center">
+                        {{#if (gt  currentPage 1)}}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{subtract currentPage 1}}&sort={{sort}}&price={{price}}&categories={{selectedCategories}}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        {{/if}}
+                        {{#each paginationPages}}
+                        <li class="page-item {{#if this.isActive}}active{{/if}}">
+                            <a class="page-link" href="?page={{this.number}}&sort={{../sort}}&price={{../price}}&categories={{../selectedCategories}}">{{this.number}}</a>
+                        </li>
+                        {{/each}}
+                        {{#if (lt currentPage totalPages)}}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{add currentPage 1}}&sort={{sort}}&price={{price}}&categories={{selectedCategories}}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                        {{/if}}
+                    </ul>
+                </nav>
+            </div>
         </div>
-    </div>
-    </div>
-    
-</main>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="/javascripts/productlisting.js"></script>
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="/javascripts/productlisting.js"></script>
+
+</body>
 
 

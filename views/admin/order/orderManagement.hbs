@@ -33,12 +33,13 @@
                 <tbody>
                     {{#each Orders}}
                     <tr>
-                        <td>{{this._id}}</td>
+                        <td>{{this.newOrderId}}</td>
                         <td class="order-date">{{this.orderDate}}</td>
                         <td>{{this.userId.email}}</td>
             <td>${{this.totalAmount}}</td>
             <td>
                 <select class="order-status" data-order-id="{{this._id}}">
+                    {{#if (isEqual this.orderStatus 'Cancelled')}}disabled{{/if}}
                     <option value="Pending" {{#if (isEqual this.orderStatus 'Pending')}}selected{{/if}}>Pending</option>
                     <option value="Confirmed" {{#if (isEqual this.orderStatus 'Confirmed')}}selected{{/if}}>Confirmed</option>
                     <option value="Processing" {{#if (isEqual this.orderStatus 'Processing')}}selected{{/if}}>Processing</option>

@@ -30,7 +30,8 @@
     "passport-google-oauth2": "^0.2.0",
     "sharp": "^0.33.3",
     "sweetalert2": "^11.6.13",
-    "twilio": "^5.0.1"
+    "twilio": "^5.0.1",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "handlebars": "^4.7.8",

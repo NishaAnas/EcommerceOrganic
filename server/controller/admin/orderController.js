@@ -29,6 +29,17 @@ exports.getOrdermanager = async(req,res)=>{
 exports.changeOrderStatus = async (req, res) => {
     try {
         const { orderId, status } = req.body;
+        
+        // Fetch the existing order
+        const existingOrder = await order.findById(orderId);
+        if (!existingOrder) {
+            return res.status(404).json({ message: 'Order not found.' });
+        }
+        // Check if the order is cancelled by the user
+        if (existingOrder.orderStatus === 'Cancelled') {
+            return res.status(400).json({ message: 'Cannot Change Status of a Cancelled Order.' });
+        }
+        //update order Status
         await order.findByIdAndUpdate(orderId, { orderStatus: status });     
         res.status(200).json({ message: 'Order status updated successfully.' });
     } catch (error) {

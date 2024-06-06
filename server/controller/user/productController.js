@@ -63,62 +63,85 @@ exports.getCategories = async (req, res) => {
 };
 
 
-//GET Product Listing Page
+// GET Product Listing Page
 exports.productListing = async (req, res) => {
-
    const successMessage = req.flash('success');
-   const errorMessage = req.flash('error')
+   const errorMessage = req.flash('error');
    try {
       const userData = req.session.userLoggedInData;
       const categories = await category.find({}).lean();
       const categoryId = req.params._id;
       if (!categoryId) {
-         res.redirect('/?error=Error in fetching Category Id')
+         req.flash('error', 'Error in fetching Category Id');
+         return res.redirect('/?error=Error in fetching Category Id');
       }
 
-      // Get search and sort parameters from the query string
-      const { search, sort } = req.query;
+      const { search, sort,selectedCategories, price, page = 1 } = req.query;
+      const perPage = 5;
 
-      // Build the query object
       let query = { categoryId };
+      if (selectedCategories) {
+         query.categoryId = { $in: selectedCategories }; // Use the parsed array directly
+      }
       if (search) {
-          // Normalize search input to handle spaces and case
          const normalizedSearch = search.trim().replace(/\s+/g, ' ').toLowerCase();
-          query.name = { $regex: new RegExp(normalizedSearch, 'i') }; // Case-insensitive search
+         query.name = { $regex: new RegExp(normalizedSearch, 'i') };
+      }
+      if (price) {
+         query.price = { $lte: parseInt(price, 10) };
       }
 
-      // Fetch products based on the query
-      let products = await product.find(query).lean();
-
-      // Sort the products if a sort parameter is provided
+      let sortOptions = {};
       if (sort) {
-         if (sort === 'asc') {
-            products = products.sort((a, b) => a.name.localeCompare(b.name));
-         } else if (sort === 'desc') {
-            products = products.sort((a, b) => b.name.localeCompare(a.name));
-         } else if (sort === 'price-low-high') {
-            products = products.sort((a, b) => a.price - b.price);
-         } else if (sort === 'price-high-low') {
-            products = products.sort((a, b) => b.price - a.price);
+         switch (sort) {
+               case 'name_asc': sortOptions = { name: 1 }; break;
+               case 'name_desc': sortOptions = { name: -1 }; break;
+               case 'price_asc': sortOptions = { price: 1 }; break;
+               case 'price_desc': sortOptions = { price: -1 }; break;
+               default: break;
          }
       }
-      
-      //const products = await product.find({ categoryId }).lean();
-      const Category = await category.findById(categoryId).lean();
-      res.render('user/product/productListing', { 
-         products, 
-         categories, 
-         Category, 
-         userData, 
-         success: successMessage, 
-         error: errorMessage 
+
+       // Sort the products based on the selected sorting option
+                  const products = await product.find(query)
+                                                .sort(sortOptions)
+                                                .skip((page - 1) * perPage)
+                                                .limit(perPage)
+                                                .lean();
+      const totalProducts = await product.countDocuments(query);
+      const totalPages = Math.ceil(totalProducts / perPage);
+
+      const paginationPages = [];
+      for (let i = 1; i <= totalPages; i++) {
+         paginationPages.push({ number: i, isActive: i === parseInt(page, 5) });
+      }
+      const selectedCategoriesNames = await category.find({ _id: { $in: selectedCategories }}, 'name').lean();
+      const categoryName = await category.findOne({ _id: categoryId }, 'name').lean();
+      console.log(categories);
+
+      res.render('user/product/productListing', {
+         title: 'Products Listing',
+         userData,
+         categories,
+         products,
+         Category: categoryName,
+         currentPage: parseInt(page, 5),
+         totalPages,
+         paginationPages,
+         price: price || 500,
+         sort,
+         selectedCategories: selectedCategories || [],
+         selectedCategoriesNames,
+         success: successMessage,
+         error: errorMessage
       });
    } catch (error) {
-      console.error(error);
-      req.flash('error', 'Server Error');
-      res.redirect('/')
+      console.log(error);
+      req.flash('error', 'Error in fetching product listing');
+      res.redirect('/');
    }
-}
+};
+
 
 
 //GET Product Details Page
@@ -143,10 +166,6 @@ exports.productDetails = async (req, res) => {
       const allVariants = await prodVariation.find({ productId: { $in: (await product.find({ categoryId: categoryId }).distinct('_id')) } }).lean();
       // Shuffle the allVariants array randomly and get first 6 varients
       const sixRandomVariants = allVariants.sort(() => Math.random() - 0.5).slice(0, 6);
-
-      // Get the first 6 elements of the shuffled array
-      //const sixRandomVariants = shuffledVariants.slice(0, 6)
-      //console.log(sixRandomVariants);
 
       // Calculate prices for the six random variants
       for (const variant of sixRandomVariants) {

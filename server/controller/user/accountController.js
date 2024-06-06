@@ -248,12 +248,14 @@ exports.deleteAddress = async(req,res)=>{
 exports.getOrderDetails = async(req,res)=>{
     const successMessage = req.flash('success');
         const errorMessage = req.flash('error');
-        const userId = req.session.userLoggedInData.userId;
          // Check if the user is logged in
         if (!req.session.userLoggedInData || !req.session.userLoggedInData.userloggedIn) {
             req.flash('error', 'To access Account, please LogIn first.');
             return res.redirect('/login');
         }
+
+        const userId = req.session.userLoggedInData.userId;
+        const userData = req.session.userLoggedInData;
         // Get page and limit from query parameters, default to page 1 and limit 5
             const page = parseInt(req.query.page) || 1;
             const limit = 5;
@@ -269,6 +271,7 @@ exports.getOrderDetails = async(req,res)=>{
     const totalOrders = await order.countDocuments({ userId: userId });
         res.render('user/Account/orderDetails',{
             orderDetails,
+            userData,
             currentPage: page,
             totalPages: Math.ceil(totalOrders / limit),
             layout: 'userAccountLayout',

@@ -1,9 +1,15 @@
 $(document).ready(function() {
     // Change order status
+    $('.order-status').each(function() {
+        $(this).data('current', $(this).val());
+    });
+
     $('.order-status').change(function() {
         const orderId = $(this).data('order-id');
         const newStatus = $(this).val();
         const $row = $(this).closest('tr');
+        const $select = $(this);
+        const prevStatus = $select.data('current');
 
         $.ajax({
             url: '/admin/changeOrderStatus',
@@ -19,15 +25,18 @@ $(document).ready(function() {
                 });
                 if (newStatus === 'Cancelled') {
                     updateCancelButton($row, true);
+                    $select.prop('disabled', true); // Disable the dropdown
                 } else {
                     updateCancelButton($row, false);
                 }
+                $select.data('current', newStatus); // Update current value
             },
             error: function(error) {
                 Swal.fire({
                     icon: 'error',
-                    text: 'Failed to update order status.'
+                    text: error.responseJSON.message || 'Failed to update order status.'
                 });
+                $select.val(prevStatus); // Go to previous value
             }
         });
     });
@@ -57,14 +66,15 @@ $(document).ready(function() {
                             icon: 'success',
                             text: 'Order cancelled successfully.'
                         }).then(() => {
-                            location.reload(); // Refresh the page to reflect the changes
+                            location.reload(); 
                         });
                         updateCancelButton($row, true);
+                        $row.find('.order-status').prop('disabled', true); // Disable the dropdown
                     },
                     error: function(error) {
                         Swal.fire({
                             icon: 'error',
-                            text: 'Failed to cancel order.'
+                            text: error.responseJSON.message || 'Failed to cancel order.'
                         });
                     }
                 });
@@ -72,29 +82,25 @@ $(document).ready(function() {
         });
     });
 
-    //Function to update the cancel button
-function updateCancelButton($row, isCancelled) {
-    const $cancelButton = $row.find('.cancel-order');
-    if (isCancelled) {
-        $cancelButton
-            .removeClass('btn-danger')
-            .addClass('btn-secondary')
-            .text('Cancelled')
-            .prop('disabled', true);
-    } else {
-        $cancelButton
-            .removeClass('btn-secondary')
-            .addClass('btn-danger')
-            .text('Cancel Order')
-            .prop('disabled', false);
+    // Function to update the cancel button
+    function updateCancelButton($row, isCancelled) {
+        const $cancelButton = $row.find('.cancel-order');
+        if (isCancelled) {
+            $cancelButton
+                .removeClass('btn-danger')
+                .addClass('btn-secondary')
+                .text('Cancelled')
+                .prop('disabled', true);
+        } else {
+            $cancelButton
+                .removeClass('btn-secondary')
+                .addClass('btn-danger')
+                .text('Cancel Order')
+                .prop('disabled', false);
+        }
     }
-}
 
-});
-
-//Format Date
-// Format the order dates
-$(document).ready(function(){
+    // Format Date
     $('.order-date').each(function(){
         var date = new Date($(this).text());
         var formattedDate = date.toLocaleString('en-GB', {
@@ -107,5 +113,3 @@ $(document).ready(function(){
         $(this).text(formattedDate);
     });
 });
-
-

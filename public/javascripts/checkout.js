@@ -67,3 +67,4 @@ document.getElementById('checkoutForm').addEventListener('submit', async functio
             });
         }
     });
+    

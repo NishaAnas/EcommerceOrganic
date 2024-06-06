@@ -3,6 +3,7 @@ const prodVariation = require('../../modals/productVariation');
 const shoppingCart = require('../../modals/shoppingCart');
 const address = require('../../modals/address');
 const order = require('../../modals/order');
+const { v4: uuidv4 } = require('uuid');
 const crypto = require('crypto');
 
 
@@ -90,6 +91,9 @@ exports.placeOrder = async (req, res) => {
     }
 
     try {
+        //function to generate 16 digit orderId
+        const newOrderId = uuidv4();
+        console.log(newOrderId);
         // Create payment details based on user selection
         const payment = {
             method: paymentOption, // e.g., 'cod', 'credit_card'
@@ -112,6 +116,7 @@ exports.placeOrder = async (req, res) => {
 
         // Create the order object to be saved in the database
         const Order = new order({
+            newOrderId: newOrderId, 
             userId: userData.userId,
             items: items,
             totalAmount: cartDetails.totalPriceOfAllProducts,
@@ -120,17 +125,10 @@ exports.placeOrder = async (req, res) => {
             delivery: delivery,
             orderStatus: 'Pending'
         });
-
+        console.log(Order);
         // Save the order to the database
         const newOrder = await order.create(Order);
-
-        // Update the stock of each item
-        // for (const item of items) {
-        //     await prodVariation.updateOne(
-        //         { _id: item.productId },
-        //         { $inc: { stock: -item.quantity } }
-        //     );
-        // }
+        
 
         // Update the stock of each item and check if stock is 0 to deactivate the product
         for (const item of items) {
@@ -162,7 +160,8 @@ exports.placeOrder = async (req, res) => {
         // Respond with a success message
         res.status(200).json({ 
             message: 'Order placed successfully', 
-            orderId: newOrder._id 
+            neworderId: newOrder.newOrderId,
+            orderId:newOrder._id
         });
     } catch (error) {
         console.error('Error placing order:', error);
@@ -178,11 +177,6 @@ exports.getOrderDetails = async (req, res) => {
     const userData = req.session.userLoggedInData;
     const orderId = req.params._id;
     console.log(orderId);
-
-    if (!mongoose.Types.ObjectId.isValid(orderId)) {
-        req.flash('error', 'Invalid order ID.');
-        return res.redirect('/'); // Redirect Home page 
-    }
 
     try {
         // Fetch order details and populate address and product details
@@ -216,7 +210,7 @@ exports.getOrderDetails = async (req, res) => {
             items: itemsWithImages
         };
 
-        //console.log(orderWithItemsAndImages.items);
+        console.log(orderWithItemsAndImages);
 
         return res.render('user/checkout/orderdetails', { 
             order: orderWithItemsAndImages, 
