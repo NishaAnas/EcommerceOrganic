@@ -1,0 +1,62 @@
+.container {
+    width: 80%;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.wallet-balance {
+    background-color: #f5f5f5;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.wallet-balance h2 {
+    margin: 0;
+}
+
+.add-money {
+    margin-bottom: 20px;
+}
+
+.add-money h2 {
+    margin: 0 0 10px 0;
+}
+
+.add-money input {
+    padding: 10px;
+    margin-right: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.add-money button {
+    padding: 10px 20px;
+    border-radius: 5px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.add-money button:hover {
+    background-color: #45a049;
+}
+
+.wallet-transactions table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.wallet-transactions table, th, td {
+    border: 1px solid black;
+}
+
+.wallet-transactions th, td {
+    padding: 10px;
+    text-align: left;
+}
+
+.wallet-transactions th {
+    background-color: #f2f2f2;
+}

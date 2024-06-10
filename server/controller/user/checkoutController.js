@@ -5,32 +5,23 @@ const address = require('../../modals/address');
 const order = require('../../modals/order');
 const { v4: uuidv4 } = require('uuid');
 const crypto = require('crypto');
+const RazorPay = require('razorpay');
+const wallet = require('../../modals/wallet');
+const WalletController = require('./walletController');
+const coupon = require('../../modals/coupon')
 
+// Initialize Razorpay instance
+const razorpayInstance = new RazorPay({
+    key_id: process.env.RAZORPAY_ID_KEY,
+    key_secret: process.env.RAZORPAY_SECRET_KEY
+});
 
-// //Get Address managemnt of checkout page
-exports.getaddressPage = async (req, res) => {
-
-    try {
-        if (!req.session.userLoggedInData || !req.session.userLoggedInData.userloggedIn) {
-            req.flash('error', 'To access the checkout, please log in first.');
-            return res.redirect('/login');
-        }
-        const userId = req.session.userLoggedInData.userId;
-        const userData = req.session.userLoggedInData;
-        const Address = await address.findOne({ userId: userId, isDefault: true });
-        console.log(Address);
-
-        res.render('user/checkout/addressManagement', { 
-            Address, 
-            userData ,
-            layout:'checkoutlayout'
-        });
-    } catch (error) {
-        console.log(error);
-        req.flash('error', 'Server Error');
-        res.redirect('/')
-    }
-}
+// Generate signature for Razorpay
+// const generateSignature = (orderId, paymentId) => {
+//     const hmac = crypto.createHmac('sha256', process.env.RAZORPAY_SECRET_KEY);
+//     hmac.update(`${orderId}|${paymentId}`);
+//     return hmac.digest('hex');
+// };
 
 
 //GET Checkout Page
@@ -56,16 +47,19 @@ exports.getcheckOut = async (req, res) => {
 
         if (!cartDetails) {
             req.flash('error', 'Your cart is empty.');
-            return res.redirect('/shoppingCart');
+            return res.redirect('/cart');
         }
-        //console.log(cartDetails);
+
+        console.log(req.session.cartDetails);
 
         return res.render('user/checkout/checkout', {
             userData,
             defaultAddress,
+            razorpaykey:razorpayInstance.key_id,
             cartitems: cartDetails.cartitems,
             totalQuantity: cartDetails.totalQuantity,
             totalPriceOfAllProducts: cartDetails.totalPriceOfAllProducts,
+            paymentMethod:cartDetails.paymentMethod,
             success: successMessage,
             error: errorMessage,
             layout:'checkoutlayout'
@@ -83,29 +77,17 @@ exports.placeOrder = async (req, res) => {
     const userData = req.session.userLoggedInData;
     const shippingAddress = req.session.addressDetails;
     const cartDetails = req.session.cartDetails;
-    const { deliveryOption, paymentOption } = req.body;
+    const { deliveryOption, paymentOption} = req.body;
 
     if (!cartDetails) {
         req.flash('error', 'Your cart is empty.');
-        return res.redirect('/shoppingCart');
+        return res.redirect('/cart');
     }
 
     try {
         //function to generate 16 digit orderId
         const newOrderId = uuidv4();
-        console.log(newOrderId);
-        // Create payment details based on user selection
-        const payment = {
-            method: paymentOption, // e.g., 'cod', 'credit_card'
-            status: paymentOption === 'cod' ? 'Pending' : 'Paid', // COD is 'Pending', others are 'Paid'
-            transactionId: null // Default to null
-        };
-
-        // Create delivery details based on user selection
-        const delivery = {
-            method: deliveryOption, // e.g., 'standard', 'express'
-            status: 'Pending' // Initial status is 'Pending'
-        };
+        //console.log(newOrderId);
 
         // Create order items from cart details
         const items = cartDetails.cartitems.map(item => ({
@@ -114,61 +96,189 @@ exports.placeOrder = async (req, res) => {
             price: item.actualPrice
         }));
 
-        // Create the order object to be saved in the database
-        const Order = new order({
-            newOrderId: newOrderId, 
-            userId: userData.userId,
-            items: items,
-            totalAmount: cartDetails.totalPriceOfAllProducts,
-            address: shippingAddress._id,
-            payment: payment,
-            delivery: delivery,
-            orderStatus: 'Pending'
-        });
-        console.log(Order);
-        // Save the order to the database
-        const newOrder = await order.create(Order);
-        
-
-        // Update the stock of each item and check if stock is 0 to deactivate the product
-        for (const item of items) {
-            const productVariant = await prodVariation.findById(item.productId);
-            const newStock = productVariant.stock - item.quantity;
-            
-            // Update the stock
-            await prodVariation.updateOne(
-                { _id: item.productId },
-                { $set: { stock: newStock } }
-            );
-
-            // If stock is 0, set isActive to false
-            if (newStock <= 0) {
-                await prodVariation.updateOne(
-                    { _id: item.productId },
-                    { $set: { isActive: false } }
-                );
-            }
+        // Delivery fee based on the delivery option
+        let deliveryFee = 0;
+        if (deliveryOption === 'express') {
+            deliveryFee = 100;
+        } else if (deliveryOption === 'standard') {
+            deliveryFee = 40;
+        } else if (deliveryOption === 'normal') {
+            deliveryFee = 60;
         }
 
-        // Delete the cart document from the database
-        await shoppingCart.deleteOne({ user: userData.userId });
+        const totalAmount = cartDetails.totalPriceOfAllProducts + deliveryFee;
 
-        // Clear the cart session  and address session after placing the order
-        req.session.cartDetails = null;
-        req.session.addressDetails = null;
+        
 
-        // Respond with a success message
-        res.status(200).json({ 
-            message: 'Order placed successfully', 
-            neworderId: newOrder.newOrderId,
-            orderId:newOrder._id
-        });
+        // Create delivery details
+        const delivery = {
+            method: deliveryOption,
+            status: 'Pending'
+        };
+
+        // Prepare order data
+        const orderData = {
+            newOrderId: newOrderId,
+            userId: userData.userId,
+            items: items,
+            totalAmount: totalAmount,
+            address: shippingAddress._id,
+            delivery: delivery,
+            orderStatus: 'Pending'
+        };
+
+        // Check payment option
+        if (paymentOption === 'cod') {
+            // If COD is selected
+            orderData.payment = {
+                method: 'COD',
+                status: 'Pending',
+                transactionId: null
+            };
+
+            // Save the order to the database
+            const newOrder = await order.create(orderData);
+
+            // Update stock and clear cart
+            await updateStockAndClearCart(items, userData.userId,req);
+
+            res.status(200).json({
+                message: 'Order placed successfully',
+                neworderId: newOrder.newOrderId,
+                orderId: newOrder._id
+            });
+        } else if (paymentOption === 'razorpay') {
+            // If Razorpay is selected, create Razorpay order
+            const amount = totalAmount * 100; // Convert to paise
+            const options = {
+                amount: amount,
+                currency: 'INR',
+                receipt: newOrderId
+            };
+
+            const razorpayOrder = await razorpayInstance.orders.create(options);
+
+            if (!razorpayOrder) {
+                throw new Error('Failed to create Razorpay order');
+            }
+
+            console.log(razorpayOrder);
+            // Save the order with status as 'Payment Pending'
+            orderData.payment = {
+                method: 'Razorpay',
+                status: 'Pending',
+                transactionId: razorpayOrder.id
+            };
+
+            const newOrder = await order.create(orderData);
+
+            // Update stock and clear cart
+            await updateStockAndClearCart(items, userData.userId, req);
+
+            res.status(200).json({
+                message: 'Razorpay order created successfully',
+                razorpayOrderId: razorpayOrder.id,
+                razorpayKey: razorpayInstance.key_id,
+                amount: amount,
+                neworderId: newOrder.newOrderId,
+                orderId: newOrder._id,
+                userData: {
+                    name: userData.name,
+                    email: userData.email,
+                    contact: userData.contact
+                }
+            });
+        }else if (paymentOption === 'wallet') {
+            console.log('wallet')
+            const userId = userData.userId;
+            const Wallet = await wallet.findOne({ userId:userId});
+            console.log(Wallet.balance)
+
+            if (!Wallet || Wallet.balance < totalAmount) {
+                return res.status(400).json({ error: 'Insufficient wallet balance' });
+            }
+            orderData.payment = {
+                method: 'Wallet',
+                status: 'Completed',
+                transactionId: null
+            };
+            
+            // Save the order to the database
+            const newOrder = await order.create(orderData);
+            console.log(`DebitOrderId:${newOrder._id}`)
+            
+            await WalletController.debitWallet(userId,totalAmount,'Oder Placed', newOrder._id);
+            
+            // Update stock and clear cart
+            await updateStockAndClearCart(items, userData.userId, req);
+
+            res.status(200).json({
+                message: 'Order placed successfully',
+                neworderId: newOrder.newOrderId,
+                orderId: newOrder._id
+            });
+        } else {
+            res.status(400).json({ error: 'Invalid payment method' });
+        }
     } catch (error) {
         console.error('Error placing order:', error);
         res.status(500).json({ error: 'An error occurred while placing the order. Please try again.' });
     }
 
 }
+
+// Function to update stock and clear cart
+const updateStockAndClearCart = async (items, userId , req) => {
+    for (const item of items) {
+        const productVariant = await prodVariation.findById(item.productId);
+        const newStock = productVariant.stock - item.quantity;
+
+        // Update the stock
+        await prodVariation.updateOne(
+            { _id: item.productId },
+            { $set: { stock: newStock } }
+        );
+
+        // If stock is 0, set isActive to false
+        if (newStock <= 0) {
+            await prodVariation.updateOne(
+                { _id: item.productId },
+                { $set: { isActive: false } }
+            );
+        }
+    }
+
+    // Delete the cart document from the database
+    await shoppingCart.deleteOne({ user: userId });
+
+    // Clear the cart session
+    req.session.cartDetails = null;
+    req.session.addressDetails = null;
+};
+
+exports.payemntVerification = async (req, res) => {
+    try {
+        const { razorpayPaymentId, razorpayOrderId, razorpaySignature, orderId } = req.body;
+        const paymentDocument = await razorpayInstance.payments.fetch(razorpayPaymentId);
+
+        if (paymentDocument.status === 'captured') {
+            await order.findByIdAndUpdate(orderId, {
+                'payment.status': 'Completed',
+                'payment.transactionId': razorpayPaymentId
+            });
+
+            res.status(200).json({
+                message: 'Razorpay payment successful',
+                orderId: orderId
+            });
+        } else {
+            throw new Error('Payment not captured');
+        }
+    } catch (error) {
+        console.error('Error verifying payment:', error);
+        res.status(500).json({ error: 'An error occurred while verifying the payment. Please try again.' });
+    }
+};
 
 //GET Order Details Page
 exports.getOrderDetails = async (req, res) => {
@@ -210,7 +320,7 @@ exports.getOrderDetails = async (req, res) => {
             items: itemsWithImages
         };
 
-        console.log(orderWithItemsAndImages);
+        //console.log(orderWithItemsAndImages);
 
         return res.render('user/checkout/orderdetails', { 
             order: orderWithItemsAndImages, 

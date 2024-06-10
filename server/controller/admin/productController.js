@@ -24,7 +24,13 @@ exports.getProductPage = async(req, res) => {
             const Category = await category.findById(product.categoryId).lean();
             product.categoryName = Category.name; 
         }
-        res.render('admin/product/product', { locals, Product, layout: 'adminlayout', success: successMessage, error: errorMessage })
+        res.render('admin/product/product', { 
+            locals, 
+            Product, 
+            layout: 'adminlayout', 
+            success: successMessage, 
+            error: errorMessage 
+        })
     } catch (error) {
         console.log(error)
         req.flash('error', 'Server Error');
@@ -112,7 +118,15 @@ try {
     const productVariations = await prodVariation.find({ productId: req.params._id, isDeleted: false}).lean();
     const productCategory = await category.find().lean();
     
-    res.render('admin/product/editProduct', { success: successMessage, error: errorMessage ,locals,productCategory,  productDetailsViewing, productVariations, layout: 'adminlayout' });
+    res.render('admin/product/editProduct', { 
+        success: successMessage, 
+        error: errorMessage ,
+        locals,
+        productCategory,  
+        productDetailsViewing, 
+        productVariations, 
+        layout: 'adminlayout' 
+    });
 } catch (error) {
     console.log(error)
     req.flash('error', 'Server Error');
@@ -226,15 +240,15 @@ exports.getVariantDetails = async (req, res) => {
     try {
         const variantId = req.params._id;
         console.log(variantId);
-        // Fetch variant details based on variantId
-        const variant = await prodVariation.findById(variantId); // Assuming productVariation is your model
+
+        const variant = await prodVariation.findById(variantId);
         
         if (!variant) {
-            // Handle case where variant is not found
+
             return res.status(404).json({ error: 'Variant not found' });
         }
         console.log(variant)
-        // Return variant details as JSON
+
         res.json({ variant });
     } catch (error) {
         console.error('Server Error', error);

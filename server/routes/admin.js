@@ -6,6 +6,7 @@ var prodController = require('../controller/admin/productController.js');
 var categoryController = require('../controller/admin/categoryController.js');
 var userController = require('../controller/admin/userController.js');
 var orderController = require('../controller/admin/orderController.js');
+const couponController = require('../controller/admin/couponController.js');
 const { upload, resizeImages } = require('../config/multer');
 const path = require('path');
 
@@ -104,6 +105,20 @@ router.post('/changeOrderStatus', orderController.changeOrderStatus);
 
 // Route to cancel an order
 router.post('/ordersCancel', orderController.cancelOrder);
+
+//GET coupons
+router.get('/couponManage',couponController.getCoupons);
+
+//Add coupon
+router.post('/addCoupon',couponController.addCoupon);
+router.get('/getCoupon/:id', couponController.getCoupon);
+
+//Update Coupon details
+router.put('/editCoupon/:_id', couponController.editCoupon);
+
+//Delete Coupon Details
+router.delete('/deleteCoupon/:_id', couponController.deleteCoupon);
+
 
 
 module.exports = router;

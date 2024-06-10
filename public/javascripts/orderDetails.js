@@ -37,13 +37,6 @@ $(document).ready(function(){
             }
         });
     });
-});
-//Pagination page change
-function changePage(page) {
-    window.location.href = `/acctorderDetails?page=${page}`;
-}
- // Format the order dates
-$(document).ready(function(){
     $('.order-date').each(function(){
         var date = new Date($(this).text());
         var formattedDate = date.toLocaleString('en-GB', {
@@ -56,3 +49,7 @@ $(document).ready(function(){
         $(this).text(formattedDate);
     });
 });
+//Pagination page change
+function changePage(page) {
+    window.location.href = `/acctorderDetails?page=${page}`;
+}

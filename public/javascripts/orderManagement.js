@@ -113,3 +113,4 @@ $(document).ready(function() {
         $(this).text(formattedDate);
     });
 });
+

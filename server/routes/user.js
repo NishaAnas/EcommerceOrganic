@@ -7,6 +7,8 @@ var cartController = require('../controller/user/cartController.js');
 var accountController = require('../controller/user/accountController.js');
 var checkoutController = require('../controller/user/checkoutController.js');
 var wishlistController = require('../controller/user/wishlistController.js');
+var walletController = require('../controller/user/walletController.js');
+var couponController = require('../controller/user/couponControlle.js')
 const passport = require('passport');
 require('../config/passport.js');
 
@@ -165,6 +167,9 @@ router.get('/checkout',checkoutController.getcheckOut);
 //Post checkout (Place Order)
 router.post('/placeOrder', checkoutController.placeOrder);
 
+//POST Payement verification
+router.post('/payementVerification',checkoutController.payemntVerification)
+
 //GET Order Details Page
 router.get('/orderDetails/:_id',checkoutController.getOrderDetails);
 
@@ -183,6 +188,21 @@ router.post('/removeFromWishlist',wishlistController.removefromWishlist)
 
 //Add to cart From wishlist
 router.post('/addToCartWishlist',wishlistController.wishAddtoCart)
+
+
+
+
+//GET wallet
+router.get('/wallet',walletController.getWallet);
+
+//Add Money to wallet
+router.post('/walletaddMoney',walletController.addMoney);
+
+//Get Applicable coupons
+router.get('/getApplicableCoupons',couponController.getCoupons);
+
+//Update session total
+router.post('/updateCartTotal',cartController.updateTotal)
 
 module.exports = router;
 

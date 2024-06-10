@@ -1,0 +1,352 @@
+<body>
+    <div class="container mt-5">
+        <h2>Coupon Management</h2>
+
+        {{#if error}}
+        <div class="alert alert-danger">
+            {{error}}
+        </div>
+        {{/if}}
+        {{#if success}}
+        <div class="alert alert-success">
+            {{success}}
+        </div>
+        {{/if}}
+        <div class="d-flex justify-content-end mb-3">
+            <!-- Add Coupon Button -->
+        <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#addCouponModal">
+            + Add Coupon
+            </button>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Discount (%)</th>
+                        <th>Expiry Date</th>
+                        <th>Status</th>
+                        <th>Min Purchase Amount</th>
+                        <th>First Purchase</th>
+                        <th>Payment Method</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each Coupons}}
+                    <tr>
+                        <td>{{this.name}}</td>
+                        <td>{{this.description}}</td>
+                        <td>{{this.discount}}</td>
+                        <td class="coupon-date">{{this.expiryDate}}</td>
+                        <td>
+                            <span class="btn btn-sm {{#if this.isActive}}btn-success{{else}}btn-danger{{/if}}">
+                                {{#if this.isActive}}Active{{else}}Inactive{{/if}}
+                            </span>
+                        </td>
+                        <td>{{this.minPurchaseAmount}}</td>
+                        <td>{{#if this.userFirstPurchase}}Yes{{else}}No{{/if}}</td>
+                        <td>{{this.paymentMethod}}</td>
+                        <td class="col-8 actionButtons d-flex justify-content-start">
+                            <button class="btn btn-sm btn-primary mr-2 editCouponBtn" data-id="{{this._id}}" data-bs-toggle="modal" data-bs-target="#editCouponModal">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger deleteCouponBtn" data-id="{{this._id}}">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add Coupon Modal -->
+    <div class="modal fade" id="addCouponModal" tabindex="-1" role="dialog" aria-labelledby="addCouponModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addCouponModalLabel">Add Coupon</h5>
+                    <button type="button" class="close" data-dismiss="modal" onclick="closeaddModal()" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="addCouponForm" >
+                    <div class="row mb-4 py-4">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                            <label for="couponName">Name</label>
+                            <input type="text" class="form-control" id="couponName" name="name" required>
+                        </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                            <label for="couponDiscount">Discount (%)</label>
+                            <input type="number" class="form-control" id="couponDiscount" name="discount" required>
+                        </div>
+                        </div>
+                    </div>
+                    <div class="row mb-4 py-4">
+                        <div class="form-group">
+                            <label for="couponDescription">Description</label>
+                            <input type="text" class="form-control" id="couponDescription" name="description" required>
+                        </div>
+                    </div>
+                    <div class="row mb-4 py-4">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                            <label for="couponExpiryDate">Expiry Date</label>
+                            <input type="date" class="form-control" id="couponExpiryDate" name="expiryDate" required>
+                        </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                            <label for="couponMinPurchaseAmount">Min Purchase Amount</label>
+                            <input type="number" class="form-control" id="couponMinPurchaseAmount"  name="minAmount">
+                        </div>
+                        </div>
+                    </div>
+                    <div class="row mb-4 py-4">
+                        <div class="col-sm-6">
+                            <label for="firstPurchase" class="col-form-label">First Purchase</label>
+                                <div class="form-check form-switch" >  
+                                <input class="form-check-input" name="firstPurchase" type="checkbox" role="switch" id="firstPurchase" style="min-height: 70%;">
+                                </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                            <label for="couponPaymentMethod">Payment Method</label>
+                            <select class="form-control" id="couponPaymentMethod" name="paymentMethod">
+                                <option value="Any">Any</option>
+                                <option value="Wallet">Wallet</option>
+                                <option value="Razorpay">Razorpay</option>
+                                <option value="Razorpay">COD</option>
+                            </select>
+                        </div>
+                        </div>
+                    </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" onclick=closeaddModal()>Close</button>
+                            <button type="submit" form="addCouponForm" class="btn btn-primary">Save Coupon</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!--Edit Attribute Modal -->
+    <div class="modal fade" id="editCouponModal" tabindex="-1" role="dialog" aria-labelledby="addAttributesModalLabel" aria-hidden="true" > 
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+        <h5 class="modal-title" id="editCouponModalLabel">Editing : {{Coupons.name}} </h5>
+        <div class="col text-end fw-lighter">
+                    <b>Coupon ID:</b> {{ Coupons._id }}
+                    
+                </div>
+                <button type="button" class="close" onclick="closeeditModal()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        </div>
+        <div class="modal-body">
+        <form id="editCouponForm" >
+        <input type="hidden" id="editCouponId" name="id">
+                <div class="row mb-4 py-4">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                            <label for="couponName">Name</label>
+                            <input type="text" class="form-control" id="editCouponName" name="name" required>
+                        </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                            <label for="couponDiscount">Discount (%)</label>
+                            <input type="number" class="form-control" id="editCouponDiscount" name="discount" required>
+                        </div>
+                        </div>
+                    </div>
+                    <div class="row mb-4 py-4">
+                        <div class="form-group">
+                            <label for="couponDescription">Description</label>
+                            <input type="text" class="form-control" id="editCouponDescription" name="description" required>
+                        </div>
+                    </div>
+                    <div class="row mb-4 py-4">
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                            <label for="couponExpiryDate">Expiry Date</label>
+                            <input type="date" class="form-control" id="editCouponExpiryDate" name="expiryDate" required>
+                        </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                            <label for="couponMinPurchaseAmount">Min Purchase Amount</label>
+                            <input type="number" class="form-control" id="editCouponMinPurchaseAmount"  name="minAmount">
+                        </div>
+                        </div>
+                    </div>
+                    <div class="row mb-4 py-4">
+                        <div class="col-sm-6">
+                            <label for="firstPurchase" class="col-form-label">First Purchase</label>
+                                <div class="form-check form-switch" >  
+                                <input class="form-check-input" name="firstPurchase" type="checkbox" role="switch" id="editCouponUserFirstPurchase" style="min-height: 70%;">
+                                </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-group">
+                            <label for="couponPaymentMethod">Payment Method</label>
+                            <select class="form-control" id="editCouponPaymentMethod" name="paymentMethod">
+                                <option value="Any">Any</option>
+                                <option value="Wallet">Wallet</option>
+                                <option value="Razorpay">Razorpay</option>
+                                <option value="Razorpay">COD</option>
+                            </select>
+                        </div>
+                        </div>
+                    </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" onclick="closeModal()">Close</button>
+                            <button type="submit" form="editCouponForm" class="btn btn-primary">Edit Coupon</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <script>
+        $(document).ready(function(){
+            $('.coupon-date').each(function(){
+        var date = new Date($(this).text());
+        var formattedDate = date.toLocaleString('en-GB', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        }).replace(',', ' at');
+        $(this).text(formattedDate);
+    });
+
+//add Coupon
+    $('#addCouponForm').on('submit', function(e) {
+                e.preventDefault();
+                $.ajax({
+                    url: '/admin/addCoupon',
+                    method: 'POST',
+                    data: $(this).serialize(),
+                    success: function(response) {
+                        $('#addCouponModal').modal('hide');
+                        Swal.fire(
+                            'Success', 
+                            'Coupon added successfully!', 
+                            'success').then(() => {
+                            location.reload();
+                        });
+                    },
+                    error: function(response) {
+                        Swal.fire(
+                            'Error', 
+                            'Failed to add coupon', 
+                            'error');
+                    }
+                });
+            });
+
+            // Open edit modal with coupon details
+            $('.editCouponBtn').on('click', function() {
+                const id = $(this).data('id');
+                $.get(`/admin/getCoupon/${id}`, function(data) {
+                    $('#editCouponId').val(data._id);
+                    $('#editCouponName').val(data.name);
+                    $('#editCouponDescription').val(data.description);
+                    $('#editCouponDiscount').val(data.discount);
+                    $('#editCouponExpiryDate').val(data.expiryDate.split('T')[0]);
+                    $('#editCouponMinPurchaseAmount').val(data.minPurchaseAmount);
+                    $('#editCouponUserFirstPurchase').prop('checked', data.userFirstPurchase);
+                    $('#editCouponPaymentMethod').val(data.paymentMethod);
+                    $('#editCouponModal').modal('show');
+                });
+            });
+            //Edit Coupon
+        $('#editCouponForm').on('submit', function(e) {
+                e.preventDefault();
+                const id = $('#editCouponId').val();
+                $.ajax({
+                    url: `/admin/editCoupon/${id}`,
+                    method: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        name: $('#editCouponName').val(),
+                        description: $('#editCouponDescription').val(),
+                        discount: $('#editCouponDiscount').val(),
+                        expiryDate: $('#editCouponExpiryDate').val(),
+                        minPurchaseAmount: $('#editCouponMinPurchaseAmount').val(),
+                        userFirstPurchase: $('#editCouponUserFirstPurchase').is(':checked'),
+                        paymentMethod: $('#editCouponPaymentMethod').val()
+                    }),
+                    success: function(response) {
+                        $('#editCouponModal').modal('hide');
+                        Swal.fire('Success', 'Coupon updated successfully!', 'success').then(() => {
+                            location.reload();
+                        });
+                    },
+                    error: function(response) {
+                        Swal.fire('Error', 'Failed to update coupon', 'error');
+                    }
+                });
+            });
+
+            // Delete Coupon 
+            $('.deleteCouponBtn').on('click', function() {
+                const id = $(this).data('id');
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $.ajax({
+                            url: `/admin/deleteCoupon/${id}`,
+                            method: 'DELETE',
+                            success: function(response) {
+                                Swal.fire(
+                                    'Deleted!', 
+                                    'Your coupon has been deleted.', 
+                                    'success'
+                                ).then(() => {
+                                    location.reload();
+                                });
+                            },
+                            error: function(response) {
+                                Swal.fire(
+                                    'Error', 
+                                    'Failed to delete coupon', 
+                                    'error'
+                                );
+                            }
+                        });
+                    }
+                });
+            });
+        })
+
+
+        function closeModal() {
+            $('#editCouponModal').modal('hide');
+        }
+        function closeaddModal() {
+            $('#addCouponModal').modal('hide');
+        }
+
+      
+    </script>

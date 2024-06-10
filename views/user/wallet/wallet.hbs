@@ -1,0 +1,39 @@
+<link rel="stylesheet" href="/stylesheets/wallet.css">
+<body>
+    <div class="container">
+        <h1>Wallet</h1>
+        <div class="wallet-balance">
+            <h2>Balance: ₹<span id="balance">{{balance}}</span></h2>
+        </div>
+        <div class="add-money">
+            <h2>Add Money</h2>
+            <input type="number" id="amount" placeholder="Enter amount">
+            <button id="add-money-button">Add Money</button>
+        </div>
+        <div class="wallet-transactions">
+            <h2>Transactions</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Amount</th>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Reason</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each walletDetails}}
+                    <tr>
+                        <td>₹{{amount}}</td>
+                        <td class="order-date">{{date}}</td>
+                        <td>{{type}}</td>
+                        <td>{{reason}}</td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="/javascripts/wallet.js"></script>
+    
+</body>

@@ -16,7 +16,13 @@ exports.getCategoryPage = async (req, res) => {
         const Category = await category.find({ isDeleted: false }).lean();
         const successMessage = req.flash('success');
         const errorMessage = req.flash('error');
-        res.render('admin/category/category', { locals, Category, layout: 'adminlayout', success: successMessage, error: errorMessage })
+        res.render('admin/category/category', { 
+            locals, 
+            Category, 
+            layout: 'adminlayout', 
+            success: successMessage, 
+            error: errorMessage 
+        })
     } catch (error) {
         console.log(error)
         req.flash('error', 'Server Error');

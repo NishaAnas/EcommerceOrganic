@@ -74,9 +74,11 @@
                                 {{#if (gt variantDetails.stock 0)}}
                                     {{#if productInCart}}
                                         <!-- Render a disabled button with a message if the product is already in the cart -->
-                                            <button class="btn btn-success  text-uppercase" type="submit" disabled >
-                                            Already Added to Cart
-                                            </button>
+                                            <a href="/cart">
+                                                <button id="viewInCartButton" class="btn btn-success text-uppercase" type="button">
+                                                    View in Cart
+                                                </button>
+                                            </a>
                                     {{else}}
                                     <!-- Render the "Add to Cart" button if the product is not in the cart -->
                                         <button class="btn btn-success  text-uppercase" type="submit" >

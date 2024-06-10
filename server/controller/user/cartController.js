@@ -71,7 +71,8 @@ exports.showShoppingCart = async(req,res)=>{
         req.session.cartDetails = {
             cartitems,
             totalQuantity,
-            totalPriceOfAllProducts
+            totalPriceOfAllProducts,
+            paymentMethod:'COD'
         };
 
         res.render('user/shoppingCart/userShoppingCart' , {
@@ -88,6 +89,23 @@ exports.showShoppingCart = async(req,res)=>{
         req.flash('error', 'Server Error');
         res.redirect('/'); 
     }  
+}
+
+//update the session variable
+exports.updateTotal = async(req,res)=>{
+    const { newTotal,paymentMethod } = req.body;
+    //console.log(req.body)
+
+    // Check if the user is logged in
+    if (!req.session.userLoggedInData || !req.session.userLoggedInData.userloggedIn) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+
+    // Update the session with the new total amount
+    req.session.cartDetails.totalPriceOfAllProducts = newTotal;
+    req.session.cartDetails.paymentMethod = paymentMethod
+
+    res.json({ message: 'Cart total updated successfully' });
 }
 
 //Add To cart
@@ -129,11 +147,11 @@ exports.addToCart = async(req,res)=>{
 
         // Find the base product to get its price
         const baseProduct = await Product.findById(variant.productId);
-        console.log(baseProduct)
+        //console.log(baseProduct)
 
         // Calculate the total price
         const totalPrice = baseProduct.price + variant.price;
-        console.log(totalPrice)
+        //console.log(totalPrice)
         
         // Check if the item already exists in the cart
         const existingItemIndex = existingShoppingCart.items.findIndex(item => item.product.equals(variantId));
@@ -141,16 +159,16 @@ exports.addToCart = async(req,res)=>{
         if (existingItemIndex !== -1) {
             // If the item already exists,
             req.flash('error', 'This item is already in your cart.');
-            console.log(' Items present')
+            //console.log(' Items present')
         } else {
              // If the item doesn't exist, create a new cart item
             await shoppingCart.findOneAndUpdate(
                 { user: userId },
                 { $push: { items: { product: variantId, quantity: 1, totalPrice: totalPrice } } }
             );
-            console.log('Items not Present')
+            //console.log('Items not Present')
         }
-        console.log('Product added to cart successfully')
+        //console.log('Product added to cart successfully')
         req.flash('success', 'Product added to cart successfully');
         res.redirect(`/productDetails/${variantId}`); // Redirect to the product Details page
 
@@ -165,14 +183,14 @@ exports.addToCart = async(req,res)=>{
 exports.deleteCartProduct = async(req,res)=>{
     try {
         const variantId = req.params._id;
-         console.log(variantId);
+        //console.log(variantId);
         const updatedCart = await shoppingCart.findOneAndUpdate(
             { 'items.product': variantId }, // Filter criteria
             { $pull: { items: { product: variantId } } } // Pull the item with the given productId from the items array
         );
-        console.log(`removed cart:${updatedCart}`)
+        //console.log(`removed cart:${updatedCart}`)
         if (updatedCart) {
-            console.log(`items length:${updatedCart.items.length}`)
+            //console.log(`items length:${updatedCart.items.length}`)
             if (updatedCart.items.length === 0) {
                 await shoppingCart.deleteOne({ _id: updatedCart._id });
                 req.flash('success', 'Product removed from cart successfully');
@@ -192,6 +210,7 @@ exports.deleteCartProduct = async(req,res)=>{
         res.redirect('/cart');
     }
 }
+
 
 //Update Cart Product
 exports.updateCartItem = async(req,res)=>{
