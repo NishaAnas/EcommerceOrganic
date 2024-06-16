@@ -13,7 +13,15 @@ exports.getCoupons = async(req,res)=>{
     const successMessage = req.flash('success');
     const errorMessage = req.flash('error');
     try{
-        const Coupons = await coupon.find({}).lean();
+        const page = parseInt(req.query.page) || 1;
+        const limit = 10; // Number of users per page
+        const skip = (page - 1) * limit;
+
+        const Coupons = await coupon.find({}).skip(skip).limit(limit).lean();
+
+        const totalcoupons = await coupon.countDocuments({});
+        const totalPages = Math.ceil(totalcoupons / limit);
+
         // Check and update the isActive status for each coupon
         Coupons.forEach(async (coupons) => {
             const currentDate = new Date();
@@ -27,6 +35,8 @@ exports.getCoupons = async(req,res)=>{
     res.render('admin/couponManage/couponManagement',{
         layout:'adminlayout',
         Coupons,
+        currentPage: page,
+        totalPages: totalPages,
         success: successMessage, 
         error: errorMessage
     })

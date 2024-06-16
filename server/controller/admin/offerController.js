@@ -12,11 +12,19 @@ const path = require('path');
 
 exports.getOfferManage = async (req, res) => {
     try {
-        const offers = await offer.find().lean();
+        const page = parseInt(req.query.page) || 1;
+        const limit = 10; // Number of users per page
+        const skip = (page - 1) * limit;
+    
+        const offers = await offer.find({}).skip(skip).limit(limit).lean();
+        const totaloffers = await offer.countDocuments({});
+        const totalPages = Math.ceil(totaloffers / limit);
 
         res.render('admin/offer/offerManage', {
             layout: 'adminlayout',
-            offers: offers, 
+            offers: offers,
+            currentPage: page,
+            totalPages: totalPages, 
             error: req.flash('error'),
             success: req.flash('success')
         });

@@ -71,15 +71,31 @@ exports.getWallet = async(req,res)=>{
                 userDetails,
                 balance: 0, 
                 transactions: [] ,
+                currentPage: 1,
+                totalPages: 1,
                 layout:'userAccountLayout'
             });
         }
-        const walletDetails=Wallet.transactions;
-        console.log(Wallet.transactions);
+
+
+        //const walletDetails=Wallet.transactions;
+        //console.log(Wallet.transactions);
+
+        // Pagination 
+        const page = parseInt(req.query.page) || 1;
+        const limit = 10; // Number of transactions per page
+        const skip = (page - 1) * limit;
+
+        const totalTransactions = Wallet.transactions.length;
+        const totalPages = Math.ceil(totalTransactions / limit);
+        const transactions = Wallet.transactions.slice(skip, skip + limit);
+
         res.render('user/wallet/wallet', {
             userDetails,
-            balance: Wallet.balance,
-            walletDetails,
+            balance: wallet.balance,
+            walletDetails: transactions,
+            currentPage: page,
+            totalPages: totalPages,
             layout:'userAccountLayout'
         });
     } catch (error) {

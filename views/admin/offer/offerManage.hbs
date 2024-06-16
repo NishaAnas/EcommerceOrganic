@@ -19,6 +19,7 @@
             </button>
         </div>
 
+
         <div class="table-responsive">
             <table class="table table-bordered">
                 <thead class="thead-light">
@@ -65,6 +66,20 @@
                     {{/each}}
                 </tbody>
             </table>
+        </div>
+        <!-- Pagination Section -->
+        <div class="pagination-container text-primary d-flex justify-content-between mt-4">
+            <div class="pagination-summary">
+                Page {{ currentPage }} of {{ totalPages }}
+            </div>
+            <div class="pagination-links d-flex gap-3">
+                {{#if (gt currentPage 1)}}
+                <a href="/admin/offerManage?page={{ subtract currentPage 1 }}" class="pagination-link">Previous</a>
+                {{/if}}
+                {{#if (lt currentPage totalPages)}}
+                <a href="/admin/offerManage?page={{ add currentPage 1 }}" class="pagination-link">Next</a>
+                {{/if}}
+            </div>
         </div>
     </div>
 

@@ -1,0 +1,106 @@
+<div class="container mb-5" style="height: 100vh;">
+    <h2>Sales Report</h2>
+    
+    <!-- Date Range Filter -->
+    <div class="form-group row mt-4">
+        <div class="col-md-3">
+            <label for="filterType">Filter Type</label>
+            <select class="form-control" id="filterType">
+                <option value="custom" selected>Custom</option>
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="monthly">Monthly</option>
+                <option value="yearly">Yearly</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label for="startDate">Start Date</label>
+            <input type="date" class="form-control" id="startDate" name="startDate" value="{{startDate}}">
+        </div>
+        <div class="col-md-3">
+            <label for="endDate">End Date</label>
+            <input type="date" class="form-control" id="endDate" name="endDate" value="{{endDate}}">
+        </div>
+        <div class="col-md-3">
+            <label></label>
+            <button class="btn btn-primary btn-block mt-4" onclick="applyFilters()">Apply Filters</button>
+        </div>
+    </div>
+
+    <!-- Sales Report Summary -->
+    <div class="row mt-4">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Completed Orders</h5>
+                    <p class="card-text" id="completedOrders">{{reportData.completedOrders}}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Cancelled Orders</h5>
+                    <p class="card-text" id="cancelledOrders">{{reportData.cancelledOrders}}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Revenue</h5>
+                    <p class="card-text" id="totalRevenue">{{reportData.totalRevenue}}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Discount Given</h5>
+                    <p class="card-text" id="totalDiscountGiven">{{reportData.totalDiscountGiven}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Download Options -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <button class="btn btn-success btn-block" onclick="downloadReport('pdf')">Download as PDF</button>
+        </div>
+        <div class="col-md-6">
+            <button class="btn btn-success btn-block" onclick="downloadReport('excel')">Download as Excel</button>
+        </div>
+    </div>
+</div>
+<script>
+    function applyFilters() {
+        const filterType = $('#filterType').val();
+        const startDate = $('#startDate').val();
+        const endDate = $('#endDate').val();
+
+        $.ajax({
+            type: 'GET',
+            url: `/admin/reportSales?filterType=${filterType}&startDate=${startDate}&endDate=${endDate}`,
+            success: function(data) {
+                $('#completedOrders').text(data.completedOrders);
+                $('#cancelledOrders').text(data.cancelledOrders);
+                $('#totalRevenue').text(data.totalRevenue);
+                $('#totalDiscountGiven').text(data.totalDiscountGiven);
+            },
+            error: function(error) {
+                console.error('Error applying filters:', error);
+                Swal.fire({
+                            title: 'Error!',
+                            text: error,
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+            }
+        });
+    }
+
+    function downloadReport(format) {
+        window.location.href = `/admin/downloadReport?filterType=${filterType}&format=${format}&startDate=${startDate}&endDate=${endDate}`;
+    }
+</script>

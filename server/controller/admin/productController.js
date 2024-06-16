@@ -16,7 +16,14 @@ exports.getProductPage = async(req, res) => {
             title: 'Product Management',
             description: 'Organic'
         }
-        const Product = await product.find({isDeleted: false}).lean();
+        const page = parseInt(req.query.page) || 1;
+        const limit = 10; // Number of products per page
+        const skip = (page - 1) * limit;
+
+        const Product = await product.find({ isDeleted: false }).skip(skip).limit(limit).lean();
+
+        const totalProducts = await product.countDocuments({ isDeleted: false });
+        const totalPages = Math.ceil(totalProducts / limit);
 
         const successMessage = req.flash('success');
         const errorMessage = req.flash('error')
@@ -27,7 +34,9 @@ exports.getProductPage = async(req, res) => {
         }
         res.render('admin/product/product', { 
             locals, 
-            Product, 
+            Product,
+            currentPage: page,
+            totalPages: totalPages, 
             layout: 'adminlayout', 
             success: successMessage, 
             error: errorMessage 

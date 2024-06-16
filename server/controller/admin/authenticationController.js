@@ -10,6 +10,7 @@ const path = require('path');
 const moment = require('moment');
 const PDFDocument = require('pdfkit');
 const ExcelJS = require('exceljs');
+const fs = require('fs');
 
 //GET Admin Login
 exports.getAdminLogin = (req,res)=>{
@@ -110,7 +111,12 @@ exports.getadminLogout = (req,res)=>{
         res.redirect('/admin/adminlogin');
     })
 }
-
+//Calculate % 
+const calculatePercentageChange = (current, previous) => {
+    if (previous === 0) return current === 0 ? "0%" : "+100%";
+    const change = ((current - previous) / previous * 100).toFixed(2);
+    return (change > 0 ? `+${change}` : `${change}`) + "%";
+};
 
 //GET Admin Dashboard
 exports.getAdminhomePage = async(req, res) => {
@@ -120,8 +126,11 @@ exports.getAdminhomePage = async(req, res) => {
             const successMessage = req.flash('success');
             const errorMessage = req.flash('error');
 
-            const totalOrders = await order.countDocuments();
+            const currentDate = moment().startOf('day');
+            const previousDate = moment().subtract(1, 'days').startOf('day');
 
+            
+            const totalOrders = await order.countDocuments();
             // Calculate total revenue
             const allorders = await order.find();
             let totalRevenue = 0;
@@ -136,14 +145,34 @@ exports.getAdminhomePage = async(req, res) => {
                 totalCouponDiscount += order.discountAmount || 0;
             }
             totalCouponDiscount = totalCouponDiscount.toFixed(2);
-
             const totalCustomers = await user.countDocuments();
 
-            // console.log(totalOrders);
-            // console.log(totalRevenue);
-            // console.log(totalCouponDiscount);
-            // console.log(totalCustomers);
-            // Fetch total customers count
+            // Fetch today's orders
+            const todayOrders = await order.find({
+                orderDate: {
+                    $gte: currentDate.toDate(),
+                    $lt: moment(currentDate).endOf('day').toDate()
+                }
+            });
+            const todaystotalOrders = todayOrders.length;
+            const todaystotalRevenue = todayOrders.reduce((total, order) => total + order.totalAmount, 0).toFixed(2);
+            const todaystotalCouponDiscount = todayOrders.reduce((total, order) => total + (order.discountAmount || 0), 0).toFixed(2);
+
+            // Fetch yesterday's orders
+            const yesterdayOrders = await order.find({
+                orderDate: {
+                    $gte: previousDate.toDate(),
+                    $lt: moment(previousDate).endOf('day').toDate()
+                }
+            });
+            const yesterdayTotalOrders = yesterdayOrders.length;
+            const yesterdayTotalRevenue = yesterdayOrders.reduce((total, order) => total + order.totalAmount, 0).toFixed(2);
+            const yesterdayTotalCouponDiscount = yesterdayOrders.reduce((total, order) => total + (order.discountAmount || 0), 0).toFixed(2);
+            
+            //calculate %
+            const totalOrdersChange = calculatePercentageChange(todaystotalOrders, yesterdayTotalOrders);
+            const totalRevenueChange = calculatePercentageChange(todaystotalRevenue, yesterdayTotalRevenue);
+            const totalCouponDiscountChange = calculatePercentageChange(todaystotalCouponDiscount, yesterdayTotalCouponDiscount);
             
                 res.render('admin/Authentication/dashbord', { 
                     layout: 'adminlayout' , 
@@ -152,6 +181,9 @@ exports.getAdminhomePage = async(req, res) => {
                     totalRevenue,
                     totalCouponDiscount,
                     totalCustomers,
+                    totalOrdersChange,
+                    totalRevenueChange,
+                    totalCouponDiscountChange,
                     successMessage: successMessage , 
                     errorMessage: errorMessage });            
         } else {
@@ -164,11 +196,6 @@ exports.getAdminhomePage = async(req, res) => {
         } 
 }
 
-// Utility function to calculate percentage change
-// function calculatePercentageChange(newVal, oldVal) {
-//     if (oldVal === 0) return 'N/A';
-//     return (((newVal - oldVal) / oldVal) * 100).toFixed(2) + '%';
-// }
 
 const getOrders = async (type, startDate, endDate) => {
     let query = {};
@@ -177,7 +204,7 @@ const getOrders = async (type, startDate, endDate) => {
         case 'custom':
             if (startDate && endDate) {
                 query = {
-                    createdAt: {
+                    orderDate: {
                         $gte: new Date(startDate),
                         $lte: new Date(endDate)
                     }
@@ -186,7 +213,7 @@ const getOrders = async (type, startDate, endDate) => {
             break;
         case 'daily':
             query = {
-                createdAt: {
+                orderDate: {
                     $gte: moment().startOf('day').toDate(),
                     $lte: moment().endOf('day').toDate()
                 }
@@ -194,7 +221,7 @@ const getOrders = async (type, startDate, endDate) => {
             break;
         case 'weekly':
             query = {
-                createdAt: {
+                orderDate: {
                     $gte: moment().startOf('isoWeek').toDate(),
                     $lte: moment().endOf('isoWeek').toDate()
                 }
@@ -202,7 +229,7 @@ const getOrders = async (type, startDate, endDate) => {
             break;
         case 'monthly':
             query = {
-                createdAt: {
+                orderDate: {
                     $gte: moment().startOf('month').toDate(),
                     $lte: moment().endOf('month').toDate()
                 }
@@ -210,7 +237,7 @@ const getOrders = async (type, startDate, endDate) => {
             break;
         case 'yearly':
             query = {
-                createdAt: {
+                orderDate: {
                     $gte: moment().startOf('year').toDate(),
                     $lte: moment().endOf('year').toDate()
                 }
@@ -222,85 +249,152 @@ const getOrders = async (type, startDate, endDate) => {
     return orders;
 };
 
+//GET slaes report page 
+exports.getSalesReportPage = async(req,res)=>{
+    try{
+        const orders = await order.find().lean();
+        const completedOrders = orders.filter(order => order.orderStatus === 'Completed');
+        const cancelledOrders = orders.filter(order => order.orderStatus === 'Cancelled');
+                        
+        const totalRevenue = completedOrders.reduce((total, order) => total + order.totalAmount, 0);
+        const totalDiscountGiven = completedOrders.reduce((total, order) => total + order.discountAmount, 0);
+        const reportData = {           
+                            totalOrders: orders.length,
+                            completedOrders: completedOrders.length,
+                            cancelledOrders: cancelledOrders.length,
+                            totalRevenue: totalRevenue,
+                            totalDiscountGiven: totalDiscountGiven
+                        };
+        console.log(`report Data :${reportData}`);
+        res.render('admin/salesReport/salesReport',{
+            layout:'adminlayout',
+            reportData
+        })
+    }catch(error){
+        console.log(error)
+    }
+}
 
-exports.getReportData = async (req, res) => {
-        try {
-            const { type, startDate, endDate } = req.body;
-    
-            const orders = await getOrders(type, startDate, endDate);
-            const reportData = {
-                totalOrders: orders.length,
-                totalRevenue: orders.reduce((total, order) => total + order.totalAmount, 0),
-                totalCouponDiscount: orders.reduce((total, order) => total + order.discountAmount, 0),
-                totalCustomers: new Set(orders.map(order => order.userId.toString())).size,
-                orders
-            };
-            //console.log(reportData);
+exports.getReportData = async(req,res)=>{
+    try{
+        const { filterType, startDate, endDate } = req.query;
+        console.log(req.query);
 
-            res.json(reportData);
-        } catch (error) {
-            console.error('Error fetching report data:', error);
-            res.status(500).json({ error: 'Server Error' });
+        const orders = await getOrders(filterType, startDate, endDate);
+        const completedOrders = orders.filter(order => order.orderStatus === 'Completed');
+        const cancelledOrders = orders.filter(order => order.orderStatus === 'Cancelled');
+                        
+        const totalRevenue = completedOrders.reduce((total, order) => total + order.totalAmount, 0);
+        const totalDiscountGiven = completedOrders.reduce((total, order) => total + order.discountAmount, 0);
+        const reportData = {           
+                            totalOrders: orders.length,
+                            completedOrders: completedOrders.length,
+                            cancelledOrders: cancelledOrders.length,
+                            totalRevenue: totalRevenue,
+                            totalDiscountGiven: totalDiscountGiven
+                        };
+        console.log(`report Data :${reportData}`);
+        res.json(reportData);
+
+    }catch(error){
+        console.log(error);
+    }
+}
+
+exports.downloadReport = async(req,res)=>{
+    try{
+        const { filterType, format, startDate, endDate } = req.query;
+        console.log(req.query);
+
+        const orders = await getOrders(filterType, startDate, endDate);
+        const completedOrders = orders.filter(order => order.orderStatus === 'Completed');
+        const cancelledOrders = orders.filter(order => order.orderStatus === 'Cancelled');
+                        
+        const totalRevenue = completedOrders.reduce((total, order) => total + order.totalAmount, 0);
+        const totalDiscountGiven = completedOrders.reduce((total, order) => total + order.discountAmount, 0);
+        const reportData = {           
+                            totalOrders: orders.length,
+                            completedOrders: completedOrders.length,
+                            cancelledOrders: cancelledOrders.length,
+                            totalRevenue: totalRevenue,
+                            totalDiscountGiven: totalDiscountGiven
+                        };
+        console.log(`Download Data :${reportData}`);
+        console.log(`completedOrders :${completedOrders}`);
+        console.log(`cancelledOrders :${cancelledOrders}`);
+        console.log(`totalRevenue :${totalRevenue}`);
+        console.log(`totalDiscountGiven :${totalDiscountGiven}`);
+
+        if (format === 'pdf') {
+            generatePDFReport(reportData, res);
+        } else if (format === 'excel') {
+            generateExcelReport(reportData, res);
+        } else {
+            res.status(400).send('Invalid format');
         }
+    }catch(error){
+        res.status(500).json('Server Error');
+    }
+}
+
+//Generate PDF Report
+const generatePDFReport = (data, res) => {
+    const doc = new PDFDocument();
+    const filename = 'Sales_Report.pdf';
+    res.setHeader('Content-disposition', 'attachment; filename="' + filename + '"');
+    res.setHeader('Content-type', 'application/pdf');
+    doc.pipe(res);
+
+    doc.fontSize(18).text('Sales Report', { align: 'center' });
+    doc.moveDown();
+    doc.fontSize(14).text(`Total Orders: ${data.totalOrders}`);
+    doc.fontSize(14).text(`Completed Orders: ${data.completedOrders}`);
+    doc.fontSize(14).text(`Cancelled Orders: ${data.cancelledOrders}`);
+    doc.fontSize(14).text(`Total Revenue: ₹${data.totalRevenue.toFixed(2)}`);
+    doc.fontSize(14).text(`Total Discount Given: ₹${data.totalDiscountGiven.toFixed(2)}`);
+    doc.moveDown();
+    doc.fontSize(12).text('End of Report', { align: 'center' });
+
+    doc.end();
 };
 
+//Generate Excel Report
+const generateExcelReport = (data, res) => {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Sales Report');
+    worksheet.columns = [
+        { header: 'Metric', key: 'metric', width: 30 },
+        { header: 'Value', key: 'value', width: 30 }
+    ];
 
-// Controller function for downloading reports
-exports.downloadReport = async (req, res) => {
-    try {
-        const { format, type, startDate, endDate, orders } = req.body;
-        console.log(req.body);
+    worksheet.addRows([
+        ['Total Orders', data.totalOrders],
+        ['Completed Orders', data.completedOrders],
+        ['Cancelled Orders', data.cancelledOrders],
+        ['Total Revenue', `₹${data.totalRevenue.toFixed(2)}`],
+        ['Total Discount Given', `₹${data.totalDiscountGiven.toFixed(2)}`]
+    ]);
 
-        // if (format === 'pdf') {
-        //     const doc = new PDFDocument();
-        //     let filename = 'sales_report.pdf';
-        //     filename = encodeURIComponent(filename);
+    worksheet.eachRow({ includeEmpty: false }, function (row, rowNumber) {
+        row.eachCell({ includeEmpty: false }, function (cell, colNumber) {
+            cell.font = { size: 12, bold: colNumber === 1 };
+        });
+    });
 
-        //     res.setHeader('Content-disposition', `attachment; filename=${filename}`);
-        //     res.setHeader('Content-type', 'application/pdf');
-
-        //     doc.fontSize(16).text(`Report Type: ${type}`, { align: 'center' });
-    //         if (startDate && endDate) {
-    //     doc.fontSize(12).text(`Date Range: ${startDate} to ${endDate}`, { align: 'center' });
-    //   }
-    //   doc.fontSize(14).text(`Total Orders: ${orders.length}`, { align: 'left' });
-    //   doc.fontSize(14).text(`Total Revenue: ${orders.reduce((total, order) => total + order.totalAmount, 0)}`, { align: 'left' });
-    //   doc.fontSize(14).text(`Total Coupon Discount: ${orders.reduce((total, order) => total + order.discountAmount, 0)}`, { align: 'left' });
-
-    //   orders.forEach(order => {
-    //     doc.fontSize(12).text(`Order ID: ${order.newOrderId}`, { align: 'left' });
-    //     doc.fontSize(12).text(`Total Amount: ${order.totalAmount}`, { align: 'left' });
-        //     doc.end();
-        //     doc.pipe(res);
-
-        // } else if (format === 'excel') {
-        //     const workbook = new ExcelJS.Workbook();
-        //     const sheet = workbook.addWorksheet('Sales Report');
-
-        //     worksheet.columns = [
-    //     { header: 'Order ID', key: 'newOrderId', width: 20 },
-    //     { header: 'Total Amount', key: 'totalAmount', width: 15 },
-    //     { header: 'Discount Amount', key: 'discountAmount', width: 15 },
-    //     { header: 'Order Date', key: 'orderDate', width: 25 }
-    //   ];
-
-            // orders.forEach(order => {
-            //     worksheet.addRow({
-            //       newOrderId: order.newOrderId,
-            //       totalAmount: order.totalAmount,
-            //       discountAmount: order.discountAmount,
-            //       orderDate: order.orderDate
-            //     });
-            //   });
-
-        //     res.setHeader('Content-Disposition', 'attachment; filename=sales_report.xlsx');
-        //     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-
-        //     await workbook.xlsx.write(res);
-        //     res.end();
-        // }
-    } catch (error) {
-        console.error('Error downloading report:', error);
-        res.status(500).json({ error: 'Server Error' });
-    }
+    const tempFilePath = path.join(__dirname, 'Sales_Report.xlsx');
+    workbook.xlsx.writeFile(tempFilePath).then(() => {
+        res.download(tempFilePath, 'Sales_Report.xlsx', (err) => {
+            if (err) {
+                console.error('Error downloading Excel file:', err);
+            }
+            fs.unlink(tempFilePath, (err) => {
+                if (err) {
+                    console.error('Error deleting temp Excel file:', err);
+                }
+            });
+        });
+    }).catch((error) => {
+        console.error('Error generating Excel file:', error);
+        res.status(500).send('Error generating Excel file');
+    });
 };

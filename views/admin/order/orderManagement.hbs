@@ -13,11 +13,6 @@
         </div>
         {{/if}}
 
-        {{!-- <div class="d-flex justify-content-end mb-3">
-            <!-- Add Order Button -->
-            <a href="/admin/addOrder" class="btn btn-sm btn-success">+ Add Order</a>
-        </div> --}}
-
         <div class="table-responsive" style="font-size: 75%;">
             <table class="table table-bordered">
                 <thead class="thead-light">
@@ -60,5 +55,20 @@
         {{/each}}
     </tbody>
 </table>
+</div>
+<!-- Pagination Section -->
+        <div class="pagination-container d-flex flex-row align-items-center justify-content-between mt-4">
+            <div class="pagination-summary text-primary">
+                Page {{ currentPage }} of {{ totalPages }}
+            </div>
+            <div class="pagination-links d-flex flex-row align-items-center gap-3">
+                {{#if (gt currentPage 1)}}
+                <a href="/admin/orderManagement?page={{ subtract currentPage 1 }}" class="pagination-link text-primary">Previous</a>
+                {{/if}}
+                {{#if (lt currentPage totalPages)}}
+                <a href="/admin/orderManagement?page={{ add currentPage 1 }}" class="pagination-link text-primary">Next</a>
+                {{/if}}
+            </div>
+        </div>
 <script src="/javascripts/orderManagement.js"></script>
     </body>

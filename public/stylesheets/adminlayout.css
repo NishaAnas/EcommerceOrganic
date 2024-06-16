@@ -6,6 +6,7 @@
 body {
 	margin: 0;
 	font-family: 'Poppins', sans-serif;
+	width: 100%;
 }
 
 a {
@@ -224,16 +225,6 @@ button:focus {
 .nav-user-btn {
 	background-color: transparent
 }
-
-
-
-
-
-
-
-
-
-
 
 input {
 	border-radius: 6px;

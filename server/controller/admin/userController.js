@@ -7,10 +7,22 @@ exports.getUserManagement = async(req,res) =>{
             description: 'Organic'
         }
     
-        const Users = await user.find({}).lean();
+        const page = parseInt(req.query.page) || 1;
+        const limit = 5; // Number of users per page
+        const skip = (page - 1) * limit;
+    
+        const Users = await user.find({}).skip(skip).limit(limit).lean();
+        const totalUsers = await user.countDocuments({});
+        const totalPages = Math.ceil(totalUsers / limit);
         const successMessage = req.flash('success');
         const errorMessage = req.flash('error');
-            res.render('admin/user/userManagement',{Users,layout: 'adminlayout',success: successMessage, error: errorMessage})
+            res.render('admin/user/userManagement',{
+                Users,
+                currentPage: page,
+                totalPages: totalPages,
+                layout: 'adminlayout',
+                success: successMessage, 
+                error: errorMessage})
     }catch(error){
         console.log(error)
         req.flash('error', 'Server Error');

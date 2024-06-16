@@ -30,10 +30,13 @@ router.get('/adminlogout',authController.getadminLogout);
 router.get('/',authController.getAdminhomePage );
 
 //GET salesReport
-router.post('/getReport',authController.getReportData);
+router.get('/reportSales',authController.getReportData);
 
 //Download Sales Report
-router.post('/downloadReport', authController.downloadReport);
+router.get('/downloadReport', authController.downloadReport);
+
+//sales report page
+router.get('/salesReport',authController.getSalesReportPage)
 
 
 

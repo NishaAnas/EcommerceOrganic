@@ -25,7 +25,7 @@
         <div class="table-responsive">
             <table class="table table-bordered">
                 <thead class="thead-light">
-                    <tr>
+                    <tr style="width: 100%;">
                         <th>Category Name</th>
                         <th>Image</th>
                         <th>Active/Deactive</th>
@@ -34,7 +34,7 @@
                 </thead>
                 <tbody>
                     {{#each Category}}
-                    <tr>
+                    <tr style="width: 100%;">
                         <td>{{this.name}}</td>
                         <td><img src="/{{this.images.[0]}}" alt="Category Image" class="img-fluid" style="width: 50px; height: 50px;"></td>
                         <td>
@@ -56,6 +56,20 @@
                     {{/each}}
                 </tbody>
             </table>
+        </div>
+        <!-- Pagination Section -->
+        <div class="pagination-container text-primary d-flex justify-content-between mt-4">
+            <div class="pagination-summary">
+                Page {{ currentPage }} of {{ totalPages }}
+            </div>
+            <div class="pagination-links d-flex gap-3">
+                {{#if (gt currentPage 1)}}
+                <a href="/admin/category?page={{ subtract currentPage 1 }}" class="pagination-link">Previous</a>
+                {{/if}}
+                {{#if (lt currentPage totalPages)}}
+                <a href="/admin/category?page={{ add currentPage 1 }}" class="pagination-link">Next</a>
+                {{/if}}
+            </div>
         </div>
     </div>
 </body>

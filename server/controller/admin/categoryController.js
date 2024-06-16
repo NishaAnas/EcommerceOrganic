@@ -12,13 +12,20 @@ exports.getCategoryPage = async (req, res) => {
             title: 'Get Category page',
             description: 'Organic'
         }
+        const page = parseInt(req.query.page) || 1;
+        const limit = 10; // Number of users per page
+        const skip = (page - 1) * limit;
 
-        const Category = await category.find({ isDeleted: false }).lean();
+        const Category = await category.find({ isDeleted: false }).skip(skip).limit(limit).lean();
+        const totalcategory = await category.countDocuments({});
+        const totalPages = Math.ceil(totalcategory / limit);
         const successMessage = req.flash('success');
         const errorMessage = req.flash('error');
         res.render('admin/category/category', { 
             locals, 
-            Category, 
+            Category,
+            currentPage: page,
+            totalPages: totalPages, 
             layout: 'adminlayout', 
             success: successMessage, 
             error: errorMessage 

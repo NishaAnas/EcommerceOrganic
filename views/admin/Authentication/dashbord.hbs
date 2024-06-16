@@ -186,23 +186,6 @@ background-color: #f7f7ff;
 
     <body>
         <div class="container mt-4">
-        <div class="row justify-content-end mb-3">
-            <div class="col-auto">
-                <div class="dropdown d-flex flex-row justify-content-end mb-3">
-                    <button class="btn btn-success dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        Sales Report
-                    </button>
-                    <div class="dropdown-menu" aria-labelledby="salesReportBtn">
-                        <a class="dropdown-item" href="#" data-report-type="custom">Custom</a>
-                        <a class="dropdown-item" href="#" data-report-type="daily">Daily</a>
-                        <a class="dropdown-item" href="#" data-report-type="weekly">Weekly</a>
-                        <a class="dropdown-item" href="#" data-report-type="monthly">Monthly</a>
-                        <a class="dropdown-item" href="#" data-report-type="yearly">Yearly</a>
-                    </div>
-                </div>
-                <div id="selectedReport" class="mt-2"></div>
-            </div>
-        </div>
         <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4">
             <div class="col">
                 <div class="card radius-10 border-start border-0 border-3 border-info">
@@ -211,7 +194,7 @@ background-color: #f7f7ff;
                             <div>
                                 <p class="mb-0 text-secondary">Total Orders</p>
                                 <h4 class="my-1 text-info" id="totalOrders">{{totalOrders}}</h4>
-                                <p class="mb-0 font-13">+2.5% from last week</p>
+                                <p class="mb-0 font-13">{{totalOrdersChange}}% from last day</p>
                             </div>
                             <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
                                 <i class="fa fa-shopping-cart"></i>
@@ -227,7 +210,7 @@ background-color: #f7f7ff;
                             <div>
                                 <p class="mb-0 text-secondary">Total Revenue</p>
                                 <h4 class="my-1 text-danger" id="totalRevenue">{{totalRevenue}}</h4>
-                                <p class="mb-0 font-13">+5.4% from last week</p>
+                                <p class="mb-0 font-13">{{totalRevenueChange}} from last day</p>
                             </div>
                             <div class="widgets-icons-2 rounded-circle bg-gradient-bloody text-white ms-auto">
                                 <i class="fa fa-inr"></i>
@@ -243,7 +226,7 @@ background-color: #f7f7ff;
                             <div>
                                 <p class="mb-0 text-secondary">Coupon Discount</p>
                                 <h4 class="my-1 text-success" id="totalCouponDiscount">{{totalCouponDiscount}}</h4>
-                                <p class="mb-0 font-13">-4.5% from last week</p>
+                                <p class="mb-0 font-13">{{totalCouponDiscountChange}} from last day</p>
                             </div>
                             <div class="widgets-icons-2 rounded-circle bg-gradient-ohhappiness text-white ms-auto">
                                 <i class="fa fa-gift"></i>
@@ -269,150 +252,5 @@ background-color: #f7f7ff;
                 </div>
             </div>
         </div>
-            <button class="btn btn-small btn-success m-3  download-pdf" type="button">
-                Download as PDF
-            </button>
-            <button class="btn btn-small btn-success m-3  download-pdf" type="button">
-                Download as Excel
-            </button>
-
     </div>
-
-    <div class="modal fade" id="customDateModal" tabindex="-1" aria-labelledby="customDateModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="customDateModalLabel">Select Date Range</h5>
-                    <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form id="customDateForm">
-                        <div class="form-group">
-                            <label for="startDate">Start Date</label>
-                            <input type="date" class="form-control" id="startDate" name="startDate" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="endDate">End Date</label>
-                            <input type="date" class="form-control" id="endDate" name="endDate" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Generate Report</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        $(document).ready(function() {
-            let currentReportType = 'daily';
-            let startDate = '';
-            let endDate = '';
-            let ordersData = [];
-
-            // Handle dropdown selection
-            $('.dropdown-item').click(function(event) {
-                event.preventDefault();
-                var reportType = $(this).data('report-type');
-                if (reportType === 'custom') {
-                    $('#customDateModal').modal('show');
-                } else {
-                    currentReportType = reportType;
-                    $('#selectedReport').text('Selected Report: ' + reportType.charAt(0).toUpperCase() + reportType.slice(1));
-                    fetchReport(reportType);
-                }
-            });
-
-            // Handle custom date range form submission
-            $('#customDateForm').submit(function(event) {
-                event.preventDefault();
-                startDate = $('#startDate').val();
-                endDate = $('#endDate').val();
-                currentReportType = 'custom';
-                $('#selectedReport').text(`Selected Report: Custom (${startDate} to ${endDate})`);
-                fetchReport('custom', { startDate: startDate, endDate: endDate });
-                $('#customDateModal').modal('hide');
-            });
-
-            // Download report as PDF
-            $('.download-pdf').on('click', function(event) {
-                event.preventDefault();
-                const format = 'pdf';
-                downloadReport(format,currentReportType,startDate, endDate);
-            });
-
-            // Download report as Excel
-            $('.download-excel').on('click', function(event) {
-                event.preventDefault();
-                const format = 'excel';
-                downloadReport(format,currentReportType,startDate, endDate);
-            });
-
-
-            // Fetch report data
-            function fetchReport(reportType, dates = {}) {
-                $.ajax({
-                    url: '/admin/getReport',
-                    type: 'POST',
-                    data: JSON.stringify({ reportType: reportType, dates: dates }),
-                    contentType: 'application/json',
-                    success: function(response) {
-                        $('#totalOrders').text(response.totalOrders);
-                        $('#totalRevenue').text(response.totalRevenue);
-                        $('#totalCouponDiscount').text(response.totalCouponDiscount);
-                        $('#totalCustomers').text(response.totalCustomers);
-                        ordersData = response.orders; 
-                        Swal.fire({
-                        icon: 'success',
-                        title: 'Report Fetched',
-                        text: 'Sales report data has been updated.'
-                    });
-                    },
-                    error: function(error) {
-                        console.error('Error fetching report:', error);
-                        Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'There was an error fetching the sales report.'
-                    });
-                    }
-                });
-            }
-
-            function downloadReport(format, type, startDate, endDate) {
-                const requestData = {
-                                format,
-                                type,
-                                startDate,
-                                endDate,
-                            };
-
-                            if (orders.length > 0) {
-                                requestData.orders = orders;
-                            }
-            $.ajax({
-                url: '/admin/downloadReport',
-                type: 'POST',  
-                contentType: 'application/json',  
-                data: JSON.stringify(orders),
-                success: function() {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Download Successful',
-                        text: `The ${type} report in ${format.toUpperCase()} format has been downloaded.`,
-                    });
-                },
-                error: function(error) {
-                    console.error('Error downloading report:', error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Download Failed',
-                        text: `There was an error downloading the ${type} report in ${format.toUpperCase()} format.`,
-                    });
-                }
-            });
-        }
-        });
-    </script>
 </body>

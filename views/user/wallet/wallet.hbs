@@ -33,6 +33,19 @@
                 </tbody>
             </table>
         </div>
+        <div class="pagination-container d-flex flex-row align-items-center justify-content-between m-4" style="background-color: aliceblue;">
+                <div class="pagination-summary text-primary">
+                    Page {{ currentPage }} of {{ totalPages }}
+                </div>
+                <div class="pagination-links d-flex flex-row align-items-center justify-content-between gap-3">
+                    {{#if (gt currentPage 1)}}
+                    <a href="/wallet?page={{ subtract currentPage 1 }}" class="pagination-link text-primary">Previous</a>
+                    {{/if}}
+                    {{#if (lt currentPage totalPages)}}
+                    <a href="/wallet?page={{ add currentPage 1 }}" class="pagination-link text-primary">Next</a>
+                    {{/if}}
+                </div>
+            </div>
     </div>
     <script src="/javascripts/wallet.js"></script>
     

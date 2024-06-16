@@ -13,15 +13,26 @@ exports.getOrdermanager = async(req,res)=>{
     const successMessage = req.flash('success');
     const errorMessage = req.flash('error');
     try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = 10; // Number of orders per page
+        const skip = (page - 1) * limit;
+    
         const Orders = await order.find({})
-            .populate('userId', 'email') 
-            .populate('items.productId') 
+            .populate('userId', 'email')
+            .populate('items.productId')
             .sort({ orderDate: -1 })
+            .skip(skip)
+            .limit(limit)
             .lean();
+    
+        const totalOrders = await order.countDocuments({});
+        const totalPages = Math.ceil(totalOrders / limit);
         
             //console.log(Orders);
         res.render('admin/order/orderManagement', { 
             Orders, 
+            currentPage: page,
+            totalPages: totalPages,
             layout:'adminlayout',
             success: successMessage, 
             error: errorMessage  
