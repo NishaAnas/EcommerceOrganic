@@ -1,8 +1,10 @@
 $(document).ready(function() {
     function updateGrandTotal() {
         const totalPrice = parseFloat($('#total-price').text());
+        const discount = parseFloat($('#discount').text());
+        const afterDiscount = parseFloat($('#after-discount').text());
         const deliveryPrice = parseFloat($('#delivery-price').text());
-        const grandTotal = totalPrice + deliveryPrice;
+        const grandTotal = discount ? afterDiscount + deliveryPrice : totalPrice + deliveryPrice;
         
         $('#grand-total').text(grandTotal.toFixed(2));
     }
@@ -133,30 +135,3 @@ $(document).ready(function() {
         }
     });
 });
-
-
-$(document).ready(function() {
-    const selectedPaymentMethod = '{{ paymentMethod }}';
-    if (selectedPaymentMethod !== 'Any') {
-        // Enable the selected payment method
-        $(`input[name="paymentOption"][value="${selectedPaymentMethod}"]`).prop('checked', true).prop('disabled', true);
-
-        // Listen for changes in the payment method selection
-        $('input[name="paymentOption"]').change(function(event) {
-            const selectedOption = $(this).val();
-            if (selectedOption !== selectedPaymentMethod) {
-                // Prevent the default behavior of changing the selection
-                event.preventDefault();
-                // Show error message
-                //alert('Cannot change payment method. Coupon is already selected.');
-                Swal.fire({
-                    title: 'Error!',
-                    text: 'Cannot change payment method. Coupon is already selected',
-                    icon: 'error'
-                });
-            }
-        });
-    }
-});
-
-

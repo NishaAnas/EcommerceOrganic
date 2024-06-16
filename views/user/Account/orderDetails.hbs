@@ -25,10 +25,14 @@
             </div>
         </a>
             {{#if (isEqual this.orderStatus "Cancelled")}}
-                <button class="cancel-button-diasbled" disabled>Cancelled</button>
-                {{else}}
+                <button class="cancel-button-disabled" disabled>Cancelled</button>
+            {{else if (isEqual this.orderStatus "Completed")}}
+                <button class="return-button" data-orderid="{{ this._id }}">Return Order</button>
+            {{else if (isEqual this.orderStatus "Return")}}
+                <button class="cancel-return" data-orderid="{{ this._id }}">Cancel-Return</button>
+            {{else}}
                 <button class="cancel-button" data-orderid="{{ this._id }}">Cancel Order</button>
-                {{/if}}
+            {{/if}}
             {{/each}}
         </div>
         <nav aria-label="Page navigation example">

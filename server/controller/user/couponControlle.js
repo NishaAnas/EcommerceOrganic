@@ -1,12 +1,6 @@
 const mongoose = require('mongoose');
-const category = require('../../modals/categories');
-const Product = require('../../modals/product');
-const prodVariation =require('../../modals/productVariation');
-const shoppingCart = require('../../modals/shoppingCart');
-const wishlist = require('../../modals/wishlist');
 const coupon = require('../../modals/coupon');
 const order = require('../../modals/order');
-const crypto = require('crypto');
 
 exports.getCoupons = async(req,res)=>{
     try{

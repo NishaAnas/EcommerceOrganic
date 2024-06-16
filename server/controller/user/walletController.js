@@ -1,9 +1,5 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
 const user = require('../../modals/user');
-const address =require('../../modals/address');
-const pincode = require('../../modals/pincode');
-const order = require('../../modals/order');
 const wallet = require('../../modals/wallet');
 
 exports.creditWallet = async (userId, amount, reason, orderId = null) => {
@@ -49,18 +45,29 @@ exports.debitWallet = async (userId, amount, reason, orderId = null) => {
 };
 
 exports.getWallet = async(req,res)=>{
+    const successMessage = req.flash('success');
+    const errorMessage = req.flash('error');
     try {
         if (!req.session.userLoggedInData || !req.session.userLoggedInData.userloggedIn) {
             req.flash('error', 'To access the wallet, please log in first.');
             return res.redirect('/login');
         }
         const userId = req.session.userLoggedInData.userId;
+
+        //Check user is blocked or not
+        const existingUser = await user.findById(userId);
+        if (existingUser.isBlocked) {
+            req.flash('error', 'Your account is blocked. Please contact the administrator for assistance.');
+            return res.redirect('/login');
+        }
+        const userData = req.session.userLoggedInData;
+
         const userDetails = await user.findById(userId).lean();
         const Wallet = await wallet.findOne({ userId }).lean();
 
         if (!Wallet) {
             return res.render('user/wallet/wallet', { 
-                userData:req.session.userLoggedInData,
+                userData,
                 userDetails,
                 balance: 0, 
                 transactions: [] ,

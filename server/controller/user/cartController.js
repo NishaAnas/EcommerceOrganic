@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const user = require('../../modals/user');
 const category = require('../../modals/categories');
 const Product = require('../../modals/product');
 const prodVariation =require('../../modals/productVariation');
@@ -32,6 +33,13 @@ exports.showShoppingCart = async(req,res)=>{
         }
 
         const userId = req.session.userLoggedInData.userId;
+
+        //Check user is blocked or not
+        const existingUser = await user.findById(userId);
+        if (existingUser.isBlocked) {
+            req.flash('error', 'Your account is blocked.');
+            return res.redirect('/login');
+        }
         const userData = req.session.userLoggedInData;
         const cart = await shoppingCart.findOne({ user: userId });
         //console.log(cart.items.length);
@@ -61,7 +69,6 @@ exports.showShoppingCart = async(req,res)=>{
             }
         }))
         //console.log(cartitems);
-
         const totalQuantity = cart.items.reduce((acc, item) => acc + item.quantity, 0);
         const totalPriceOfAllProducts = cartitems.reduce((acc, item) => acc + item.totalPrice, 0);
        // console.log(totalQuantity);
@@ -72,7 +79,9 @@ exports.showShoppingCart = async(req,res)=>{
             cartitems,
             totalQuantity,
             totalPriceOfAllProducts,
-            paymentMethod:'COD'
+            discountAmount:0,
+            afterDiscountTotal:totalPriceOfAllProducts,
+            couponName:""
         };
 
         res.render('user/shoppingCart/userShoppingCart' , {
@@ -93,7 +102,7 @@ exports.showShoppingCart = async(req,res)=>{
 
 //update the session variable
 exports.updateTotal = async(req,res)=>{
-    const { newTotal,paymentMethod } = req.body;
+    const { newTotal,discountAmount,couponName} = req.body;
     //console.log(req.body)
 
     // Check if the user is logged in
@@ -102,11 +111,13 @@ exports.updateTotal = async(req,res)=>{
     }
 
     // Update the session with the new total amount
-    req.session.cartDetails.totalPriceOfAllProducts = newTotal;
-    req.session.cartDetails.paymentMethod = paymentMethod
+    req.session.cartDetails.afterDiscountTotal = Number(newTotal);
+    req.session.cartDetails.discountAmount=Number(discountAmount);
+    req.session.cartDetails.couponName=couponName;
 
     res.json({ message: 'Cart total updated successfully' });
 }
+
 
 //Add To cart
 exports.addToCart = async(req,res)=>{
@@ -125,6 +136,13 @@ exports.addToCart = async(req,res)=>{
             return res.redirect('/login');
         }
         const userId = req.session.userLoggedInData.userId;
+
+        //Check user is blocked or not
+        const existingUser = await user.findById(userId);
+        if (existingUser.isBlocked) {
+            req.flash('error', 'Your account is blocked.');
+            return res.redirect('/login');
+        }
         const variantId = req.body.variantId;
         //console.log(variantId);
 
@@ -183,31 +201,27 @@ exports.addToCart = async(req,res)=>{
 exports.deleteCartProduct = async(req,res)=>{
     try {
         const variantId = req.params._id;
-        //console.log(variantId);
         const updatedCart = await shoppingCart.findOneAndUpdate(
-            { 'items.product': variantId }, // Filter criteria
-            { $pull: { items: { product: variantId } } } // Pull the item with the given productId from the items array
+            { 'items.product': variantId },
+            { $pull: { items: { product: variantId } } },
+            { new: true }
         );
-        //console.log(`removed cart:${updatedCart}`)
+
         if (updatedCart) {
-            //console.log(`items length:${updatedCart.items.length}`)
             if (updatedCart.items.length === 0) {
                 await shoppingCart.deleteOne({ _id: updatedCart._id });
-                req.flash('success', 'Product removed from cart successfully');
-                return res.redirect('/emptyCart');
-            }else {
-                req.flash('success', 'Product removed from cart successfully');
-                res.redirect('/cart');
+                return res.json({ success: true, totalQuantity: 0, totalPriceOfAllProducts: 0 });
+            } else {
+                const totalQuantity = updatedCart.items.reduce((acc, item) => acc + item.quantity, 0);
+                const totalPriceOfAllProducts = updatedCart.items.reduce((acc, item) => acc + item.totalPrice, 0);
+                return res.status(200).json({ success: true, totalQuantity, totalPriceOfAllProducts });
             }
-            }else {
-                req.flash('error', 'Error: Product not found in cart');
-                res.redirect('/cart');
+        } else {
+            return resstatus(400).json({ success: false, error: 'Error: Product not found in cart' });
         }
     } catch (error) {
-        console.log(error);
         console.error('Server Error:', error);
-        req.flash('error', 'Server Error');
-        res.redirect('/cart');
+        return res.sytatus(500).json({ success: false, error: 'Server Error' });
     }
 }
 
@@ -216,6 +230,11 @@ exports.deleteCartProduct = async(req,res)=>{
 exports.updateCartItem = async(req,res)=>{
     try {
         const { variantId, quantity } = req.body;
+
+        // Validate input
+        if (!variantId || !quantity || quantity <= 0) {
+            return res.status(400).json({ error: 'Invalid variant ID or quantity.' });
+        }
 
         // Find the product to get its price
         const variant = await prodVariation.findById(variantId);
@@ -254,48 +273,5 @@ exports.updateCartItem = async(req,res)=>{
     } catch (error) {
         console.error('Error updating cart item:', error);
         res.status(500).json({ error: 'Internal Server Error' });
-    }
-}
-
-//Add Items from cart to wishlist
-exports.addtoWishlist = async(req,res)=>{
-    try {
-        const userId = req.session.userLoggedInData.userId;
-        const variantId = req.body.variantId;
-        
-        console.log(req.body.variantId);
-        // Check if the user already has a wishlist
-        let existingWishlist = await wishlist.findOne({ userId: userId });
-
-        if (!existingWishlist) {
-            // If the user doesn't have a wishlist, create a new one with the product
-            await wishlist.create({
-                userId: userId,
-                products: [{ product: variantId }]
-            });
-            req.flash('success', 'Product added to wishlist successfully');
-        } else {
-            // Check if the item already exists in the wishlist
-            const existingItem = existingWishlist.products.find(item => item.product.equals(variantId));
-
-            console.log(existingItem);
-            if (existingItem) {
-                req.flash('error', 'This item is already in your wishlist.');
-            } else {
-                // If the item doesn't exist, add it to the wishlist using an update query
-                await wishlist.updateOne(
-                    { userId: userId },
-                    { $push: { products: { product: variantId } } }
-                );
-                req.flash('success', 'Product added to wishlist successfully');
-            }
-        }
-
-        res.redirect(`/cart`); 
-
-    } catch (error) {
-        console.error('Error adding product to wishlist:', error);
-        req.flash('error', 'Server Error');
-        res.redirect('/'); 
     }
 }

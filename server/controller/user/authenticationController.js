@@ -216,7 +216,7 @@ exports.postLogin = async (req, res) => {
       }
       //Check if the user is blocked
       if (existingUser.isBlocked) {
-         req.flash('error', 'This emailId is blocked. Please contact the administrator for assistance.');
+         req.flash('error', 'This emailId is blocked.');
          return res.redirect('/login');
       }
       // Compare the provided password with the hashed password in the database

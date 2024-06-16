@@ -38,7 +38,7 @@ exports.getCoupons = async(req,res)=>{
 }
 
 exports.addCoupon = async(req,res)=>{
-    const {name,discount,description,expiryDate,minAmount,firstPurchase,paymentMethod } = req.body; 
+    const {name,discount,description,expiryDate,minAmount,firstPurchase } = req.body; 
     console.log(req.body);
     const existingCoupon = await coupon.findOne({ name });
     if (existingCoupon) {
@@ -58,7 +58,6 @@ exports.addCoupon = async(req,res)=>{
         expiryDate,
         minPurchaseAmount:minAmount,
         userFirstPurchase: firstPurchase === 'on' ? true : false, 
-        paymentMethod,
         updatedAt: null,
     });
         try {
@@ -86,7 +85,7 @@ exports.getCoupon = async (req, res) => {
 // Edit Coupon Details
 exports.editCoupon=async(req,res)=>{
     
-        const { firstPurchase, paymentMethod, minAmount } = req.body;
+        const { firstPurchase, minAmount } = req.body;
     try {
         const updatedCoupon = await coupon.findByIdAndUpdate(req.params._id, req.body, 
             { new: true });

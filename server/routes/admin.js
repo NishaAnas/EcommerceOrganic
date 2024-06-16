@@ -7,6 +7,7 @@ var categoryController = require('../controller/admin/categoryController.js');
 var userController = require('../controller/admin/userController.js');
 var orderController = require('../controller/admin/orderController.js');
 const couponController = require('../controller/admin/couponController.js');
+const offerController = require('../controller/admin/offerController.js');
 const { upload, resizeImages } = require('../config/multer');
 const path = require('path');
 
@@ -26,7 +27,13 @@ router.post('/adminsignup',authController.postAdminSignup);
 router.get('/adminlogout',authController.getadminLogout);
 
 //GET admin Home Page
-router.get('/',authController.getAdminhomePage )
+router.get('/',authController.getAdminhomePage );
+
+//GET salesReport
+router.post('/getReport',authController.getReportData);
+
+//Download Sales Report
+router.post('/downloadReport', authController.downloadReport);
 
 
 
@@ -87,14 +94,9 @@ router.put('/deleteVariant/:_id', prodController.deleteVariant);
 //GET User Management Page
 router.get('/user',userController.getUserManagement)
 
-//GET Blocked User
-router.get('/blockedUser',userController.getBlockedUser)
+router.post('/blockUser', userController.blockUser);
+router.post('/unblockUser', userController.unblockUser);
 
-//GET Edit User Page
-router.get('/editUser/:_id',userController.getEditUser)
-
-//PUT Edit User Page
-router.put('/editUser/:_id',userController.putEditUser)
 
 
 //GET order Management Page
@@ -105,6 +107,9 @@ router.post('/changeOrderStatus', orderController.changeOrderStatus);
 
 // Route to cancel an order
 router.post('/ordersCancel', orderController.cancelOrder);
+
+//Get Order Details for admin
+router.get('/orderDetails/:id', orderController.getOrderDetails);
 
 //GET coupons
 router.get('/couponManage',couponController.getCoupons);
@@ -118,6 +123,29 @@ router.put('/editCoupon/:_id', couponController.editCoupon);
 
 //Delete Coupon Details
 router.delete('/deleteCoupon/:_id', couponController.deleteCoupon);
+
+
+
+//ADD offer to database
+router.post('/addOffer', offerController.addOffers);
+
+//GET offers for Offer Management page
+router.get('/getOffers', offerController.getOfferManage);
+
+//GET products for offer page
+router.get('/getproducts', offerController.getProducts);
+
+//GET categories for offer page
+router.get('/getcategories', offerController.getCategories);
+
+//get details for editi details
+router.get('/getOffer/:_id', offerController.getOffer);
+
+//Edit offer Details
+router.post('/editOffer/:_id', offerController.editOffer);
+
+//Delete offers
+router.delete('/deleteOffer/:_id', offerController.deleteOffer);
 
 
 

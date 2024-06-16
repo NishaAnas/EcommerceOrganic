@@ -26,7 +26,7 @@
                             </thead>
                             <tbody>
                                 {{#each cartitems}}
-                                <tr>
+                                <tr id="cart-item-{{variantId}}">
                                     <td>
                                         <a href="/productDetails/{{variantId}}">
                                         <figure class="itemside align-items-center">
@@ -44,13 +44,13 @@
                                         </figure>
                                         </a>
                                     </td>
-                                    <td> <select class="form-control quantity-select" data-variant-id="{{variantId}}" style="width: 50%;">
-                                            <option value="1" {{#if (isEqual quantity 1)}}selected{{/if}}>1</option>
-                                            <option value="2" {{#if (isEqual quantity 2)}}selected{{/if}}>2</option>
-                                            <option value="3" {{#if (isEqual quantity 3)}}selected{{/if}}>3</option>
-                                            <option value="4" {{#if (isEqual quantity 4)}}selected{{/if}}>4</option>
-                                        </select>
-                                        <span id="stock-error-{{variantId}}" class="text-danger"></span>
+                                    <td> <div class="quantity-controls" data-variant-id="{{variantId}}" style="display: flex; align-items: center;">
+                                            <button type="button" class="btn btn-sm btn-danger quantity-decrease">-</button>
+                                            <input type="text" class="form-control quantity-input" value="{{quantity}}" style="width: 40%;height: 10%; text-align: center;" readonly>
+                                            <button type="button" class="btn btn-sm btn-danger quantity-increase">+</button>
+                                            <span id="stock-error-{{variantId}}" class="text-danger"></span>
+                                        </div>
+                                    
                                     <td>
                                         <div class="price-wrap"> 
                                             <var class="price" id="total-price-{{variantId}}">{{totalPrice}}<br></var> 
@@ -59,15 +59,9 @@
                                     </td>
                                     <td class="text-right d-none d-md-block ">
                                         <div class="d-flex justify-content-around">
-                                        <form id="wishlistForm" method="POST" action="/addcartToWishlist">
-                                        <input type="hidden" name="variantId" value="{{variantId}}">
-                                        <button type="submit" class="btn btn-secondary " data-abc="true">
-                                            <i class="bi bi-heart px-1"></i>
-                                        </button> 
-                                        </form>
-                                        <form id="removeForm" method="POST" action="/removeCartProduct/{{variantId}}">
-                                        <button type="submit" class="btn btn-danger " data-abc="true">
-                                            <i class="bi bi-trash px-1"></i>
+                                        <form id="removeForm" data-variant-id="{{variantId}}">
+                                        <button type="submit" class="btn" data-abc="true">
+                                            <i class="bi bi-x-lg"></i>
                                         </button> 
                                         </form>
                                         </div>
@@ -140,95 +134,4 @@
     </div>
 </div>
         <script src="/javascripts/shoppingCart.js"></script>
-    <script>
-        $(document).ready(function() {
-            $('.btn-apply-coupon').click(function() {
-                const totalAmount = $('.total-price-of-all-products').text();
-                $.ajax({
-                    url: '/getApplicableCoupons',
-                            method: 'GET',
-                            data: { totalAmount },
-                            success: function(response) {
-                                const coupons = response.coupons;
-                                const couponList = $('#coupon-list');
-                                couponList.empty();
-
-                                if (coupons.length > 0) {
-                                    coupons.forEach(coupon => {
-                                        const couponItem = `<li class="list-group-item">
-                                            ${coupon.name} - ${coupon.description} -<br>
-                                            Discount :${coupon.discount}% -Min-Purchase ${coupon.minPurchaseAmount}-<br>
-                                            PayementMethod :${coupon.paymentMethod}
-                                            <button class="btn btn-link apply-coupon" data-coupon-name="${coupon.name}" data-coupon-id="${coupon._id}" data-discount="${coupon.discount}" data-payment-method="${coupon.paymentMethod}">
-                                            Apply
-                                            </button>
-                                        </li>`;
-                                        couponList.append(couponItem);
-                                    });
-                                } else {
-                                    couponList.append('<li class="list-group-item">No coupons available</li>');
-                                }
-                                $('#couponModal').modal('show');
-                            }
-                                })
-                            })
-
-                            $(document).on('click', '.apply-coupon', function() {
-                                const couponName = $(this).data('coupon-name');
-                                const discount = $(this).data('discount');
-                                const paymentMethod = $(this).data('payment-method')
-                                const totalAmount = parseFloat($('.total-price-of-all-products').text());
-                                const discountAmount = (totalAmount * discount / 100).toFixed(2);
-                                const newTotal = (totalAmount - discountAmount).toFixed(2);
-
-                                // Update the coupon input field and discount field
-                                    $('.coupon').val(couponName);
-                                    $('.discount-with-coupon').text(`- ${discountAmount}`);
-                                    $('.total-price-with-discount-products').text(newTotal);
-                                    // Change the button to "Remove"
-                                    $('.btn-apply-coupon').html('<i class="bi bi-trash3"></i>').removeClass('btn-apply-coupon').addClass('btn-remove-coupon');
-
-                                        // Update the session with the new total amount
-                                                $.ajax({
-                                                    url: '/updateCartTotal',
-                                                    method: 'POST',
-                                                    data: { newTotal,paymentMethod },
-                                                    success: function(response) {
-                                                        console.log(response.message);
-                                                    },
-                                                    error: function(error) {
-                                                        console.log('Error updating cart total:', error);
-                                                    }
-                                                });
-                                    $('#applyCouponModal').modal('hide');
-                            })
-
-                            $(document).on('click', '.btn-remove-coupon', function() {
-                                // Reset the coupon input field and discount field
-                                $('.coupon').val('');
-                                    $('.discount-with-coupon').text('- 00.00');
-                                    const originalTotal = $('.total-price-of-all-products').text();
-                                    $('.total-price-with-discount-products').text(originalTotal);
-
-                                    // Change the button back to "View Coupons"
-                                    $(this).html('<i class="bi bi-eye"></i>').removeClass('btn-remove-coupon').addClass('btn-apply-coupon');
-
-                                    // Update the session with the original total amount
-                                    $.ajax({
-                                        url: '/updateCartTotal',
-                                        method: 'POST',
-                                        data: { newTotal: originalTotal },
-                                        success: function(response) {
-                                            console.log(response.message);
-                                        },
-                                        error: function(error) {
-                                            console.log('Error updating cart total:', error);
-                                        }
-                                    });
-                            });
-                        })
-                        function closecouponModal(){
-                            $('#applyCouponModal').modal('hide');
-                        }
-    </script> 
 </body>

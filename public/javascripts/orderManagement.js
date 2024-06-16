@@ -23,7 +23,9 @@ $(document).ready(function() {
                     icon: 'success',
                     text: 'Order status updated successfully.'
                 });
-                if (newStatus === 'Cancelled') {
+                if (newStatus === 'Completed') {
+                    disableOrderControls($row);
+                } else if (newStatus === 'Cancelled') {
                     updateCancelButton($row, true);
                     $select.prop('disabled', true); // Disable the dropdown
                 } else {
@@ -99,6 +101,19 @@ $(document).ready(function() {
                 .prop('disabled', false);
         }
     }
+
+    // Function to disable order controls
+    function disableOrderControls($row) {
+        $row.find('.order-status').prop('disabled', true); // Disable the dropdown
+        $row.find('.cancel-order').prop('disabled', true); // Disable the cancel button
+    }
+
+    // Initial check for completed status
+    $('.order-status').each(function() {
+        if ($(this).val() === 'Completed') {
+            disableOrderControls($(this).closest('tr'));
+        }
+    });
 
     // Format Date
     $('.order-date').each(function(){

@@ -45,7 +45,32 @@ h1 {
     text-align: center;
     cursor: pointer;
 }
-.cancel-button-diasbled{
+
+.return-button{
+    display: block;
+    width: 200px;
+    margin: 20px auto;
+    padding: 10px;
+    background-color: #06b549;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    text-align: center;
+    cursor: pointer;
+}
+.cancel-button-disabled{
+    display: block;
+    width: 200px;
+    margin: 20px auto;
+    padding: 10px;
+    background-color: #ff4b4b;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.cancel-return{
     display: block;
     width: 200px;
     margin: 20px auto;

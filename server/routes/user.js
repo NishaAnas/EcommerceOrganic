@@ -121,8 +121,8 @@ router.get('/emptyCart',cartController.getEmptyCart)
 //Update Cart Item
 router.post('/updateCartItem', cartController.updateCartItem);
 
-//Add Items from cart to wishlist
-router.post('/addcartToWishlist',cartController.addtoWishlist)
+//Update session total
+router.post('/updateCartTotal',cartController.updateTotal)
 
 
 
@@ -156,6 +156,14 @@ router.get('/acctorderDetails',accountController.getOrderDetails);
 //Cancel Order
 router.post('/cancelOrder', accountController.cancelOrder);
 
+//Return Order
+router.post('/returnOrder',accountController.returnOrder);
+
+//Cancel return request
+router.post('/cancelReturn',accountController.cancelReturn);
+
+//Cancel a single item of an order
+router.post('/cancelOrderItem', accountController.cancelOrderItem);
 
 
 //Get Address managemnt of checkout page
@@ -201,8 +209,7 @@ router.post('/walletaddMoney',walletController.addMoney);
 //Get Applicable coupons
 router.get('/getApplicableCoupons',couponController.getCoupons);
 
-//Update session total
-router.post('/updateCartTotal',cartController.updateTotal)
+
 
 module.exports = router;
 

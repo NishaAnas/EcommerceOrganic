@@ -39,6 +39,14 @@ const orderSchema = new Schema({
         required: true,
         ref: 'Address'
     },
+    couponCode:{
+        type : String,
+        default:null
+    },
+    discountAmount:{
+        type:Number,
+        default:0
+    },
     payment: {
         type: paymentSchema,
         required: true

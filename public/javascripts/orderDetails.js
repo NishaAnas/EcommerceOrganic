@@ -37,6 +37,85 @@ $(document).ready(function(){
             }
         });
     });
+
+    $('.return-button').click(function() {
+        var orderId = $(this).data('orderid');
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Do you want to return this order?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, return it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/returnOrder',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ orderId: orderId }),
+                    success: function(response) {
+                        Swal.fire(
+                            'Returned!',
+                            'Your order has been returned.',
+                            'success'
+                        ).then(() => {
+                            location.reload();
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        Swal.fire(
+                            'Error!',
+                            'There was a problem returning your order.',
+                            'error'
+                        );
+                        console.error('Error returning order:', error);
+                    }
+                });
+            }
+        });
+    });
+
+    $('.cancel-return').click(function() {
+        var orderId = $(this).data('orderid');
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Do you want to cancel the return request?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, cancel it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: '/cancelReturn',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ orderId: orderId }),
+                    success: function(response) {
+                        Swal.fire(
+                            'Cancelled!',
+                            'Your return request has been cancelled.',
+                            'success'
+                        ).then(() => {
+                            location.reload();
+                        });
+                    },
+                    error: function(xhr, status, error) {
+                        Swal.fire(
+                            'Error!',
+                            'There was a problem cancelling your request.',
+                            'error'
+                        );
+                        console.error('Error cancelling return request:', error);
+                    }
+                });
+            }
+        });
+    });
+
     $('.order-date').each(function(){
         var date = new Date($(this).text());
         var formattedDate = date.toLocaleString('en-GB', {

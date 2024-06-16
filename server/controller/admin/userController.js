@@ -1,11 +1,4 @@
 const user = require('../../modals/user')
-const category = require('../../modals/categories')
-const product = require('../../modals/product')
-const admin = require ('../../modals/admin')
-const { upload, resizeImages } = require('../../config/multer');
-const mongoose = require('mongoose')
-const bcrypt = require('bcrypt')
-const path = require('path');
 
 exports.getUserManagement = async(req,res) =>{
     try{
@@ -14,7 +7,7 @@ exports.getUserManagement = async(req,res) =>{
             description: 'Organic'
         }
     
-        const Users = await user.find({isBlocked: false}).lean();
+        const Users = await user.find({}).lean();
         const successMessage = req.flash('success');
         const errorMessage = req.flash('error');
             res.render('admin/user/userManagement',{Users,layout: 'adminlayout',success: successMessage, error: errorMessage})
@@ -25,55 +18,22 @@ exports.getUserManagement = async(req,res) =>{
     }
 }
 
-//GET Blocked User
-exports.getBlockedUser = async(req,res)=>{
-    try{
-        const locals = {
-            title: 'Blocke User',
-            description: 'Organic'
-        }
-    
-        const Users = await user.find({isBlocked: true}).lean();
-        const successMessage = req.flash('success');
-        const errorMessage = req.flash('error');
-            res.render('admin/user/blockedUser',{Users,layout: 'adminlayout',success: successMessage, error: errorMessage})
-    }catch(error){
-        console.log(error)
-        req.flash('error', 'Server Error');
-        res.render('admin/user/blockedUser', { layout: 'adminlayout', error: error });
-    }
-}
-
-// GET EDIT Users
-exports.getEditUser = async(req,res)=>{
-    const locals = {
-        title: 'Edit User page',
-        description: 'Organic'
-    }
+exports.blockUser = async (req, res) => {
     try {
-        const userDetailsViewing = await user.findOne({ _id: req.params._id }).lean();
-        console.log(userDetailsViewing)
-        res.render('admin/user/userEdit', { locals, userDetailsViewing, layout: 'adminlayout' });
+        const userId = req.body.userId;
+        await user.findByIdAndUpdate(userId, { isBlocked: false });
+        res.status(200).json({ message: 'User blocked successfully.' });
     } catch (error) {
-        console.log(error)
-        req.flash('error', 'Server Error');
-        res.redirect('/user/userManagement');
+        res.status(500).json({ message: 'Failed to block user.' });
     }
-}
+};
 
-//Put Edit User
-exports.putEditUser = async(req,res)=>{
-    console.log(req.body)
+exports.unblockUser = async (req, res) => {
     try {
-        await user.findByIdAndUpdate(req.params._id, {
-            isBlocked:true
-        })
-        console.log('User updated Successfully');
-        req.flash('success', 'User updated successfully');
-        res.redirect(`/admin/user`);
+        const userId = req.body.userId;
+        await user.findByIdAndUpdate(userId, { isBlocked: true });
+        res.status(200).json({ message: 'User unblocked successfully.' });
     } catch (error) {
-        console.log(error)
-        req.flash('error', 'Server Error');
-        res.redirect(`/admin/user`);
+        res.status(500).json({ message: 'Failed to unblock user.' });
     }
-}
+};

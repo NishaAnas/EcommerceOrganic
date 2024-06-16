@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const prodVariation = require('../../modals/productVariation');
 const shoppingCart = require('../../modals/shoppingCart');
+const user = require('../../modals/user');
 const address = require('../../modals/address');
 const order = require('../../modals/order');
 const { v4: uuidv4 } = require('uuid');
@@ -35,6 +36,14 @@ exports.getcheckOut = async (req, res) => {
             return res.redirect('/login');
         }
         const userId = req.session.userLoggedInData.userId;
+
+        //Check user is blocked or not
+        const existingUser = await user.findById(userId);
+        if (existingUser.isBlocked) {
+            req.flash('error', 'Your account is blocked.');
+            return res.redirect('/login');
+        }
+
         const addressRecord = await address.findOne({ userId: userId, isDefault: true });
         const defaultAddress = addressRecord ? addressRecord.toObject() : null;
         //console.log(defaultAddress);
@@ -50,7 +59,7 @@ exports.getcheckOut = async (req, res) => {
             return res.redirect('/cart');
         }
 
-        console.log(req.session.cartDetails);
+        //console.log(req.session.cartDetails);
 
         return res.render('user/checkout/checkout', {
             userData,
@@ -59,7 +68,9 @@ exports.getcheckOut = async (req, res) => {
             cartitems: cartDetails.cartitems,
             totalQuantity: cartDetails.totalQuantity,
             totalPriceOfAllProducts: cartDetails.totalPriceOfAllProducts,
-            paymentMethod:cartDetails.paymentMethod,
+            couponName:cartDetails.couponName,
+            discountAmount:cartDetails.discountAmount,
+            afterDiscountTotal:cartDetails.afterDiscountTotal,
             success: successMessage,
             error: errorMessage,
             layout:'checkoutlayout'
@@ -106,8 +117,8 @@ exports.placeOrder = async (req, res) => {
             deliveryFee = 60;
         }
 
-        const totalAmount = cartDetails.totalPriceOfAllProducts + deliveryFee;
-
+        const totalAmount = cartDetails.afterDiscountTotal + deliveryFee;
+        //console.log(totalAmount);
         
 
         // Create delivery details
@@ -121,6 +132,8 @@ exports.placeOrder = async (req, res) => {
             newOrderId: newOrderId,
             userId: userData.userId,
             items: items,
+            couponCode:cartDetails.couponName,
+            discountAmount:cartDetails.discountAmount,
             totalAmount: totalAmount,
             address: shippingAddress._id,
             delivery: delivery,
@@ -162,7 +175,7 @@ exports.placeOrder = async (req, res) => {
                 throw new Error('Failed to create Razorpay order');
             }
 
-            console.log(razorpayOrder);
+            //console.log(razorpayOrder);
             // Save the order with status as 'Payment Pending'
             orderData.payment = {
                 method: 'Razorpay',
@@ -205,7 +218,7 @@ exports.placeOrder = async (req, res) => {
             
             // Save the order to the database
             const newOrder = await order.create(orderData);
-            console.log(`DebitOrderId:${newOrder._id}`)
+            //console.log(`DebitOrderId:${newOrder._id}`)
             
             await WalletController.debitWallet(userId,totalAmount,'Oder Placed', newOrder._id);
             
@@ -320,7 +333,7 @@ exports.getOrderDetails = async (req, res) => {
             items: itemsWithImages
         };
 
-        //console.log(orderWithItemsAndImages);
+        console.log(orderWithItemsAndImages);
 
         return res.render('user/checkout/orderdetails', { 
             order: orderWithItemsAndImages, 

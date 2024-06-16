@@ -1,0 +1,85 @@
+<style>
+        .container {
+            background-color: #f9f9f9;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            border-bottom: 2px solid #6c757d;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .order-info {
+            margin-bottom: 15px;
+        }
+        .order-info strong {
+            color: #6c757d;
+        }
+        .order-items {
+            list-style-type: none;
+            padding: 0;
+        }
+        .order-items li {
+            background-color: #fff;
+            padding: 15px;
+            border: 1px solid #e9ecef;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .order-items li strong {
+            display: block;
+            color: #6c757d;
+        }
+        .btn-primary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Order Details <small class="text-muted">Order ID: {{orderDetails.newOrderId}}</small></h2>
+        
+        <div class="order-info">
+            <strong>User:</strong> {{orderDetails.userId.email}} ({{orderDetails.userId.name}})
+        </div>
+        <div class="order-info">
+            <strong>Order Date:</strong> {{orderDetails.orderDate}}
+        </div>
+        <div class="order-info">
+            <strong>Status:</strong> {{orderDetails.orderStatus}}
+        </div>
+        <div class="order-info">
+            <strong>Coupon Code (Amount):</strong> {{orderDetails.couponCode}} ({{orderDetails.discountAmount}})
+        </div>
+        <div class="order-info">
+            <strong>Total Amount:</strong> Rs. {{orderDetails.totalAmount}}
+        </div>
+        <div class="order-info">
+            <strong>Address:</strong> {{orderDetails.address.street}}, {{orderDetails.address.city}}, {{orderDetails.address.state}}, {{orderDetails.address.zip}}
+        </div>
+        <h3 class="mt-4">Items:</h3>
+        <ul class="order-items">
+            <div class="table-responsive" style="font-size: 75%;">
+            <table class="table table-bordered">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each orderDetails.items}}
+                    <tr>
+                        <td>{{this.productId.attributeValue}}</td>
+                        <td>{{this.quantity}}</td>
+                        <td>Rs. {{this.price}}</td>
+        </tr>
+    {{/each}}
+    </tbody>
+</table>
+        <a href="/admin/ordermanage" class="btn btn-primary mt-3">Back to Orders</a>
+    </div>
+    </body>

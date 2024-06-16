@@ -30,7 +30,6 @@
                         <th>Status</th>
                         <th>Min Purchase Amount</th>
                         <th>First Purchase</th>
-                        <th>Payment Method</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -48,7 +47,6 @@
                         </td>
                         <td>{{this.minPurchaseAmount}}</td>
                         <td>{{#if this.userFirstPurchase}}Yes{{else}}No{{/if}}</td>
-                        <td>{{this.paymentMethod}}</td>
                         <td class="col-8 actionButtons d-flex justify-content-start">
                             <button class="btn btn-sm btn-primary mr-2 editCouponBtn" data-id="{{this._id}}" data-bs-toggle="modal" data-bs-target="#editCouponModal">
                                 <i class="bi bi-pencil"></i>
@@ -116,17 +114,6 @@
                                 <div class="form-check form-switch" >  
                                 <input class="form-check-input" name="firstPurchase" type="checkbox" role="switch" id="firstPurchase" style="min-height: 70%;">
                                 </div>
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                            <label for="couponPaymentMethod">Payment Method</label>
-                            <select class="form-control" id="couponPaymentMethod" name="paymentMethod">
-                                <option value="Any">Any</option>
-                                <option value="Wallet">Wallet</option>
-                                <option value="Razorpay">Razorpay</option>
-                                <option value="Razorpay">COD</option>
-                            </select>
-                        </div>
                         </div>
                     </div>
                         <div class="modal-footer">
@@ -198,17 +185,6 @@
                                 <input class="form-check-input" name="firstPurchase" type="checkbox" role="switch" id="editCouponUserFirstPurchase" style="min-height: 70%;">
                                 </div>
                         </div>
-                        <div class="col-sm-6">
-                            <div class="form-group">
-                            <label for="couponPaymentMethod">Payment Method</label>
-                            <select class="form-control" id="editCouponPaymentMethod" name="paymentMethod">
-                                <option value="Any">Any</option>
-                                <option value="Wallet">Wallet</option>
-                                <option value="Razorpay">Razorpay</option>
-                                <option value="Razorpay">COD</option>
-                            </select>
-                        </div>
-                        </div>
                     </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" onclick="closeModal()">Close</button>
@@ -261,7 +237,8 @@
             // Open edit modal with coupon details
             $('.editCouponBtn').on('click', function() {
                 const id = $(this).data('id');
-                $.get(`/admin/getCoupon/${id}`, function(data) {
+                $.get(`/admin/getCoupon/${id}`,
+                function(data) {
                     $('#editCouponId').val(data._id);
                     $('#editCouponName').val(data.name);
                     $('#editCouponDescription').val(data.description);
@@ -269,7 +246,6 @@
                     $('#editCouponExpiryDate').val(data.expiryDate.split('T')[0]);
                     $('#editCouponMinPurchaseAmount').val(data.minPurchaseAmount);
                     $('#editCouponUserFirstPurchase').prop('checked', data.userFirstPurchase);
-                    $('#editCouponPaymentMethod').val(data.paymentMethod);
                     $('#editCouponModal').modal('show');
                 });
             });
@@ -288,7 +264,6 @@
                         expiryDate: $('#editCouponExpiryDate').val(),
                         minPurchaseAmount: $('#editCouponMinPurchaseAmount').val(),
                         userFirstPurchase: $('#editCouponUserFirstPurchase').is(':checked'),
-                        paymentMethod: $('#editCouponPaymentMethod').val()
                     }),
                     success: function(response) {
                         $('#editCouponModal').modal('hide');
@@ -347,6 +322,4 @@
         function closeaddModal() {
             $('#addCouponModal').modal('hide');
         }
-
-      
     </script>

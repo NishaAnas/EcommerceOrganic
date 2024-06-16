@@ -27,11 +27,6 @@ const couponSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    paymentMethod: {
-        type: String,
-        enum: ['Wallet', 'Razorpay', 'Any'],
-        default: 'Any'
-    },
     isActive: {
         type: Boolean,
         default: true

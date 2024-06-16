@@ -25,6 +25,13 @@ exports.getProfilePage = async (req, res) => {
             return res.redirect('/login');
         }
         const userId = req.session.userLoggedInData.userId;
+
+        //Check user is blocked or not
+        const existingUser = await user.findById(userId);
+        if (existingUser.isBlocked) {
+            req.flash('error', 'Your account is blocked.');
+            return res.redirect('/login');
+        }
         const userData = req.session.userLoggedInData;
 
         const userDetails = await user.findById(userId).lean();
@@ -323,8 +330,7 @@ exports.cancelOrder = async (req, res) => {
                     { new: true }
                 )
                 console.log(`updatedOrder:${updatedOrder}`);
-                // }
-                //}
+
                 if (!updatedOrder) {
                     throw new Error('Failed to update order status');
                 }
@@ -367,3 +373,131 @@ exports.cancelOrder = async (req, res) => {
         res.status(500).json({ message: 'Server error', error });
     }
 }
+
+exports.returnOrder = async(req,res)=>{
+    const { orderId } = req.body;
+    try{
+        const orderToReturn = await order.findById(orderId);
+        if (!orderToReturn) {
+            return res.status(404).send({ message: 'Order not found' });
+        }
+
+        if (orderToReturn.orderStatus !== 'Completed') {
+            return res.status(400).send({ message: 'Can only return a completed order' });
+        }
+        await order.findOneAndUpdate({ _id: orderId },
+            { orderStatus: 'Return' },
+            { new: true })
+
+        res.send({ message: 'Request for Return is processed' });
+    }catch(error){
+        console.error(error);
+        res.status(500).send({ message: 'Server error' });
+    }
+}
+
+exports.cancelReturn = async(req,res)=>{
+    const { orderId } = req.body;
+    try{
+        const orderToCancelReturn = await order.findById(orderId);
+        if (!orderToCancelReturn) {
+            return res.status(404).send({ message: 'Order not found' });
+        }
+
+        if (orderToCancelReturn.orderStatus !== 'Return') {
+            return res.status(400).send({ message: 'This order Does not have return request' });
+        }
+        await order.findOneAndUpdate({ _id: orderId },
+            { orderStatus: 'Pending' },
+            { new: true })
+        res.send({ message: 'Request for Return is processed' });
+    }catch(error){
+        console.error(error);
+        res.status(500).send({ message: 'Server error' });
+    }
+}
+
+exports.cancelOrderItem = async (req, res) => {
+    try {
+        const { orderId, itemId } = req.body;
+
+        const orderToCancelItem = await order.findById(orderId).populate({
+            path: 'items.productId',
+            model: 'productVariation'
+        });
+        if (!orderToCancelItem) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        const itemIndex = orderToCancelItem.items.findIndex(item => item._id.toString() === itemId);
+        if (itemIndex === -1) {
+            return res.status(404).json({ message: 'Item not found in the order' });
+        }
+
+        const itemToCancel = orderToCancelItem.items[itemIndex];
+
+        //console.log(itemToCancel)
+
+        const paymentMethod = orderToCancelItem.payment.method;
+        const itemAmount = itemToCancel.quantity * itemToCancel.productId.price;
+        let updateQuery = {};
+
+        if (orderToCancelItem.items.length === 1) {
+            // If it's the last item, cancel the entire order
+            updateQuery = { $set: { orderStatus: 'Cancelled' } };
+        } else if (paymentMethod === 'COD') {
+
+            orderToCancelItem.items.splice(itemIndex, 1);
+
+            updateQuery = { 
+                $set: { items: orderToCancelItem.items },
+                $inc: { totalAmount: -itemAmount }
+            };
+        } else if (paymentMethod === 'Razorpay') {
+
+            const refund = await razorpayInstance.payments.refund(orderToCancelItem.payment.transactionId, {
+                amount: itemAmount * 100
+            });
+            if (!refund) {
+
+                throw new Error('Failed to process refund');
+            }
+            orderToCancelItem.items.splice(itemIndex, 1);
+
+            updateQuery = { 
+                $set: { items: orderToCancelItem.items },
+                $inc: { totalAmount: -itemAmount }
+            };
+
+            await WalletController.creditWallet(orderToCancelItem.userId, itemAmount, 'Refund from order item', orderId);
+        } else if(paymentMethod === 'Wallet'){
+
+            orderToCancelItem.items.splice(itemIndex, 1);
+            updateQuery = { 
+
+                $set: { items: orderToCancelItem.items },
+                $inc: { totalAmount: -itemAmount }
+            };
+
+            await WalletController.creditWallet(orderToCancelItem.userId, itemAmount, 'Refund from order item', orderId);
+        }else{
+
+            return res.status(400).json({ message: 'Invalid payment method' });
+        }
+
+        const updatedOrder = await order.findOneAndUpdate(
+
+            { _id: orderId },
+            updateQuery,
+            { new: true }
+        );
+        return res.status(200).json({
+
+            message: 'Order item cancelled successfully',
+            order: updatedOrder
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'Server error', error });
+    }
+};

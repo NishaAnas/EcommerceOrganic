@@ -100,7 +100,7 @@
                             <div class="form-check mb-3">
                                 <input class="form-check-input" type="radio"
                                     name="paymentOption" value="paypal"
-                                    id="payment-paypal" {{#if (isEqual paymentMethod 'Paypal')}}checked{{/if}}>
+                                    id="payment-paypal">
                                 <label class="form-check-label"
                                     for="payment-paypal">
                                     PayPal
@@ -109,7 +109,7 @@
                             <div class="form-check mb-3">
                                 <input class="form-check-input" type="radio"
                                     name="paymentOption" value="razorpay"
-                                    id="payment-razorpay" {{#if (isEqual paymentMethod 'Razorpay')}}checked{{/if}}>
+                                    id="payment-razorpay">
                                 <label class="form-check-label"
                                     for="payment-razorpay">
                                     Razorpay
@@ -118,7 +118,7 @@
                             <div class="form-check mb-3">
                                 <input class="form-check-input" type="radio"
                                     name="paymentOption" value="wallet"
-                                    id="payment-wallet" {{#if (isEqual paymentMethod 'Wallet')}}checked{{/if}}>
+                                    id="payment-wallet">
                                 <label class="form-check-label"
                                     for="payment-wallet">
                                     Wallet
@@ -127,7 +127,7 @@
                             <div class="form-check mb-3">
                                 <input class="form-check-input" type="radio"
                                     name="paymentOption" value="card"
-                                    id="payment-card" {{#if (isEqual paymentMethod 'Credit/Debit')}}checked{{/if}}>
+                                    id="payment-card">
                                 <label class="form-check-label"
                                     for="payment-card">
                                     Credit Card/Debit Card
@@ -157,7 +157,7 @@
                             <div class="form-check mb-3">
                                 <input class="form-check-input" type="radio"
                                     name="paymentOption" value="cod"
-                                    id="payment-cod" {{#if (isEqual paymentMethod 'COD')}}checked{{/if}}>
+                                    id="payment-cod">
                                 <label class="form-check-label"
                                     for="payment-cod">
                                     Cash on Delivery
@@ -192,12 +192,59 @@
                                     <span class="text-muted">₹{{totalPrice}}</span>
                                 </li>
                                 {{/each}}
+
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <b>Total Products:</b>
+                                    </div>
+                                    <div>
+                                        <span id="total-quantity">{{totalQuantity}}</span>
+                                    </div>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <b>Total Price:</b>
+                                    </div>
+                                    <div>
+                                        ₹<span id="total-price">{{totalPriceOfAllProducts}}</span>
+                                    </div>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <b>Discount: ( {{couponName}}  )</b>
+                                    </div>
+                                    <div>
+                                        -₹<span id="discount">{{discountAmount}}</span>
+                                    </div>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <b>After Discount:</b>
+                                    </div>
+                                    <div>
+                                        ₹<span id="after-discount">{{afterDiscountTotal}}</span>
+                                    </div>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <b>Delivery Price:</b>
+                                    </div>
+                                    <div>
+                                        +₹<span id="delivery-price"></span>
+                                    </div>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <hr>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <b>Grand Total:</b>
+                                    </div>
+                                    <div>
+                                        ₹<span id="grand-total"></span>
+                                    </div>
+                                </li>
                             </ul>
-                            <p>Total Products: <span id="total-quantity">{{totalQuantity}}</span></p>
-                            <p>Total Price: ₹<span id="total-price">{{totalPriceOfAllProducts}}</span></p>
-                            <p>Delivery Price: ₹<span id="delivery-price"></span></p>
-                            <hr>
-                            <p>Grand Total: ₹<span id="grand-total"></span></p>
                         </div>
                     </div>
                     <div class="container">
@@ -208,61 +255,6 @@
 
             </div>
         </form>
-        <!-- Card Details Modal -->
-        <div class="modal fade" id="card-details-modal" tabindex="-1"
-            aria-labelledby="cardDetailsModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="cardDetailsModalLabel">Enter
-                            Card Details</h5>
-                        <button type="button" class="close"
-                            data-bs-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <form>
-                            <div class="form-group">
-                                <label for="card-number">Card Number</label>
-                                <input type="text" class="form-control"
-                                    id="card-number"
-                                    placeholder="Enter card number">
-                            </div>
-                            <div class="form-group">
-                                <label for="expiry-date">Expiry Date</label>
-                                <input type="text" class="form-control"
-                                    id="expiry-date" placeholder="MM/YY">
-                            </div>
-                            <div class="form-group">
-                                <label for="cvv">CVV</label>
-                                <input type="text" class="form-control" id="cvv"
-                                    placeholder="Enter CVV">
-                            </div>
-                            <div class="form-group">
-                                <label>Card Type</label>
-                                <div>
-                                    <img src="/images/visa.jpeg" alt="Visa"
-                                        class="img-fluid" style="width: 50px;">
-                                    <img src="/images/mastercard.png"
-                                        alt="MasterCard" class="img-fluid"
-                                        style="width: 50px;">
-                                    <img src="/images/americanexpress.jpeg"
-                                        alt="American Express" class="img-fluid"
-                                        style="width: 50px;">
-                                    <img src="/images/rupay.png" alt="Rupay"
-                                        class="img-fluid" style="width: 50px;">
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-primary"
-                            id="save-card-details">Save</button>
-                    </div>
-                </div>
-            </div>
-        </div>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="/javascripts/checkout.js"></script>
 

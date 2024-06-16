@@ -34,15 +34,20 @@ exports.getCategoryPage = async (req, res) => {
 exports.getaddCategoryPage = (req, res) => {
     const successMessage = req.flash('success');
     const errorMessage = req.flash('error');
-    res.render('admin/category/addCategory', { layout: 'adminlayout', success: successMessage, error: errorMessage })
+    res.render('admin/category/addCategory', { 
+        layout: 'adminlayout', 
+        success: successMessage, 
+        error: errorMessage 
+    })
 }
 
 
 //POST Add Category Page
 exports.postaddCategory = async (req, res) => {
     try {
+        console.log(req.body)
         const { name, description, isActive } = req.body;
-        const existingCategory = await category.findOne({ name: req.body.name });
+        const existingCategory = await category.findOne({ name});
 
         // If another category with the same name exists
         if (existingCategory) {
@@ -62,11 +67,11 @@ exports.postaddCategory = async (req, res) => {
         });
         await category.create(newCategory);
         req.flash('success', 'Category added successfully');
-        res.redirect('/admin/category');
+        return res.json({ success: true, message: 'Category added successfully' });
     } catch (error) {
         console.error('Error saving category:', error);
         req.flash('error', 'Server Error');
-        res.redirect('/admin/addCategory');
+        return res.json({ success: false, message: 'Server Error' });
     }
 
 }

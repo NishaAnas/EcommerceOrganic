@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const category = require('../../modals/categories');
+const user = require('../../modals/user');
 const Product = require('../../modals/product');
 const prodVariation = require('../../modals/productVariation');
 const wishlist = require('../../modals/wishlist')
@@ -30,7 +31,15 @@ exports.getWislist=async (req,res)=>{
             return res.redirect('/login');
         }
 
-        //const userId = req.session.userLoggedInData.userId;
+        const userId = req.session.userLoggedInData.userId;
+
+        //Check user is blocked or not
+        const existingUser = await user.findById(userId);
+        if (existingUser.isBlocked) {
+            req.flash('error', 'Your account is blocked. Please contact the administrator for assistance.');
+            return res.redirect('/login');
+        }
+
         const userData = req.session.userLoggedInData;
 
         // Find the user's wishlist and populate product details

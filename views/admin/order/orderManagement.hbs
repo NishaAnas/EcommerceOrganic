@@ -33,10 +33,11 @@
                 <tbody>
                     {{#each Orders}}
                     <tr>
-                        <td>{{this.newOrderId}}</td>
+                        <td><a href="/admin/orderDetails/{{this._id}}">{{this.newOrderId}}</a>
+                        </td>
                         <td class="order-date">{{this.orderDate}}</td>
                         <td>{{this.userId.email}}</td>
-            <td>${{this.totalAmount}}</td>
+            <td>Rs{{this.totalAmount}}</td>
             <td>
                 <select class="order-status" data-order-id="{{this._id}}">
                     {{#if (isEqual this.orderStatus 'Cancelled')}}disabled{{/if}}

@@ -4,13 +4,10 @@ body {
 
 .btn-primary {
     color: #fff;
-    background-color: #007bff;
-    border-color: #007bff;
 }
 .form-check-input[type=checkbox].form-switch {
     height: 50%; 
 }
-
 
 /* Responsive design */
 @media (max-width: 768px) {
@@ -37,4 +34,5 @@ body {
     font-size: 28px;
     font-weight: normal;
     cursor: pointer;
+    z-index: 2;
 }

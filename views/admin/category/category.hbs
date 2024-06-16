@@ -1,23 +1,25 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+<link rel="stylesheet" href="/stylesheets/addcategory.css">
 <body>
     <div class="container mt-5">
         <h2>Category Management <small>Organic</small></h2>
 
-        {{#if success}}
-        <div class="alert alert-success">
-            {{success}}
-        </div>
-        {{/if}}
         {{#if error}}
-        <div class="alert alert-danger">
-            {{error}}
-        </div>
+            <div class="alert alert-danger">
+                {{error}}
+            </div>
+        {{/if}}                
+        {{#if success}}
+            <div class="alert alert-success">
+                {{success}}
+            </div>
         {{/if}}
 
-        <div class="d-flex justify-content-end mb-3">
-            <!-- Add Category Button -->
-            <a href="/admin/addcategory" class="btn btn-sm btn-success">+ Add Category</a>
+        <div class="d-flex justify-content-end mb-3">       
+            <a href="/admin/addcategory" class="btn btn-sm btn-success mr-2">
+                    + Add Category
+            </a>     
+            
         </div>
 
         <div class="table-responsive">
@@ -56,4 +58,4 @@
             </table>
         </div>
     </div>
-  </body>
+</body>
