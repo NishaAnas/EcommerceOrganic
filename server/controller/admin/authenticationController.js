@@ -11,6 +11,8 @@ const moment = require('moment');
 const PDFDocument = require('pdfkit');
 const ExcelJS = require('exceljs');
 const fs = require('fs');
+const Chart = require('chart.js');
+
 
 //GET Admin Login
 exports.getAdminLogin = (req,res)=>{
@@ -213,43 +215,37 @@ const getOrders = async (type, startDate, endDate) => {
             break;
         case 'daily':
             query = {
-                orderDate: {
-                    $gte: moment().startOf('day').toDate(),
-                    $lte: moment().endOf('day').toDate()
-                }
+                orderDate: {$gte: moment().startOf('day').toDate(),$lte: moment().endOf('day').toDate()}
             };
             break;
         case 'weekly':
             query = {
-                orderDate: {
-                    $gte: moment().startOf('isoWeek').toDate(),
-                    $lte: moment().endOf('isoWeek').toDate()
-                }
+                orderDate: {$gte: moment().startOf('isoWeek').toDate(),$lte: moment().endOf('isoWeek').toDate()}
             };
             break;
         case 'monthly':
             query = {
-                orderDate: {
-                    $gte: moment().startOf('month').toDate(),
-                    $lte: moment().endOf('month').toDate()
-                }
+                orderDate: {$gte: moment().startOf('month').toDate(),$lte: moment().endOf('month').toDate()}
             };
             break;
         case 'yearly':
             query = {
-                orderDate: {
-                    $gte: moment().startOf('year').toDate(),
-                    $lte: moment().endOf('year').toDate()
-                }
+                orderDate: {$gte: moment().startOf('year').toDate(),$lte: moment().endOf('year').toDate()}
             };
             break;
     }
 
-    const orders = await order.find(query);
-    return orders;
+    const orderDetails = await order.find(query)
+            .populate('address')
+            .populate({
+                path: 'items.productId',
+                model: 'productVariation',
+                select: 'attributeValue'
+            });
+    return orderDetails;
 };
 
-//GET slaes report page 
+//GET sales report page 
 exports.getSalesReportPage = async(req,res)=>{
     try{
         const orders = await order.find().lean();
@@ -275,6 +271,7 @@ exports.getSalesReportPage = async(req,res)=>{
     }
 }
 
+//Generate Report Data
 exports.getReportData = async(req,res)=>{
     try{
         const { filterType, startDate, endDate } = req.query;
@@ -301,44 +298,39 @@ exports.getReportData = async(req,res)=>{
     }
 }
 
+
+//Download Report
 exports.downloadReport = async(req,res)=>{
     try{
         const { filterType, format, startDate, endDate } = req.query;
         console.log(req.query);
 
-        const orders = await getOrders(filterType, startDate, endDate);
-        const completedOrders = orders.filter(order => order.orderStatus === 'Completed');
-        const cancelledOrders = orders.filter(order => order.orderStatus === 'Cancelled');
-                        
-        const totalRevenue = completedOrders.reduce((total, order) => total + order.totalAmount, 0);
-        const totalDiscountGiven = completedOrders.reduce((total, order) => total + order.discountAmount, 0);
-        const reportData = {           
-                            totalOrders: orders.length,
-                            completedOrders: completedOrders.length,
-                            cancelledOrders: cancelledOrders.length,
-                            totalRevenue: totalRevenue,
-                            totalDiscountGiven: totalDiscountGiven
-                        };
-        console.log(`Download Data :${reportData}`);
-        console.log(`completedOrders :${completedOrders}`);
-        console.log(`cancelledOrders :${cancelledOrders}`);
-        console.log(`totalRevenue :${totalRevenue}`);
-        console.log(`totalDiscountGiven :${totalDiscountGiven}`);
-
+        const orders = await getOrders(filterType, startDate, endDate)
+        orders.forEach(order => {
+            console.log('Order ID:', order.newOrderId);
+            order.items.forEach(item => {
+                console.log('Product ID:', item.productId);
+                console.log('Quantity:', item.quantity);
+                console.log('Price:', item.price);
+                console.log('Product Attribute Value:', item.productId.attributeValue);
+            });
+        });
+                
         if (format === 'pdf') {
-            generatePDFReport(reportData, res);
+            generatePDFReport(orders, res);
         } else if (format === 'excel') {
-            generateExcelReport(reportData, res);
+            generateExcelReport(orders, res);
         } else {
             res.status(400).send('Invalid format');
         }
+
     }catch(error){
         res.status(500).json('Server Error');
+        console.log(error)
     }
 }
 
-//Generate PDF Report
-const generatePDFReport = (data, res) => {
+const generatePDFReport = (orders, res) => {
     const doc = new PDFDocument();
     const filename = 'Sales_Report.pdf';
     res.setHeader('Content-disposition', 'attachment; filename="' + filename + '"');
@@ -347,38 +339,144 @@ const generatePDFReport = (data, res) => {
 
     doc.fontSize(18).text('Sales Report', { align: 'center' });
     doc.moveDown();
-    doc.fontSize(14).text(`Total Orders: ${data.totalOrders}`);
-    doc.fontSize(14).text(`Completed Orders: ${data.completedOrders}`);
-    doc.fontSize(14).text(`Cancelled Orders: ${data.cancelledOrders}`);
-    doc.fontSize(14).text(`Total Revenue: ₹${data.totalRevenue.toFixed(2)}`);
-    doc.fontSize(14).text(`Total Discount Given: ₹${data.totalDiscountGiven.toFixed(2)}`);
-    doc.moveDown();
-    doc.fontSize(12).text('End of Report', { align: 'center' });
 
+    const tableTop = 100;
+    const tableLeft = 50;
+    const rowHeight = 25;
+    const columnWidths = [50, 100, 60, 70, 100, 80, 80];
+
+    // Draw Table Headers
+    drawTableRow(doc, tableTop, tableLeft, rowHeight, columnWidths, [
+        'Order', 'Product', 'Quantity', 'Price', 'Total Price', 'Discount', 'Coupon Used'
+    ], true);
+
+    let currentTop = tableTop + rowHeight;
+
+    // Draw Table Rows
+    orders.forEach((order, orderIndex) => {
+        order.items.forEach((item, itemIndex) => {
+            const { productId, quantity, price } = item;
+            const totalItemPrice = quantity * price;
+            const { discountAmount, couponCode } = order;
+            const productDetails = item.productId.attributeValue;
+
+            drawTableRow(doc, currentTop, tableLeft, rowHeight, columnWidths, [
+                itemIndex === 0 ? `Order ${orderIndex + 1}` : '',
+                productDetails,
+                quantity.toString(),
+                `₹${price.toFixed(2)}`,
+                `₹${totalItemPrice.toFixed(2)}`,
+                `₹${discountAmount.toFixed(2)}`,
+                couponCode || '-'
+            ]);
+
+            currentTop += rowHeight;
+        });
+
+        // Draw Total Amount and Order Status
+        drawTableRow(doc, currentTop, tableLeft, rowHeight, columnWidths, [
+            '', '', '', '', `Total Amount: ₹${order.totalAmount.toFixed(2)}`, `Order Status: ${order.orderStatus}`, ''
+        ], false, true);
+
+        currentTop += rowHeight;
+
+        // Draw an empty row
+        drawEmptyRow(doc, currentTop, tableLeft, rowHeight, columnWidths);
+        currentTop += rowHeight;
+    });
+
+    doc.fontSize(12).text('End of Report', { align: 'center' });
     doc.end();
 };
 
-//Generate Excel Report
-const generateExcelReport = (data, res) => {
+const drawTableRow = (doc, top, left, height, widths, row, isHeader = false, isBold = false) => {
+    const backgroundColor = isHeader ? '#eeeeee' : '#ffffff';
+    doc.rect(left, top, widths.reduce((a, b) => a + b), height).fill(backgroundColor).stroke();
+
+    let currentLeft = left;
+
+    row.forEach((cell, i) => {
+        doc.rect(currentLeft, top, widths[i], height).stroke();
+        doc.fillColor('#000000')
+            .font(isHeader || isBold ? 'Helvetica-Bold' : 'Helvetica')
+            .fontSize(10)
+            .text(cell, currentLeft + 5, top + 5, { width: widths[i] - 10, align: 'left' });
+
+        currentLeft += widths[i];
+    });
+};
+
+const drawEmptyRow = (doc, top, left, height, widths) => {
+    const backgroundColor = '#ffffff';
+    doc.rect(left, top, widths.reduce((a, b) => a + b), height).fill(backgroundColor).stroke();
+    
+    let currentLeft = left;
+
+    widths.forEach((width, i) => {
+        doc.rect(currentLeft, top, width, height).stroke();
+        currentLeft += width;
+    });
+};
+
+const generateExcelReport = (orders, res) => {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Sales Report');
     worksheet.columns = [
-        { header: 'Metric', key: 'metric', width: 30 },
-        { header: 'Value', key: 'value', width: 30 }
+        { header: 'Order ID', key: 'orderId', width: 15 },
+        { header: 'Product Name', key: 'productName', width: 30 },
+        { header: 'Quantity', key: 'quantity', width: 10 },
+        { header: 'Total Price', key: 'totalPrice', width: 15 },
+        { header: 'Discount', key: 'discount', width: 15 },
+        { header: 'Coupon Used', key: 'coupon', width: 20 },
+        { header: 'Total Amount Paid', key: 'totalAmount', width: 20 },
+        { header: 'Order Status', key: 'orderStatus', width: 15 }
     ];
 
-    worksheet.addRows([
-        ['Total Orders', data.totalOrders],
-        ['Completed Orders', data.completedOrders],
-        ['Cancelled Orders', data.cancelledOrders],
-        ['Total Revenue', `₹${data.totalRevenue.toFixed(2)}`],
-        ['Total Discount Given', `₹${data.totalDiscountGiven.toFixed(2)}`]
-    ]);
+    // Add rows for each order
+    orders.forEach(order => {
+        let isFirstItem = true;
+        let orderTotalPrice = 0;
 
-    worksheet.eachRow({ includeEmpty: false }, function (row, rowNumber) {
-        row.eachCell({ includeEmpty: false }, function (cell, colNumber) {
-            cell.font = { size: 12, bold: colNumber === 1 };
+        order.items.forEach(item => {
+            const totalItemPrice = item.quantity * item.price;
+            orderTotalPrice += totalItemPrice;
+
+            worksheet.addRow({
+                orderId: isFirstItem ? order.newOrderId : '',
+                productName: item.productId.attributeValue,
+                quantity: item.quantity,
+                totalPrice: totalItemPrice,
+                discount: isFirstItem ? order.discountAmount || 0 : '',
+                coupon: isFirstItem ? order.couponCode || '' :'-',
+                // totalAmount: isFirstItem ? order.totalAmount : '',
+                // orderStatus: isFirstItem ? order.orderStatus : ''
+            });
+
+            isFirstItem = false;
         });
+
+        // Add an empty row after each order
+        worksheet.addRow({});
+
+        // Calculate and add the total amount row for the order
+        worksheet.addRow({
+            orderId: '',
+            productName: 'Total Amount:',
+            quantity: '',
+            totalPrice: '',
+            discount: '',
+            coupon: '',
+            totalAmount: order.totalAmount,
+            orderStatus: order.orderStatus
+        });
+
+        // Add another empty row after the total amount row
+        worksheet.addRow({});
+    });
+
+    // Format header row
+    worksheet.getRow(1).eachCell(cell => {
+        cell.font = { bold: true };
     });
 
     const tempFilePath = path.join(__dirname, 'Sales_Report.xlsx');
@@ -398,3 +496,4 @@ const generateExcelReport = (data, res) => {
         res.status(500).send('Error generating Excel file');
     });
 };
+

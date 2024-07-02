@@ -13,7 +13,7 @@ exports.getCategoryPage = async (req, res) => {
             description: 'Organic'
         }
         const page = parseInt(req.query.page) || 1;
-        const limit = 10; // Number of users per page
+        const limit = 10; 
         const skip = (page - 1) * limit;
 
         const Category = await category.find({ isDeleted: false }).skip(skip).limit(limit).lean();

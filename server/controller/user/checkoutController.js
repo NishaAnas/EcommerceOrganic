@@ -9,7 +9,8 @@ const crypto = require('crypto');
 const RazorPay = require('razorpay');
 const wallet = require('../../modals/wallet');
 const WalletController = require('./walletController');
-const coupon = require('../../modals/coupon')
+const coupon = require('../../modals/coupon');
+
 
 // Initialize Razorpay instance
 const razorpayInstance = new RazorPay({
@@ -40,7 +41,7 @@ exports.getcheckOut = async (req, res) => {
         //Check user is blocked or not
         const existingUser = await user.findById(userId);
         if (existingUser.isBlocked) {
-            req.flash('error', 'Your account is blocked.');
+            req.flash('error', 'Your account is blocked by Admin.');
             return res.redirect('/login');
         }
 
@@ -95,6 +96,14 @@ exports.placeOrder = async (req, res) => {
         return res.redirect('/cart');
     }
 
+    if (!shippingAddress) {
+        return res.status(400).json({ error: 'Shipping address is required.' });
+    }
+
+    if (!paymentOption) {
+        return res.status(400).json({ error: 'Payment option is required.' });
+    }
+
     try {
         //function to generate 16 digit orderId
         const newOrderId = uuidv4();
@@ -119,7 +128,6 @@ exports.placeOrder = async (req, res) => {
 
         const totalAmount = cartDetails.afterDiscountTotal + deliveryFee;
         //console.log(totalAmount);
-        
 
         // Create delivery details
         const delivery = {
@@ -142,17 +150,16 @@ exports.placeOrder = async (req, res) => {
 
         // Check payment option
         if (paymentOption === 'cod') {
-            // If COD is selected
+            if(totalAmount > 1000){
+                return res.status(400).json({ error: 'COD orders above Rs. 1000 are not allowed.' });
+            }
             orderData.payment = {
                 method: 'COD',
                 status: 'Pending',
                 transactionId: null
             };
 
-            // Save the order to the database
             const newOrder = await order.create(orderData);
-
-            // Update stock and clear cart
             await updateStockAndClearCart(items, userData.userId,req);
 
             res.status(200).json({
@@ -161,7 +168,6 @@ exports.placeOrder = async (req, res) => {
                 orderId: newOrder._id
             });
         } else if (paymentOption === 'razorpay') {
-            // If Razorpay is selected, create Razorpay order
             const amount = totalAmount * 100; // Convert to paise
             const options = {
                 amount: amount,
@@ -176,7 +182,6 @@ exports.placeOrder = async (req, res) => {
             }
 
             //console.log(razorpayOrder);
-            // Save the order with status as 'Payment Pending'
             orderData.payment = {
                 method: 'Razorpay',
                 status: 'Pending',
@@ -184,8 +189,6 @@ exports.placeOrder = async (req, res) => {
             };
 
             const newOrder = await order.create(orderData);
-
-            // Update stock and clear cart
             await updateStockAndClearCart(items, userData.userId, req);
 
             res.status(200).json({
@@ -216,13 +219,9 @@ exports.placeOrder = async (req, res) => {
                 transactionId: null
             };
             
-            // Save the order to the database
             const newOrder = await order.create(orderData);
-            //console.log(`DebitOrderId:${newOrder._id}`)
             
             await WalletController.debitWallet(userId,totalAmount,'Oder Placed', newOrder._id);
-            
-            // Update stock and clear cart
             await updateStockAndClearCart(items, userData.userId, req);
 
             res.status(200).json({
@@ -260,8 +259,6 @@ const updateStockAndClearCart = async (items, userId , req) => {
             );
         }
     }
-
-    // Delete the cart document from the database
     await shoppingCart.deleteOne({ user: userId });
 
     // Clear the cart session
@@ -302,7 +299,11 @@ exports.getOrderDetails = async (req, res) => {
     console.log(orderId);
 
     try {
-        // Fetch order details and populate address and product details
+        if (!req.session.userLoggedInData || !req.session.userLoggedInData.userloggedIn) {
+            req.flash('error', 'To access the OrderDetails, please log in first.');
+            return res.redirect('/login');
+        }
+
         const orderDetails = await order.findById(orderId)
             .populate('address')
             .populate({
@@ -313,7 +314,7 @@ exports.getOrderDetails = async (req, res) => {
         // Combine product details with image URLs
         const itemsWithImages = orderDetails.items.map(item => {
             const product = item.productId.toObject();
-            const images = product.images; //images is an array of URLs
+            const images = product.images;
             return {
                 ...item.toObject(),
                 productId: product._id,
@@ -327,7 +328,6 @@ exports.getOrderDetails = async (req, res) => {
             };
         });
 
-        // Combine order details with items including images
         const orderWithItemsAndImages = {
             ...orderDetails.toObject(),
             items: itemsWithImages
@@ -345,5 +345,150 @@ exports.getOrderDetails = async (req, res) => {
         console.log(error);
         req.flash('error', 'Server Error');
         res.redirect('/')
+    }
+}
+
+const calculateDeliveryFee = (deliveryOption) => {
+    let deliveryFee = 0;
+    if (deliveryOption === 'express') {
+        deliveryFee = 100;
+    } else if (deliveryOption === 'standard') {
+        deliveryFee = 40;
+    } else if (deliveryOption === 'normal') {
+        deliveryFee = 60;
+    }
+    return deliveryFee;
+};
+
+//Display Invoice
+exports.displayInvoice = async(req,res)=>{
+    try {
+        const orders = await order.findById(req.params.orderId)
+                            .populate('items.productId')
+                            .populate('address')
+                            .exec();
+        if (!orders) {
+            return res.status(404).send('Order not found');
+        }
+
+        const deliveryFee = calculateDeliveryFee(orders.delivery.method);
+        const subTotal = orders.items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+        const totalAmount = subTotal - orders.discountAmount + deliveryFee;
+
+        const invoiceData = {
+            orderId: orders.newOrderId,
+            invoiceNumber :`#INV-${Math.floor(100000 + Math.random() * 900000)}`, // Generate invoice number
+            orderDate: orders.orderDate,
+            billedTo: {
+                name: orders.address.name,
+                address: {
+                    street: orders.address.street,
+                    city: orders.address.city,
+                    state: orders.address.state,
+                    zip: orders.address.pincode
+                }
+            },
+            items: orders.items.map((item, index) => ({
+                orderNumber: index + 1,
+                item: item.productId.attributeValue,
+                price: item.price,
+                quantity: item.quantity,
+                total: item.price * item.quantity
+            })),
+            subTotal,
+            discountAmount: orders.discountAmount  ,
+            deliveryFee,
+            totalAmount,
+            paymentStatus:orders.orderStatus,
+            invoiceDate: new Date().toLocaleDateString(),
+            orderNumber: orders.newOrderId,
+            storeAddress: "Z-20 Sector 12,Thiruvananthapuram , Kerala , 600006 ,  India",
+            storeEmail: "xyz@987.com",
+            storePhone: "+91-012-345-6789",
+        };
+
+        res.json(invoiceData);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server error');
+    }
+}
+
+exports.retryPayment = async(req,res)=>{
+    const { orderId } = req.params;
+    const { paymentMethod } = req.body;
+    const userData = req.session.userLoggedInData;
+    console.log(req.session.userLoggedInData)
+
+    // console.log(orderId);
+    // console.log(paymentMethod);
+
+    try{
+        const orderDetails = await order.findById(orderId);
+        if (!orderDetails || orderDetails.payment.status !== 'Pending' || orderDetails.orderStatus==='Cancelled') {
+            return res.status(400).json({ error: 'Invalid order.' });
+        }
+
+        if (paymentMethod === 'razorpay') {
+            const amount = orderDetails.totalAmount * 100; // Convert to paise
+            const options = {
+                amount: amount,
+                currency: 'INR',
+                receipt: orderDetails.newOrderId,
+                payment_capture: 1
+            };
+
+            const razorpayOrder = await razorpayInstance.orders.create(options);
+
+            if (!razorpayOrder) {
+                throw new Error('Failed to create Razorpay order');
+            }
+            const updatedOrder = await order.findByIdAndUpdate(orderId, {
+                'payment.method': 'Razorpay',
+                'payment.status': 'Pending', 
+                'payment.transactionId': razorpayOrder.id
+            }, { new: true });
+
+            return res.status(200).json({
+                message: 'Payment Completed',
+                razorpayOrderId: razorpayOrder.id,
+                razorpayKey: razorpayInstance.key_id,
+                amount: amount,
+                neworderId: orderDetails.newOrderId,
+                orderId: orderDetails._id,
+                userData: {
+                    name: userData.name,
+                    email: userData.email,
+                    contact: userData.contact
+                }
+            });
+        }else if(paymentMethod === 'wallet'){
+            const userId = orderDetails.userId;
+
+            const Wallet = await wallet.findOne({ userId:userId});
+            console.log(Wallet.balance)
+
+            if (!Wallet || Wallet.balance < orderDetails.totalAmount) {
+                return res.status(400).json({ error: 'Insufficient wallet balance' });
+            }
+
+            await WalletController.debitWallet(userId,orderDetails.totalAmount,'Oder Placed', orderDetails._id);
+            const updatedOrder = await order.findByIdAndUpdate(orderId, {
+                'payment.method': 'Wallet',
+                'payment.status': 'Completed', 
+            }, { new: true });
+
+            res.status(200).json({
+                message: 'Payment Completed',
+                neworderId: orderDetails.newOrderId,
+                orderId: orderDetails._id
+            });
+
+        }
+    }catch(error){
+        console.log(error);
+        res.status(500).json({
+            error: 'Server Error'
+        })
     }
 }

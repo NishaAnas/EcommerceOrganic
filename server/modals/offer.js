@@ -24,9 +24,6 @@ const offerSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    maxDiscount: {
-        type: Number //for % - maximum amount discount 
-    },
     startDate: {
         type: Date,
         required: true

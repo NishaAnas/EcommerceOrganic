@@ -168,14 +168,26 @@ exports.addAddress = async (req, res) => {
             pincode: req.body.pincode,
             area: req.body.area
         });
-        await address.create(newAddress);
-        req.flash('success', 'Address added Successfully ');
-        res.redirect('/checkaddressManagement');
+        await newAddress.save();
+
+        const User = await user.findByIdAndUpdate(
+            userId,
+            { $push: { addresses: newAddress._id } },
+            { new: true }
+        );
+
+        if (User) {
+            req.flash('success', 'Address added Successfully');
+        } else {
+            req.flash('error', 'User not found while adding address');
+        }
+
+        res.redirect('/addressManagement');
 
     } catch (error) {
         console.log(error);
         req.flash('error', 'server Error ');
-        res.redirect(`/checkaddressManagement`);
+        res.redirect(`/addressManagement`);
     }
 }
 
@@ -247,10 +259,22 @@ exports.deleteAddress = async (req, res) => {
         const deletedAddress = await address.findByIdAndDelete(addressId);
 
         if (deletedAddress) {
-            req.flash('success', 'Address deleted successfully.');
+            // Remove the address from the associated user's addresses array
+            const User = await user.findByIdAndUpdate(
+                deletedAddress.userId,
+                { $pull: { addresses: addressId } },
+                { new: true }
+            );
+
+            if (User) {
+                req.flash('success', 'Address deleted successfully.');
+            } else {
+                req.flash('error', 'User not found while deleting address.');
+            }
         } else {
             req.flash('error', 'Failed to delete address. Please try again.');
         }
+        
         res.redirect('/addressManagement');
     } catch (error) {
         console.log(error);
@@ -446,53 +470,40 @@ exports.cancelOrderItem = async (req, res) => {
             // If it's the last item, cancel the entire order
             updateQuery = { $set: { orderStatus: 'Cancelled' } };
         } else if (paymentMethod === 'COD') {
-
             orderToCancelItem.items.splice(itemIndex, 1);
-
             updateQuery = { 
                 $set: { items: orderToCancelItem.items },
                 $inc: { totalAmount: -itemAmount }
             };
         } else if (paymentMethod === 'Razorpay') {
-
             const refund = await razorpayInstance.payments.refund(orderToCancelItem.payment.transactionId, {
                 amount: itemAmount * 100
             });
             if (!refund) {
-
                 throw new Error('Failed to process refund');
             }
             orderToCancelItem.items.splice(itemIndex, 1);
-
             updateQuery = { 
                 $set: { items: orderToCancelItem.items },
                 $inc: { totalAmount: -itemAmount }
             };
-
             await WalletController.creditWallet(orderToCancelItem.userId, itemAmount, 'Refund from order item', orderId);
         } else if(paymentMethod === 'Wallet'){
-
             orderToCancelItem.items.splice(itemIndex, 1);
             updateQuery = { 
-
                 $set: { items: orderToCancelItem.items },
                 $inc: { totalAmount: -itemAmount }
             };
-
             await WalletController.creditWallet(orderToCancelItem.userId, itemAmount, 'Refund from order item', orderId);
         }else{
-
             return res.status(400).json({ message: 'Invalid payment method' });
         }
-
         const updatedOrder = await order.findOneAndUpdate(
-
             { _id: orderId },
             updateQuery,
             { new: true }
         );
         return res.status(200).json({
-
             message: 'Order item cancelled successfully',
             order: updatedOrder
         });
@@ -501,3 +512,82 @@ exports.cancelOrderItem = async (req, res) => {
         res.status(500).json({ message: 'Server error', error });
     }
 };
+
+
+exports.returnOrderItem = async(req,res)=>{
+    try {
+        const { orderId, itemId } = req.body;
+        console.log(req.body);
+
+        const orderToReturnItem = await order.findById(orderId).populate({
+            path: 'items.productId',
+            model: 'productVariation'
+        });
+        if (!orderToReturnItem) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        const itemIndex = orderToReturnItem.items.findIndex(item => item._id.toString() === itemId);
+        if (itemIndex === -1) {
+            return res.status(404).json({ message: 'Item not found in the order' });
+        }
+        
+        const itemToReturn = orderToReturnItem.items[itemIndex];
+        const paymentMethod = orderToReturnItem.payment.method;
+        const itemAmount = itemToReturn.quantity * itemToReturn.productId.price;
+        let updateQuery = {};
+
+        if (orderToReturnItem.items.length === 1) {
+            // If it's the last item, cancel the entire order
+            updateQuery = { $set: { orderStatus: 'Return' } };
+        } else if (paymentMethod === 'COD') {
+            orderToReturnItem.items.splice(itemIndex, 1);
+            updateQuery = { 
+                $set: { items: orderToReturnItem.items },
+                $inc: { totalAmount: -itemAmount }
+            };
+        } else if (paymentMethod === 'Razorpay') {
+            console.log(orderToReturnItem.payment.transactionId)
+            // const refund = await razorpayInstance.payments.refund(orderToReturnItem.payment.transactionId, {
+            //     amount: itemAmount * 100
+            // });
+            // if (!refund) {
+            //     throw new Error('Failed to process refund');
+            // }
+            orderToReturnItem.items.splice(itemIndex, 1);
+            updateQuery = { 
+                $set: { items: orderToReturnItem.items },
+                $inc: { totalAmount: -itemAmount }
+            };
+            await WalletController.creditWallet(orderToReturnItem.userId, itemAmount, 'Refund from order item', orderId);
+        } else if(paymentMethod === 'Wallet'){
+            orderToReturnItem.items.splice(itemIndex, 1);
+            updateQuery = { 
+                $set: { items: orderToReturnItem.items },
+                $inc: { totalAmount: -itemAmount }
+            };
+            await WalletController.creditWallet(orderToReturnItem.userId, itemAmount, 'Refund from order item', orderId);
+        }else{
+            return res.status(400).json({ message: 'Invalid payment method' });
+        }
+        // orderToReturnItem.items.splice(itemIndex, 1);
+        // updateQuery = { 
+        //     $set: { items: orderToReturnItem.items },
+        //     $inc: { totalAmount: -itemAmount }
+        // };
+
+        const updatedOrder = await order.findOneAndUpdate(
+            { _id: orderId },
+            updateQuery,
+            { new: true }
+        );
+
+        return res.status(200).json({
+            message: 'Return request processed successfully',
+            order: updatedOrder
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'Server error', error });
+    }
+}

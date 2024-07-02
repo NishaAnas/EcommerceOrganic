@@ -1,5 +1,23 @@
 //Update Area According to pincode
 document.addEventListener('DOMContentLoaded', function() {
+    const nameInput = document.getElementById('uname');
+    const streetInput = document.getElementById('street');
+
+    nameInput.addEventListener('input', function() {
+        validateName();
+    });
+
+    streetInput.addEventListener('input', function() {
+        validateStreet();
+    });
+
+    const addAddressForm = document.getElementById('addAddressForm');
+    addAddressForm.addEventListener('submit', function(event) {
+        if (!validateName() || !validateStreet()) {
+            event.preventDefault();
+        }
+    });
+
     const pincodeInputAdd = document.getElementById('pincode');
     const areaInputAdd = document.getElementById('area');
     const pincodeErrorAdd = document.getElementById('pincode_error');
@@ -15,6 +33,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
         pincodeInput.addEventListener('input', function() {
             updateAreaAndValidatePincode(this, areaInput, pincodeError);
+        });
+    });
+
+    document.querySelectorAll('input[name="defaultAddress"]').forEach(radio => {
+        radio.addEventListener('change', function () {
+            if (this.checked) {
+                const addressId = this.getAttribute('data-address-id');
+                updateDefaultAddress(addressId);
+            }
         });
     });
 });
@@ -41,19 +68,6 @@ function updateAreaAndValidatePincode(input, areaElement, pincodeErrorElement) {
     }
 }
 
-
-
-//To change Default Address
-document.addEventListener('DOMContentLoaded', function () {
-    document.querySelectorAll('input[name="defaultAddress"]').forEach(radio => {
-        radio.addEventListener('change', function () {
-            if (this.checked) {
-                const addressId = this.getAttribute('data-address-id');
-                updateDefaultAddress(addressId);
-            }
-        });
-    });
-});
 
 function updateDefaultAddress(addressId) {
     fetch('/updateDefaultAddress', {
@@ -90,4 +104,34 @@ function updateDefaultAddress(addressId) {
                     confirmButtonText: 'OK'
                 });
             });
+}
+
+function validateName() {
+    const nameInput = document.getElementById('uname');
+    const nameError = document.getElementById('name_error');
+    const value = nameInput.value.trim();
+    if (value === '') {
+        nameError.textContent = 'Name is required';
+        nameInput.setCustomValidity('Name is required');
+        return false;
+    } else {
+        nameError.textContent = '';
+        nameInput.setCustomValidity('');
+        return true;
+    }
+}
+
+function validateStreet() {
+    const streetInput = document.getElementById('street');
+    const streetError = document.getElementById('street_error');
+    const value = streetInput.value.trim();
+    if (value === '') {
+        streetError.textContent = 'Street is required';
+        streetInput.setCustomValidity('Street is required');
+        return false;
+    } else {
+        streetError.textContent = '';
+        streetInput.setCustomValidity('');
+        return true;
+    }
 }

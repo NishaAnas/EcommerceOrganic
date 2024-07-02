@@ -35,7 +35,6 @@ exports.userHome = async (req, res) => {
       }
 }
 
-
 //GET Login Page
 exports.login = (req, res) => {
    console.log('login page loaded')
@@ -43,6 +42,8 @@ exports.login = (req, res) => {
    const success = req.flash('success');
    if (!req.session.userLoggedInData){
    res.render('user/Authentication/login', { success, error, layout:'athenticationlayout' });
+}else{
+   res.render('user/Authentication/login' , { success, error, layout:'athenticationlayout'});
 }
 }
 
@@ -129,7 +130,7 @@ exports.postVerifyotp = async (req, res) => {
          phoneNumber,
          addresses: [],
          walletId: null,
-         wishlist: [],
+         wishlist: null,
       });
 
       // Save user to database
@@ -212,13 +213,26 @@ exports.postLogin = async (req, res) => {
 
       if (!existingUser) {
          req.flash('error', 'Invalid email or password.');
-         res.redirect('/login');
+         return res.redirect('/login');
       }
       //Check if the user is blocked
       if (existingUser.isBlocked) {
          req.flash('error', 'This emailId is blocked.');
          return res.redirect('/login');
       }
+      
+      if(!existingUser.hashedPassword){
+         if (existingUser.googleId) {
+            req.flash('error', 'You have registered with Google. Please log in with Google.');
+            return res.redirect('/login');
+         }
+   
+         if (existingUser.facebookId) {
+            req.flash('error', 'You have registered with Facebook. Please log in with Facebook.');
+            return res.redirect('/login');
+         }
+      }
+      
       // Compare the provided password with the hashed password in the database
       const passwordMatch = await bcrypt.compare(password, existingUser.hashedPassword);
 
@@ -387,26 +401,58 @@ exports.successGoogleLogin = (req, res) => {
       req.flash('error', 'Login with Google Unsuccessful');
       res.redirect('/login');
    }
-   console.log(req.user);
-   req.flash('success', 'Login with Google Successful');
-   res.render('user/Authentication/index' );
+   try {
+      // Set session variables
+      req.session.userLoggedInData = {
+         userloggedIn: true,
+         email: req.user.email,
+         userId: req.user._id,
+         userName: req.user.userName,
+         phoneNumber: req.user.phoneNumber
+      };
+
+      req.flash('success', 'Login with Google Successful');
+      res.redirect('/');
+   } catch (error) {
+      console.error('Error during Google login:', error);
+      req.flash('error', 'Server Error');
+      res.redirect('/login');
+   }
 }
 
 //Failure Google Auth
 exports.failureGoogleLogin = (req, res) => {
    req.flash('error', 'Login with Google Unsuccessful');
-   res.render('user/Authentication/login' , {layout:'athenticationlayout'});
+   // res.render('user/Authentication/login' , {layout:'athenticationlayout'});
+   res.redirect('/login');
 }
 
 //Facebook Success Login
 exports.successFacebookLogin = (req, res) => {
-   console.log(req.user);
-   req.flash('success', 'Login with Facebook Successful');
-   res.render('user/Authentication/index', {layout:'athenticationlayout'} );
+   if (!req.user) {
+      req.flash('error', 'Login with Facebook Unsuccessful');
+      res.redirect('/login');
+   }
+   try {
+      // Set session variables
+      req.session.userLoggedInData = {
+         userloggedIn: true,
+         email: req.user.email,
+         userId: req.user._id,
+         userName: req.user.userName,
+      };
+
+      req.flash('success', 'Login with Facebook Successful');
+      res.redirect('/');
+   } catch (error) {
+      console.error('Error during Facebook login:', error);
+      req.flash('error', 'Server Error');
+      res.redirect('/login');
+   }
 }
 
 // //Failure Facebook Auth
 exports.failureFacebookLogin = (req, res) => {
    req.flash('error', 'Login with Facebook Unsuccessful');
-   res.render('user/Authentication/login', {layout:'athenticationlayout'});
+   res.redirect('/login');
 }

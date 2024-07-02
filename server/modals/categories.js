@@ -13,7 +13,7 @@ const categorySchema = new Schema({
     images: {
         type: [String],
         required: true // Array of image URLs
-      },
+    },
     isActive: {
         type: Boolean,
         default: true

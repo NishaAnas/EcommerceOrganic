@@ -1,189 +1,4 @@
-<style>
-   body{
-margin-top:20px;
-background-color: #f7f7ff;
-}
-.radius-10 {
-    border-radius: 10px !important;
-}
-
-.border-info {
-    border-left: 5px solid  #0dcaf0 !important;
-}
-.border-danger {
-    border-left: 5px solid  #fd3550 !important;
-}
-.border-success {
-    border-left: 5px solid  #15ca20 !important;
-}
-.border-warning {
-    border-left: 5px solid  #ffc107 !important;
-}
-.dropdown {
-	position: relative;
-	padding: 5px 10px;
-	background-color: #fff;
-	-webkit-box-shadow: 0 -2px 24px rgba(160, 163, 189, .25);
-	box-shadow: 0 -2px 24px rgba(160, 163, 189, .25);
-	border-radius: 4px;
-	-webkit-transition: .3s all;
-	-o-transition: .3s all;
-	transition: .3s all;
-	z-index: 3
-}
-.dropdown::before {
-	content: '';
-	position: relative;
-	border-style: solid;
-	border-width: 0 15px 15px;
-	border-color: transparent transparent #fff
-}
-.drop li:last-child a {
-	border-width: 0
-}
-
-.drop a {
-	display: inline-block;
-	width: 100%;
-	font-weight: 500;
-	font-size: 14px;
-	line-height: 2.43;
-	color: #767676;
-	border-bottom: 1px solid #eee;
-	text-align: left
-}
-.main-nav .nav-user-wrapper .users-item-dropdown1 {
-	width: 171px;
-	right: 0
-}
-
-.main-nav .nav-user-img,
-.main-nav .nav-user-wrapper .users-item-dropdown1 a {
-	display: -webkit-box;
-	display: -ms-flexbox;
-	display: flex;
-	-webkit-box-align: center;
-	-ms-flex-align: center;
-	align-items: center
-}
-.nav-user-img {
-    position: relative; /* Set position relative for the container */
-}
-
-/* Style for the dropdown button */
-.nav-user-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-}
-
-/* Style for the profile image */
-.nav-user-img img {
-    width: 30px; /* Adjust size as needed */
-    height: 30px; /* Adjust size as needed */
-    border-radius: 50%; /* Ensure the image is round */
-}
-
-/* Position the dot */
-.online-dot {
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    background-color: green;
-    border-radius: 50%;
-    top: 5px; /* Adjust as needed */
-    right: 5px; /* Adjust as needed */
-}
-
-/* Style for the dropdown menu */
-.nav-user-dropdown1 {
-    display: none;
-    position: absolute;
-    background-color: #fff;
-    min-width: 120px; /* Adjust as needed */
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    z-index: 2;
-}
-
-.drop a:hover {
-	color: #6A9739
-}
-.card {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-    word-wrap: break-word;
-    background-color: #fff;
-    background-clip: border-box;
-    border: 0px solid rgba(0, 0, 0, 0);
-    border-radius: .25rem;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 2px 6px 0 rgb(218 218 253 / 65%), 0 2px 6px 0 rgb(206 206 238 / 54%);
-}
-
-.bg-gradient-scooter {
-    background: #17ead9;
-    background: -webkit-linear-gradient( 
-45deg
- , #17ead9, #6078ea)!important;
-    background: linear-gradient( 
-45deg
- , #17ead9, #6078ea)!important;
-}
-.widgets-icons-2 {
-    width: 56px;
-    height: 56px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #ededed;
-    font-size: 27px;
-    border-radius: 10px;
-}
-.rounded-circle {
-    border-radius: 50%!important;
-}
-.text-white {
-    color: #fff!important;
-}
-.ms-auto {
-    margin-left: auto!important;
-}
-.bg-gradient-bloody {
-    background: #f54ea2;
-    background: -webkit-linear-gradient( 
-45deg
- , #f54ea2, #ff7676)!important;
-    background: linear-gradient( 
-45deg
- , #f54ea2, #ff7676)!important;
-}
-
-.bg-gradient-ohhappiness {
-    background: #00b09b;
-    background: -webkit-linear-gradient( 
-45deg
- , #00b09b, #96c93d)!important;
-    background: linear-gradient( 
-45deg
- , #00b09b, #96c93d)!important;
-}
-
-.bg-gradient-blooker {
-    background: #ffdf40;
-    background: -webkit-linear-gradient( 
-45deg
- , #ffdf40, #ff8359)!important;
-    background: linear-gradient( 
-45deg
- , #ffdf40, #ff8359)!important;
-}
-</style>
-
-
+<link rel="stylesheet" href="/stylesheets/dashboard.css">
     <body>
         <div class="container mt-4">
         <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4">
@@ -253,4 +68,25 @@ background-color: #f7f7ff;
             </div>
         </div>
     </div>
+
+    <div class="row mt-4">
+            <div class="col-12">
+                <select id="revenueFilter" class="form-select">
+                    <option value="week">This Week</option>
+                    <option value="month">This Month</option>
+                    <option value="year">This Year</option>
+                </select>
+
+                <canvas id="revenueChart"></canvas>
+
+            </div>
+        </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        const ctx = document.getElementById('revenueChart').getContext('2d');
+        const revenueChart = new Char
+    })
+</script>
 </body>

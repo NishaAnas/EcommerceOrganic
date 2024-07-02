@@ -53,15 +53,16 @@ exports.getCategories = async (req, res) => {
 };
 
 exports.addOffers = async (req, res) => {
-    const{title,type,applicableItems,discountType,discountValue,maxDiscount,startDate,endDate} = req.body
+    const{title,type,applicableItems,discountType,discountValue,startDate,endDate} = req.body
     console.log(req.body);
+
+    //create new offer object
     const newOffer = new offer({
         title,
         type,
         applicableItems,
         discountType,
         discountValue,
-        maxDiscount,
         startDate,
         endDate
     })
@@ -78,11 +79,9 @@ exports.addOffers = async (req, res) => {
 exports.getOffer = async (req, res) => {
     try {
         const offers = await offer.findById(req.params._id).lean();
-
         if (!offers) {
             return res.status(404).json({ error: 'Offer not found' });
         }
-
         console.log(offers);
         res.json(offers);
     } catch (err) {
@@ -92,7 +91,7 @@ exports.getOffer = async (req, res) => {
 
 // Edit an offer
 exports.editOffer = async (req, res) => {
-    const { title, type, applicableItems, discountType, discountValue, maxDiscount, startDate, endDate, isActive } = req.body;
+    const { title, type, applicableItems, discountType, discountValue, startDate, endDate, isActive } = req.body;
     //console.log(req.body);
     const offerId = req.params._id;
     console.log(offerId);
@@ -113,7 +112,6 @@ exports.editOffer = async (req, res) => {
             applicableItems,
             discountType,
             discountValue,
-            maxDiscount,
             startDate,
             endDate
 

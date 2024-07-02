@@ -3,7 +3,7 @@
         .sidebar {
             width: 250px;
             position: absolute;
-            height: 200%;
+            height: 100%;
             background-color: #ffffff;
             padding: 20px;
             overflow-y: auto;
@@ -28,6 +28,47 @@
         .filter-header {
             cursor: pointer;
         }
+        .pagination-container {
+            background-color: aliceblue;
+            margin: 20px;
+            padding: 10px;
+        }
+        .pagination-link {
+            text-decoration: none;
+            color: #6A9739;
+        }
+
+        .filter-section {
+        margin-bottom: 20px;
+        margin-top: 20px;
+    }
+    .filter-header {
+        cursor: pointer;
+    }
+    .price-range {
+        width: 100%;
+    }
+    .product-discount-label
+    {
+        display:block;
+        padding:4px 15px 4px 30px;
+        color:#fff;
+        background-color:#206b1b;
+        position:absolute;
+        top:0px;
+        right:0;
+        -webkit-clip-path:polygon(34% 0,100% 0,100% 100%,0 100%);
+        clip-path:polygon(34% 0,100% 0,100% 100%,0 100%)
+        }  
+.price
+{
+    color:#000;
+    font-size:19px;
+    font-weight:400;
+    margin-bottom:8px;
+    text-align:left;
+    transition:all .3s;
+    }
     </style>
 </head>
 <body>
@@ -45,109 +86,92 @@
         
         <div class="sidebar">
             <h4></h4>
-            <form id="filter-form" method="GET" action="/productList/{{Category._id}}"></form>
-            {{#each categories}}
-            <input type="hidden" class="selected-category" name="selectedCategories[]" value="{{this._id}}">
-            {{/each}}
+            <form id="filter-form" method="GET" action="/productList/{{Category._id}}">
+                {{#each categories}}
+                <input type="hidden" class="selected-category" name="selectedCategories[]" value="{{this._id}}">
+                {{/each}}
 
-            <div class="search-section">
-                <input list="productSuggestions" type="text" class="search-input" id="search-input" placeholder="Search..." style="width: 50%; color: black;">
-                <datalist id="productSuggestions">
-                    {{#each products}}
-                    <option value="{{this.name}}"></option>
-                    {{/each}}
-                </datalist>
-                <button class="btn btn-primary  btn-small mt-2" id="search-button" style="width: 30%;">
-                    <i class="bi bi-search"></i></button>
-            </div>
-            <h4>Filters</h4>
-            <div class="filter-section">
-                <h5 class="filter-header" data-toggle="collapse" data-target="#categoryFilter">Categories</h5>
-                <div id="categoryFilter" class="collapse">
-                    {{#each categories}}
-                        <input type="checkbox" class="category-checkbox" id="cat{{@index}}" name="category" value="{{this._id}}">
-                        <label for="cat{{@index}}">{{this.name}}</label><br>
+                <div class="search-section">
+                    <input list="productSuggestions" type="text" class="search-input" id="search-input" name="search" placeholder="Search..." style="width: 100%; color: black;" value="{{searchQuery}}">
+                    <datalist id="productSuggestions">
+                        {{#each products}}
+                        <option value="{{this.name}}"></option>
                         {{/each}}
+                    </datalist>
                 </div>
-            </div>
-            <div class="filter-section">
-                <h5 class="filter-header" data-toggle="collapse" data-target="#priceFilter">Price Range</h5>
-                <div id="priceFilter" class="collapse">
-                    <input type="range" class="price-range" id="priceRange" min="0" max="1000" step="10">
-                    <p>Price: Rs<span id="priceValue">250</span></p>
+                <h4>Filters</h4>
+                <div class="filter-section">
+                    <h5 class="filter-header" data-toggle="collapse" data-target="#categoryFilter">Categories</h5>
+                    <div id="categoryFilter" class="collapse">
+                        {{#each categories}}
+                            <input type="checkbox" class="category-checkbox" id="cat{{@index}}" name="selectedCategories[]" value="{{this._id}}">
+                            <label for="cat{{@index}}">{{this.name}}</label><br>
+                        {{/each}}
+                    </div>
                 </div>
-            </div>
-            <div class="filter-section">
-                <h5 class="filter-header" data-toggle="collapse" data-target="#featuredFilter">Featured Products</h5>
-                <div id="featuredFilter" class="collapse">
-                    <input type="checkbox" id="featured" name="featured">
-                    <label for="featured">Featured products</label>
+                <div class="filter-section">
+                    <h5 class="filter-header" data-toggle="collapse" data-target="#priceFilter">Price Range</h5>
+                    <div id="priceFilter" class="collapse ">
+                        <input type="range" class="price-range" id="priceRange" name="maxPrice" max="1000" step="10" value="1000">
+                        <span style="margin-left: 10px;">Max price: Rs<span id="priceValue">1000</span></span>
+                    </div>
                 </div>
-            </div>
-            <div class="filter-section">
-                <h5 class="filter-header" data-toggle="collapse" data-target="#offersFilter">Offers</h5>
-                <div id="offersFilter" class="collapse">
-                    <input type="checkbox" id="offers" name="offers">
-                    <label for="offers">Offers</label>
+                <div class="filter-section">
+                    <h5 class="filter-header" data-toggle="collapse" data-target="#featuredFilter">Featured Products</h5>
+                    <div id="featuredFilter" class="collapse">
+                        <input type="checkbox" id="featured" name="featured">
+                        <label for="featured">Featured products</label>
+                    </div>
                 </div>
-            </div>
-            <div class="filter-section">
-                <h5 class="filter-header" data-toggle="collapse" data-target="#discountFilter">Discount</h5>
-                <div id="discountFilter" class="collapse">
-                    <input type="checkbox" id="discount" name="discount">
-                    <label for="discount">10% Discount</label><br>
-                    <input type="checkbox" id="discount" name="discount">
-                    <label for="discount">20% Discount</label><br>
-                    <input type="checkbox" id="discount" name="discount">
-                    <label for="discount">30% Discount</label><br>
-                    <input type="checkbox" id="discount" name="discount">
-                    <label for="discount">40% Discount</label>
+                <div class="filter-section">
+                    <h5 class="filter-header" data-toggle="collapse" data-target="#offersFilter">Offers</h5>
+                    <div id="offersFilter" class="collapse">
+                        <input type="checkbox" id="offers" name="offers">
+                        <label for="offers">Offers</label>
+                    </div>
                 </div>
-            </div>
-            <div class="filter-section">
-                <h5 class="filter-header" data-toggle="collapse" data-target="#sortFilter">Sort</h5>
-                <div id="sortFilter" class="collapse">
-                    <input type="checkbox" id="sort" value="name_asc">
-                    <label for="sort">Name (A-Z)</label><br>
-                    <input type="checkbox" id="sort" value="name_desc">
-                    <label for="sort">Name (Z-A)</label><br>
-                    <input type="checkbox" id="sort" value="price_asc">
-                    <label for="sort">Price (Low-High)</label><br>
-                    <input type="checkbox" id="sort" value="price_desc">
-                    <label for="sort">Price (High-Low)</label>
+                <div class="filter-section">
+                    <h5 class="filter-header" data-toggle="collapse" data-target="#discountFilter">Discount</h5>
+                    <div id="discountFilter" class="collapse">
+                        <input type="checkbox" id="discount10" name="discount10">
+                        <label for="discount10">10% Discount</label><br>
+                        <input type="checkbox" id="discount20" name="discount20">
+                        <label for="discount20">20% Discount</label><br>
+                        <input type="checkbox" id="discount30" name="discount30">
+                        <label for="discount30">30% Discount</label><br>
+                        <input type="checkbox" id="discount40" name="discount40">
+                        <label for="discount40">40% Discount</label>
+                    </div>
                 </div>
-            </div>
-            <div class="filter-section">
-                <h5 class="filter-header" data-toggle="collapse" data-target="#bestSellersFilter">Best Sellers</h5>
-                <div id="bestSellersFilter" class="collapse">
-                    <input type="checkbox" id="bestSellers" name="bestSellers">
-                    <label for="bestSellers">Best sellers</label>
+                <div class="filter-section">
+                    <h5 class="filter-header" data-toggle="collapse" data-target="#sortFilter">Sort</h5>
+                    <div id="sortFilter" class="collapse">
+                        <input type="radio" id="sortNameAsc" name="sort" value="name_asc">
+                        <label for="sortNameAsc">Name (A-Z)</label><br>
+                        <input type="radio" id="sortNameDesc" name="sort" value="name_desc">
+                        <label for="sortNameDesc">Name (Z-A)</label><br>
+                        <input type="radio" id="sortPriceAsc" name="sort" value="price_asc">
+                        <label for="sortPriceAsc">Price (Low-High)</label><br>
+                        <input type="radio" id="sortPriceDesc" name="sort" value="price_desc">
+                        <label for="sortPriceDesc">Price (High-Low)</label>
+                    </div>
                 </div>
-            </div>
-            <div class="filter-section">
-                <button class="btn btn-secondary" id="reset-filters" type="button">Reset</button>
-                <button class="btn btn-primary" id="apply-filters" type="submit" form="filter-form">Apply</button>
-            </div>
+                <div class="filter-section">
+                    <h5 class="filter-header" data-toggle="collapse" data-target="#bestSellersFilter">Best Sellers</h5>
+                    <div id="bestSellersFilter" class="collapse">
+                        <input type="checkbox" id="bestSellers" name="bestSellers">
+                        <label for="bestSellers">Best sellers</label>
+                    </div>
+                </div>
+                <div class="filter-section">
+                    <button class="btn btn-secondary" id="reset-filters" type="button">Reset</button>
+                    <button class="btn btn-primary" id="apply-filters" type="submit" form="filter-form">Apply</button>
+                </div>
             </form>
         </div>
 
         <div class="content">
-            <div class="container m-3 d-flex flex-column p-3">
-                <div class="d-flex align-items-center justify-content-between">
-                    <div class="dropdown sort-dropdown d-flex flex-end">
-                        <button class="btn dropdown-toggle dropdown-btn" style="background-color: #6A9739;" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Sort By
-                        </button>
-                        <ul class="dropdown-menu list-dropdown item-dropdown">
-                            <li><a class="dropdown-item sort-option" href="#" data-sort="asc">Aa-Zz</a></li>
-                            <li><a class="dropdown-item sort-option" href="#" data-sort="desc">Zz-Aa</a></li>
-                            <li><a class="dropdown-item sort-option" href="#" data-sort="price-low-high">price low-high</a></li>
-                            <li><a class="dropdown-item sort-option" href="#" data-sort="price-high-low">price high-low</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            <div class="col px-5">
+            <div class="col px-5 mt-5">
                 <div class="row">
                     <div class="col">
                         <nav aria-label="breadcrumb">
@@ -162,15 +186,27 @@
             </div>
             <div class="container py-5">
                 <h4 class="text-center">
-        <strong id="category-name">{{Category.name}}</strong>
-        <span id="new-category-name" style="display: none;">{{Category.name}}</span>
-    </h4>
-    <div class="selected-categories" style="display: hidden;">
-        Selected Categories:
-        {{#each selectedCategoriesNames}}
-            <span>{{this.name}} / </span> 
-        {{/each}}
-    </div>
+                    <strong id="category-name">{{Category.name}}</strong>
+                    <span id="new-category-name" style="display: none;">{{Category.name}}</span>
+                </h4>
+                <div class="d-flex flex-column justify-content-center align-items-start gap-3">
+                {{#if selectedCategories}}
+                    <div class="selected-categories" style="display: block;">
+                        <strong>Selected Categories:</strong>
+                        {{#each selectedCategoriesNames}}
+                            <span class="selected-category-label">{{this.name}}<strong> / </strong></span> 
+                        {{/each}}
+                    </div>
+                {{/if}}
+                {{#if maxPrice}}
+                    <div class="selected-max-price" style="display: block;">
+                        <strong>Selected Max Price:</strong>
+                        <span class="selected-max-price-label">Rs{{maxPrice}}</span>
+                    </div>
+                {{/if}}
+                </div>
+                <div id="search-error" style="display: none; color: red;">This product is not in the filtered list.</div>
+                <input type="hidden" id="category-id" value="{{Category._id}}">
                 <div class="row" id="product-list">
                     {{#each products}}
                     <div class="col-md-4">
@@ -178,48 +214,50 @@
                         <a class="prod_card" href="/productPlus/{{this._id}}" class="product-link">
                             <div class="profile-card-2">
                                 <img src="/{{this.images.[0]}}" alt="{{title}}" loading="lazy" class="img img-responsive">
-                                <div class="profile-name">
+                                {{!-- {{#if this.offer}}
+                                <span class="product-discount-label">
+                                    {{#if (isEqual this.offer.discountType "Percentage")}}
+                                        {{this.offer.discountValue}}% off
+                                    {{else}}
+                                        {{this.offer.discountValue}} Rs off
+                                    {{/if}}
+                                </span>
+                                    {{/if}} --}}
+                                    <div class="d-flex flex-row align-items-start">
+                                        <div class="profile-name">
                                     {{name}}
                                 </div>
                                 <div class="profile-username">
-                                    Min Price: {{price}}
+                                    
                                 </div>
+                                    </div>
+                                
                             </div>
                         </a>
                     </div>
                     {{/each}}
                 </div>
-                <nav aria-label="Page navigation example">
-                    <ul class="pagination justify-content-center">
-                        {{#if (gt  currentPage 1)}}
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{subtract currentPage 1}}&sort={{sort}}&price={{price}}&categories={{selectedCategories}}" aria-label="Previous">
-                                <span aria-hidden="true">&laquo;</span>
-                            </a>
-                        </li>
+                <!-- Pagination Section -->
+                {{#if showPagination}}
+                <!-- Pagination Section -->
+                <div class="pagination-container d-flex flex-row align-items-center justify-content-between m-4">
+                    <div class="pagination-summary text-primary">
+                        Page {{ currentPage }} of {{ totalPages }}
+                    </div>
+                    <div class="pagination-links d-flex flex-row align-items-center justify-content-between gap-3">
+                        {{#if (gt currentPage 1)}}
+                            <a href="/productList/{{Category._id}}?page={{subtract currentPage 1}}&search={{searchQuery}}&maxPrice={{maxPrice}}&sort={{sort}}{{#each selectedCategories}}&selectedCategories[]={{this}}{{/each}}" class="pagination-link text-primary">Previous</a>
                         {{/if}}
-                        {{#each paginationPages}}
-                        <li class="page-item {{#if this.isActive}}active{{/if}}">
-                            <a class="page-link" href="?page={{this.number}}&sort={{../sort}}&price={{../price}}&categories={{../selectedCategories}}">{{this.number}}</a>
-                        </li>
-                        {{/each}}
                         {{#if (lt currentPage totalPages)}}
-                        <li class="page-item">
-                            <a class="page-link" href="?page={{add currentPage 1}}&sort={{sort}}&price={{price}}&categories={{selectedCategories}}" aria-label="Next">
-                                <span aria-hidden="true">&raquo;</span>
-                            </a>
-                        </li>
+                            <a href="/productList/{{Category._id}}?page={{add currentPage 1}}&search={{searchQuery}}&maxPrice={{maxPrice}}&sort={{sort}}{{#each selectedCategories}}&selectedCategories[]={{this}}{{/each}}" class="pagination-link text-primary">Next</a>
                         {{/if}}
-                    </ul>
-                </nav>
+                    </div>
+                </div>
+                {{/if}}
             </div>
         </div>
     </main>
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
     <script src="/javascripts/productlisting.js"></script>
-
 </body>
 
 

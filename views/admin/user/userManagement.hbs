@@ -71,10 +71,10 @@
 
             Swal.fire({
                 title: 'Are you sure?',
-                text: `You are about to ${isBlocked ? 'block' : 'unblock'} this user.`,
+                text: `You are about to ${isBlocked ? 'unblock' : 'block'} this user.`,
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonText: `Yes, ${isBlocked ? 'block' : 'unblock'} it!`,
+                confirmButtonText: `Yes, ${isBlocked ? 'unblock' : 'block'} it!`,
                 cancelButtonText: 'No, keep it'
             }).then((result) => {
                 if (result.isConfirmed) {
@@ -85,21 +85,21 @@
                         success: function(response) {
                             Swal.fire({
                                 icon: 'success',
-                                text: `User ${isBlocked ? 'blocked' : 'unblocked'} successfully.`
+                                text: `User ${isBlocked ? 'unblocked' : 'blocked'} successfully.`
                             }).then(() => {
                                 $button
                                     .toggleClass('btn-success btn-danger')
                                     .find('i')
                                     .toggleClass('bi-person-check bi-person-lock');
                                 $button.closest('tr').find('span')
-                                    .toggleClass('text-danger text-success')
-                                    .text(isBlocked ? 'Deactive' : 'Active');
+                                    .toggleClass('text-danger text-sucess')
+                                    .text(isBlocked ? 'Active' : 'Deactive');
                             });
                         },
                         error: function(error) {
                             Swal.fire({
                                 icon: 'error',
-                                text: `Failed to ${isBlocked ? 'block' : 'unblock'} user.`
+                                text: `Failed to ${isBlocked ? 'unblock' : 'block'} user.`
                             });
                         }
                     });

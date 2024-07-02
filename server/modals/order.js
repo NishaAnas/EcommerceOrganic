@@ -19,7 +19,7 @@ const orderSchema = new Schema({
         productId: {
             type: Schema.Types.ObjectId,
             required: true,
-            ref: 'product'
+            ref: 'productVariation'
         },
         quantity: {
             type: Number,

@@ -24,7 +24,7 @@ exports.getOrdermanager = async(req,res)=>{
             .skip(skip)
             .limit(limit)
             .lean();
-    
+
         const totalOrders = await order.countDocuments({});
         const totalPages = Math.ceil(totalOrders / limit);
         
@@ -96,9 +96,20 @@ exports.getOrderDetails = async(req,res)=>{
             req.flash('error', 'Order not found.');
             return res.redirect('/admin/orderManage');
         }
+
+        let deliveryCharge = 0;
+        if (orderDetails.delivery.method === 'express') {
+            deliveryCharge = 100;
+        } else if (orderDetails.delivery.method === 'standard') {
+            deliveryCharge = 40;
+        } else if (orderDetails.delivery.method === 'normal') {
+            deliveryCharge = 60;
+        } 
+
         console.log(orderDetails.items)
         res.render('admin/order/orderDetails', { 
-            orderDetails, 
+            orderDetails,
+            deliveryCharge, 
             layout: 'adminlayout' 
         });
     } catch (error) {

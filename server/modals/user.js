@@ -11,34 +11,35 @@ const userSchema = new Schema({
     },
     email: {
         type: String,
-        required: true,
-        unique: true, 
-        trim: true
+        unique: true,
+        trim: true,
+        sparse: true
     },
     hashedPassword: {
         type: String,
-        required: true
+        required: function () {
+            return !['google', 'facebook'].includes(this.provider);
+        }
     },
     phoneNumber: {
-        type: String, 
-        required: true,
+        type: String,
         trim: true
     },
     addresses: {
-        type: [ // Array of address objects
+        type: [ 
             {
                 type: Schema.Types.ObjectId,
-                ref: 'address' // Reference to a separate Address collection
+                ref: 'Address' 
             }
             ]
     },
     walletId: {
         type: Schema.Types.ObjectId,
-        ref: 'wallet' // Reference to a separate Wallet collection
+        ref: 'Wallet' 
     },
     wishlist: {
-        type: [Schema.Types.ObjectId], // Array of product IDs for the user's wishlist
-        ref: 'product' // Reference to the Product collection
+        type: Schema.Types.ObjectId, 
+        ref: 'wishlist' 
     },
     isActive: {
         type: Boolean,
@@ -55,6 +56,21 @@ const userSchema = new Schema({
     resetPasswordExpires: {
         type: Date,
         default: Date.now
+    },
+    provider: {
+        type: String,
+        enum: ['local', 'google', 'facebook'], 
+        default: 'local' // Default to local authentication
+    },
+    googleId: {
+        type: String,
+        unique: true,
+        sparse: true // Ensures uniqueness while allowing null values
+    },
+    facebookId: {
+        type: String,
+        unique: true,
+        sparse: true 
     }
 });
 

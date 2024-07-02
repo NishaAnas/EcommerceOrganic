@@ -18,6 +18,9 @@ const passport = require('passport');
 const flash = require('connect-flash');
 const Swal = require('sweetalert2');
 const RazorPay = require('razorpay');
+const jsPDF = require('jspdf');
+const html2canvas = require('html2canvas');
+const Chart = require('chart.js');
 
 
 var userRouter = require('./server/routes/user');

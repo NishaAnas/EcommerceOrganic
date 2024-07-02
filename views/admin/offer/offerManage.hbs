@@ -25,11 +25,10 @@
                 <thead class="thead-light">
                     <tr>
                         <th>Title</th>
-                        <th>Applicable Items</th>
                         <th>Type</th>
+                        <th>Applicable Items</th>
                         <th>Discount Type</th>
                         <th>Discount Value</th>
-                        <th>Max Discount</th>
                         <th>Start Date</th>
                         <th>End Date</th>
                         <th>Status</th>
@@ -40,11 +39,10 @@
                     {{#each offers}}
                     <tr>
                         <td>{{this.title}}</td>
-                        <td>{{this.applicableItems}}</td>
                         <td>{{this.type}}</td>
+                        <td>{{this.applicableItems}}</td>
                         <td>{{this.discountType}}</td>
-                        <td>{{this.discountValue}}</td>
-                        <td>{{this.maxDiscount}}</td>
+                        <td>{{#if (isEqual this.discountType "Percentage")}}{{this.discountValue}} % {{else}}{{this.discountValue}} Rs {{/if}}</td>
                         <td class="offer-date">{{this.startDate}}</td>
                         <td class="offer-date">{{this.endDate}}</td>
                         <td>
@@ -136,12 +134,6 @@
                                     <input type="number" class="form-control" id="discountValue" name="discountValue" required>
                                 </div>
                             </div>
-                            <div class="col-sm-4">
-                                <div class="form-group">
-                                    <label for="maxDiscount">Max Discount</label>
-                                    <input type="number" class="form-control" id="maxDiscount" name="maxDiscount" required>
-                                </div>
-                            </div>
                         </div>
                         <div class="row mb-4 py-4">
                             <div class="col-sm-6">
@@ -221,12 +213,6 @@
                                 <div class="form-group">
                                     <label for="editDiscountValue">Discount Value</label>
                                     <input type="number" class="form-control" id="editDiscountValue" name="discountValue" required>
-                                </div>
-                            </div>
-                            <div class="col-sm-4">
-                                <div class="form-group">
-                                    <label for="editMaxDiscount">Max Discount</label>
-                                    <input type="number" class="form-control" id="editMaxDiscount" name="maxDiscount" required>
                                 </div>
                             </div>
                         </div>
@@ -312,7 +298,6 @@
                     applicableItems: $('#applicableItems').val(),
                     discountType: $('#discountType').val(),
                     discountValue: $('#discountValue').val(),
-                    maxDiscount: $('#maxDiscount').val(),
                     startDate: $('#startDate').val(),
                     endDate: $('#endDate').val(),
                     isActive: isActive
@@ -356,7 +341,6 @@
                 $('#editType').trigger('change', offers.applicableItems);
                 $('#editDiscountType').val(offers.discountType);
                 $('#editDiscountValue').val(offers.discountValue);
-                $('#editMaxDiscount').val(offers.maxDiscount);
                 $('#editStartDate').val(offers.startDate.split('T')[0]);
                 $('#editEndDate').val(offers.endDate.split('T')[0]);
             },
@@ -396,7 +380,6 @@
             applicableItems: $('#editApplicableItems').val(),
             discountType: $('#editDiscountType').val(),
             discountValue: $('#editDiscountValue').val(),
-            maxDiscount: $('#editMaxDiscount').val(),
             startDate: $('#editStartDate').val(),
             endDate: $('#editEndDate').val(),
             isActive: isActive
