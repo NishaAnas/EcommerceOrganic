@@ -1,5 +1,8 @@
 <link rel="stylesheet" href="/stylesheets/orderdetails.css">
-
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+</head>
 <body>
     <div class="container">
         <h1>Order Details</h1>
@@ -24,26 +27,37 @@
                 </div>
                 <div class="row">
                     <div class="col">Final Amount:</div>
-                    <div class="col">₹{{  order.totalAmount }}</div>
+                    <div class="col total-amount">₹{{  order.totalAmount }}  <a href="#" data-orderid="{{ order._id }}" style="color:blue; text-decoration: underline;" data-bs-toggle="modal" data-bs-target="#invoiceModal">View Invoice</a></div>
+                    
                 </div>
                 <div class="row">
                     <div class="col">Payment Method:</div>
-                    <div class="col">{{ order.payment.method}} ({{ order.payment.status}})</div>
-                </div>
+                    <div class="col">{{ order.payment.method}} ({{ order.payment.status}})
+                        {{#if (isEqual order.orderStatus "Cancelled")}}
+                        <span class="text-muted">Cancelled Order</span>
+                        {{else if (isEqual order.payment.status "Pending")}}
+                            <a id="retryPaymentButton" href="#" data-orderid="{{ order._id }}" style="color:blue; text-decoration: underline;" data-bs-toggle="modal" data-bs-target="#retryPaymentModal">Retry Payment</a></div>
+                    {{/if}}
+                    </div>
+                
                 <div class="row">
                     <div class="col">Delivery Details:</div>
                     <div class="col">{{ order.delivery.method}} ({{ order.delivery.status}})</div>
                 </div>
                 <div class="row">
                     {{#if (isEqual order.orderStatus "Cancelled")}}
-                <button class="btn btn-sm btn-info cancel-button" disabled>Cancelled</button>
-                {{else}}
-                <button class="btn btn-sm btn-info cancel-button" data-orderid="{{ order._id}}">Cancel Order</button>
-                {{/if}}
+                        <button class="btn btn-sm btn-info cancel-button" disabled>Cancelled</button>
+                    {{else if (isEqual order.orderStatus "Completed")}}
+                        <button class="btn btn-sm btn-info return-button" data-orderid="{{ order._id }}">Return Order</button>
+                    {{else if (isEqual order.orderStatus "Return")}}
+                        <button class="btn btn-sm btn-info cancel-return-button" data-orderid="{{ order._id }}">Cancel Return</button>
+                    {{else}}
+                        <button class="btn btn-sm btn-info cancel-button" data-orderid="{{ order._id }}">Cancel Order</button>
+                    {{/if}}
                     
                 </div>
-            </div>
-        </div>
+                </div>
+
         <div class="order-items">
             <h2>Ordered Items</h2>
             <table>
@@ -72,12 +86,18 @@
                     <td style="width: 25%;">{{ this.quantity }}</td>
                     <td style="width: 10%;">
                         {{#if (isEqual ../order.orderStatus "Cancelled")}}
-                    <button class="btn btn-sm cancel-item-button" disabled>
-                        <i class="bi bi-x-lg"></i></button>
-                    {{else}}
-                    <button class="btn btn-sm cancel-item-button" data-orderid="{{ ../order._id }}" data-itemid="{{ this._id }}">
-                    <i class="bi bi-x-lg"></i></button>
-                    {{/if}}
+                            <button class="btn btn-sm cancel-item-button" disabled>
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        {{else if (isEqual ../order.orderStatus "Completed")}}
+                            <button class="btn btn-sm return-item-button" data-orderid="{{ ../order._id }}" data-itemid="{{ this._id }}">
+                                <i class="fa fa-undo"></i>
+                            </button>
+                        {{else}}
+                            <button class="btn btn-sm cancel-item-button" data-orderid="{{ ../order._id }}" data-itemid="{{ this._id }}">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        {{/if}}
                     </td>
                 </tr>
                 
@@ -86,59 +106,115 @@
     </table>
         </div>
     </div>
+
+    <div class="modal fade" id="invoiceModal" tabindex="-1" aria-labelledby="invoiceModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="invoiceContent" class="container">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="invoice-title">
+                                            <h4 class="float-end font-size-15">Invoice <span id="invoiceNumber"></span><br>
+                                            <span class="badge bg-success font-size-12 ms-2" id="paymentStatus"></span></h4>
+                                            <div class="mb-4 d-flex flex-row align-items-start">
+                                                <h2 class="mb-1 text-muted">ORGANIC</h2>
+                                            </div>
+                                            <div class="text-muted">
+                                                <p class="mb-1" id="storeAddress"></p>
+                                                <p class="mb-1"><i class="fa fa-envelope"></i> <span id="storeEmail"></span></p>
+                                                <p><i class="fa fa-phone" ></i> <span id="storePhone"></span></p>
+                                            </div>
+                                        </div>
+                                        <hr class="my-4">
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <div class="text-muted">
+                                                    <h5 class="font-size-16 mb-3">Billed To:</h5>
+                                                    <h5 class="font-size-15 mb-2" id="billedToName"></h5>
+                                                    <p id="billedToAddress"></p>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6 text-sm-end text-muted">
+                                                <div>
+                                                    <h5 class="font-size-15 mb-1">Invoice Date:</h5>
+                                                    <p id="invoiceDate"></p>
+                                                </div>
+                                                <div class="mt-4">
+                                                    <h5 class="font-size-15 mb-1">Order No:</h5>
+                                                    <p id="orderNumber"></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="py-2">
+                                            <h5 class="font-size-15">Order Summary</h5>
+                                            <div class="table-responsive">
+                                                <table class="table align-middle table-nowrap table-centered mb-0">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>No.</th>
+                                                            <th>Item</th>
+                                                            <th>Price</th>
+                                                            <th>Quantity</th>
+                                                            <th class="text-end">Total</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="orderSummary">
+                                                        
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                        <div class="d-print-none mt-4 float-end">
+                            <a href="#" class="btn btn-success me-1" id="downloadInvoice"><i class="fa fa-download"></i> Download PDF</a>
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Retry Payment Modal -->
+<div class="modal fade" id="retryPaymentModal" tabindex="-1" aria-labelledby="retryPaymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="retryPaymentModalLabel">Retry Payment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="retryPaymentForm">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="paymentMethod" id="razorpay" value="razorpay">
+                        <label class="form-check-label" for="razorpay">
+                            Razorpay
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="paymentMethod" id="wallet" value="wallet">
+                        <label class="form-check-label" for="wallet">
+                            Wallet
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="confirmRetryPayment">Pay</button>
+            </div>
+        </div>
+    </div>
+</div>
+
     <script src="/javascripts/orderDetails.js"></script>
-    <script>
-        // public/javascripts/orderDetails.js
-
-$(document).ready(function() {
-    $('.cancel-item-button').on('click', function(event) {
-        var orderId = $(this).data('orderid');
-        var itemId = $(this).data('itemid');
-
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "Do you really want to cancel this item?",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, cancel it!',
-            cancelButtonText: 'No, keep it'
-        }).then(function(result) {
-            if (result.isConfirmed) {
-                $.ajax({
-                    url: '/cancelOrderItem',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({ orderId: orderId, itemId: itemId }),
-                    success: function(result) {
-                        Swal.fire({
-                            title: 'Cancelled!',
-                            text: result.message,
-                            icon: 'success',
-                            confirmButtonText: 'OK'
-                        }).then(function() {
-                            $('tr[data-itemid="' + itemId + '"]').remove();
-                            $('#total-amount').text('₹' + result.order.totalAmount.toFixed(2));
-                            if (result.order.orderStatus === 'Cancelled') {
-                                $('.cancel-item-button').prop('disabled', true);
-                            }
-                            location.reload();
-                        });
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Error:', error);
-                        Swal.fire({
-                            title: 'Error!',
-                            text: xhr.responseJSON.message || 'An error occurred while cancelling the item.',
-                            icon: 'error',
-                            confirmButtonText: 'OK'
-                        });
-                    }
-                });
-            }
-        });
-    });
-});
-
-
-    </script>
 </body>

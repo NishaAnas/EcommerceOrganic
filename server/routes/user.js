@@ -21,17 +21,16 @@ router.get('/' ,  authController.userHome)
 //GET Login Page
 router.get('/login',authController.login)
 
-//POST Auth using Google
-router.get('/auth/google',passport.authenticate('google',{scope:
-['email' ,'profile']
-}));
+//Get Auth using Google
+router.get('/auth/google',passport.authenticate('google',{scope:['email' ,'profile']}));
 
 //Auth callBAck
 router.get('/auth/google/callback',
-passport.authenticate('google', {
-    successRedirect:'/success',
-    failureRedirect:'/failure'
-})
+    passport.authenticate('google', { failureRedirect: '/failure' }),
+    (req, res) => {
+        req.flash('success', 'Login with Google Successful');
+        res.redirect('/success');
+    }
 );
 
 //Success
@@ -48,17 +47,18 @@ router.get('/auth/facebook',passport.authenticate('facebook',{scope:
 
 //Auth callback
 router.get('/auth/facebook/callback',
-    passport.authenticate('facebook', {
-        successRedirect:'/success',
-        failureRedirect:'/failure'
-    })
+    passport.authenticate('facebook', { failureRedirect: '/faceFailure' }),
+    (req, res) => {
+        req.flash('success', 'Login with facebook Successful');
+        res.redirect('/faceSuccess');
+    }
     );
 
 //Success
-router.get('/success',authController.successFacebookLogin);
+router.get('/faceSuccess',authController.successFacebookLogin);
     
 //Failure
-router.get('/failure',authController.failureFacebookLogin);
+router.get('/faceFailure',authController.failureFacebookLogin);
 
 
 //GET SignUp Page
@@ -165,9 +165,9 @@ router.post('/cancelReturn',accountController.cancelReturn);
 //Cancel a single item of an order
 router.post('/cancelOrderItem', accountController.cancelOrderItem);
 
+router.post('/returnOrderItem',accountController.returnOrderItem)
 
-//Get Address managemnt of checkout page
-//router.get('/checkaddressManagement',checkoutController.getaddressPage);
+
 
 //GET Checkout Page
 router.get('/checkout',checkoutController.getcheckOut);
@@ -180,6 +180,12 @@ router.post('/payementVerification',checkoutController.payemntVerification)
 
 //GET Order Details Page
 router.get('/orderDetails/:_id',checkoutController.getOrderDetails);
+
+//GET Invoice
+router.get('/displayInvoice/:orderId',checkoutController.displayInvoice);
+
+//Retry Payment
+router.post('/retryPayment/:orderId',checkoutController.retryPayment);
 
 
 //GET Empty Wishlist

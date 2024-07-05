@@ -158,6 +158,8 @@ function closeModal() {
 function closeeditModal() {
     $('#editAttributesModal').modal('hide');
 }
+
+//for getting attribute details of product(For attribute editing)
 $(document).ready(function(){
     $('.editVariantButton').click(function() {
         var variantId = $(this).data('variantid');
@@ -208,14 +210,13 @@ function alertFunction () {
     if (isConfirm) {
         deleteForm.submit();          
     } else {
-      swal("Cancelled", "Your file is safe :)", "error");
+      swal("Cancelled", "error");
     }
   });
 }
 
 $(document).ready(function() {
     $("#delete_attributes").click(function() {
-        // Show SweetAlert confirmation dialog
         Swal.fire({
             title: "Are you sure?",
             text: "Once deleted, you will not be able to recover this variant!",
@@ -225,7 +226,6 @@ $(document).ready(function() {
             cancelButtonColor: "#3085d6",
             confirmButtonText: "Yes, delete it!"
         }).then(function(result) {
-            // If user confirms deletion, submit the form
             if (result.isConfirmed) {
                 $("#deleteform").submit();
             }

@@ -125,35 +125,24 @@ exports.addToCart = async(req,res)=>{
         // Check if the user is logged in
         if (!req.session.userLoggedInData || !req.session.userLoggedInData.userloggedIn) {
             req.flash('error', 'To add items to the cart, please log in first.');
-            const refererUrl = req.headers.referer || '/';
-
-            // Parse the URL to extract the productId
-            const variantId = refererUrl.split('/').pop();
-            //console.log('Product ID:', productId);
-            req.session.returnTo = refererUrl;
-            req.session.variantId = variantId;
-
             return res.redirect('/login');
         }
         const userId = req.session.userLoggedInData.userId;
-
         //Check user is blocked or not
         const existingUser = await user.findById(userId);
+        console.log(existingUser.isBlocked)
         if (existingUser.isBlocked) {
-            req.flash('error', 'Your account is blocked.');
+            req.flash('error', 'Your account is blocked by Admin.');
             return res.redirect('/login');
         }
         const variantId = req.body.variantId;
-        //console.log(variantId);
-
-        // Check if the user already has a shopping cart
         let existingShoppingCart = await shoppingCart.findOne({ user: userId });
 
         // If the user doesn't have a shopping cart, create a new one
         if (!existingShoppingCart) {
             existingShoppingCart = await shoppingCart.create({ user: userId, items: [] });
         }
-        // Find the product Variant to get its price
+
         const variant = await prodVariation.findById(variantId);
         //console.log(variant)
 
@@ -225,7 +214,6 @@ exports.deleteCartProduct = async(req,res)=>{
     }
 }
 
-
 //Update Cart Product
 exports.updateCartItem = async(req,res)=>{
     try {
@@ -238,10 +226,9 @@ exports.updateCartItem = async(req,res)=>{
 
         // Find the product to get its price
         const variant = await prodVariation.findById(variantId);
-
         //Check for available stock
         if (!variant || variant.stock < quantity) {
-            return res.status(400).json({ error: 'Insufficient stock available.' });
+            return res.status(400).json({ error: 'Insufficient stock available.', stock: variant ? variant.stock : 0 });
         }
         // Find the base product to get its price
         const baseProduct = await Product.findById(variant.productId);
@@ -251,8 +238,6 @@ exports.updateCartItem = async(req,res)=>{
         const actualPrice = baseProduct.price + variant.price;
         //console.log(totalPrice)
         const prodtotalPrice = actualPrice*quantity;
-
-        // Get the current user's shopping cart
         const userId = req.session.userLoggedInData.userId;
 
         // Update the quantity and total price of the product in the shopping cart

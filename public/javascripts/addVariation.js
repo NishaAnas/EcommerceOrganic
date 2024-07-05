@@ -60,3 +60,4 @@ function validateVariationName(name) {
     var regex = /^[a-zA-Z]/;
     return regex.test(name);
 }
+

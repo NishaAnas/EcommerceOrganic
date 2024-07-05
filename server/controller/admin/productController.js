@@ -69,6 +69,7 @@ try {
 //POST Add Product
 exports.postAddProduct= async(req,res)=>{
 const {sku,title,name,price,categoryId,isActive } = req.body; 
+console.log(req.body);
 
 const existingProduct = await product.findOne({ title: req.body.title });
         
@@ -85,9 +86,6 @@ const existingProduct = await product.findOne({ title: req.body.title });
 const imagePaths = req.resizedImages.map(relativeImagePath => {
 return `uploads\\${path.basename(relativeImagePath)}`;
 });
-
-
-console.log(`sku:${sku},title:${title}, description:${productDescription},price:${price},images:${imagePaths},categoryId:${categoryId},isActive:${isActive}`)
 
 const newProduct = new product({
     sku:sku,

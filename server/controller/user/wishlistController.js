@@ -6,6 +6,24 @@ const prodVariation = require('../../modals/productVariation');
 const wishlist = require('../../modals/wishlist')
 const shoppingCart = require('../../modals/shoppingCart');
 
+
+//Initialize wishlist
+const initializeWishlist = async (userId) => {
+    let existingWishlist = await wishlist.findOne({ userId });
+
+    if (!existingWishlist) {
+        existingWishlist = new wishlist({
+            userId,
+            products: []
+        });
+        await existingWishlist.save();
+
+        await user.findByIdAndUpdate(userId, { wishlist: existingWishlist._id });
+    }
+
+    return existingWishlist._id;
+};
+
 //Empty wishlist
 exports.getEmptyWishlist = async(req,res)=>{
     const successMessage = req.flash('success');
@@ -43,16 +61,13 @@ exports.getWislist=async (req,res)=>{
         const userData = req.session.userLoggedInData;
 
         // Find the user's wishlist and populate product details
-        const Wishlist = await wishlist.findOne({ userId: userData.userId }).populate('products.product').lean();
+        const wishlistId = await initializeWishlist(userData.userId);
+        const Wishlist = await wishlist.findById(wishlistId).populate('products.product').lean();
 
         if (!Wishlist || Wishlist.products.length === 0) {
             req.flash('info', 'Your wishlist is empty.');
             return res.redirect('/emptyWishlist');
         }
-
-        // // Find the user's wishlist and populate product details
-        // const Wishlist = await wishlist.findOne({ userId: userData.userId }).populate('products');
-
         
         // Retrieve product details for each product in the wishlist
         const detailedProducts = [];
@@ -109,18 +124,10 @@ exports.addToWishlist = async(req,res)=>{
         const variantId = req.body.variantId;
 
         // Check if the user already has a wishlist
-        let existingWishlist = await wishlist.findOne({ userId: userId });
+        const existingWishlistId = await initializeWishlist(userId);
+        const existingWishlist = await wishlist.findById(existingWishlistId);
 
-        if (!existingWishlist) {
-            // If the user doesn't have a wishlist, create a new one with the product
-            await wishlist.create({
-                userId: userId,
-                products: [{ product: variantId }]
-            });
-            req.flash('success', 'Product added to wishlist successfully');
-        } else {
-            // Check if the item already exists in the wishlist
-            const existingItem = existingWishlist.products.find(item => item.product.equals(variantId));
+        const existingItem = existingWishlist.products.find(item => item.product.equals(variantId));
 
             if (existingItem) {
                 req.flash('error', 'This item is already in your wishlist.');
@@ -132,7 +139,6 @@ exports.addToWishlist = async(req,res)=>{
                 );
                 req.flash('success', 'Product added to wishlist successfully');
             }
-        }
 
         res.redirect(`/productDetails/${variantId}`); 
 
@@ -145,6 +151,7 @@ exports.addToWishlist = async(req,res)=>{
 
 //Remove from Wishlist
 exports.removefromWishlist = async(req,res)=>{
+    const userId = req.session.userLoggedInData.userId;
     const { variantId } = req.body;
     console.log(variantId);
     try {

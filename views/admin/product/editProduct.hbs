@@ -81,11 +81,11 @@
                         </div>
                         <div class="col">
                                 <label for="category Name"><b>Category</b></label>
+                                <input type="hidden" id="product-categoryId" value="{{productDetailsViewing.categoryId}}">
                                 <select id="categoryId" name="categoryId" class="form-select" required>
                                     {{#each productCategory}}
-                                    <option value="{{this._id}}" {{#isEqual this._id productDetailsViewing.categoryId}}selected{{/isEqual}}>
-                                    {{this.name}}</option>
-                                    {{/each}}
+            <option value="{{this._id}}">{{this.name}}</option>
+        {{/each}}
                                 </select>
                             </div>
                 </div>
@@ -359,9 +359,17 @@
     </div>
 </div>
 
-                </body>
                 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-                    <script src="/javascripts/editProduct.js"></script>
-
-
-                
+                <script src="/javascripts/editProduct.js"></script>
+                <script>
+                    document.addEventListener("DOMContentLoaded", function() {
+                    const categoryId = document.getElementById('product-categoryId').value.trim()
+                    const categorySelect = document.getElementById("categoryId")
+                    Array.from(categorySelect.options).forEach(option => {
+                        if (option.value === categoryId) {
+                        option.selected = true;
+                        }
+                    });
+                });
+                </script>
+                </body>

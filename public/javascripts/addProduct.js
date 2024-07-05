@@ -18,7 +18,6 @@
                 });
             }
         }
-        //document.getElementById('form').reset();
         document.getElementById('container').innerHTML = image_show();
     }
 
@@ -59,25 +58,25 @@
     
         const sku = document.getElementById('product-sku').value.trim();
         const title = document.getElementById('product-title').value.trim();
-        const description = document.getElementById('product-description').value.trim();
+        const name = document.getElementById('product-name').value.trim();
         const price = document.getElementById('product-price').value.trim();
         const images = document.getElementById('product-image').files;
     
         const skuError = document.getElementById('sku_error');
         const titleError = document.getElementById('title_error');
-        const descriptionError = document.getElementById('description_error');
+        const nameError = document.getElementById('name_error');
         const priceError = document.getElementById('price_error');
         const imageError = document.getElementById('image_error');
     
         skuError.innerHTML = '';
         titleError.innerHTML = '';
-        descriptionError.innerHTML = '';
+        nameError.innerHTML = '';
         priceError.innerHTML = '';
         imageError.innerHTML = '';
     
         // SKU validation
         const skuRegex = /^[A-Z0-9]+$/;
-        if (!sku) {
+        if (sku.trim()==='') {
             isValid = false;
             skuError.innerHTML = 'SKU is required.';
         } else if (!skuRegex.test(sku)) {
@@ -86,28 +85,28 @@
         }
     
         // Title validation
-        const titleRegex = /^[A-Za-z0-9\s]+$/;
-        if (!title) {
+        const titleRegex = /^[a-zA-Z][a-zA-Z0-9_ -$&()]*$/;
+        if (title.trim()==='') {
             isValid = false;
             titleError.innerHTML = 'Title is required.';
         } else if (!titleRegex.test(title)) {
             isValid = false;
-            titleError.innerHTML = 'Invalid title format. Only alphabets are allowed.';
+            titleError.innerHTML = 'Invalid title format.';
         }
     
-        // Description validation
-        const descriptionRegex = /^[A-Za-z0-9.,\s]+$/;
-        if (!description) {
+        // name validation
+        const nameRegex = /^[a-zA-Z][a-zA-Z0-9_ -$&()]*$/;
+        if (name.trim()==='') {
             isValid = false;
-            descriptionError.innerHTML = 'Description is required.';
-        } else if (!descriptionRegex.test(description)) {
+            nameError.innerHTML = 'Name is required.';
+        } else if (!nameRegex.test(name)) {
             isValid = false;
-            descriptionError.innerHTML = 'Invalid description format. Only alphanumeric characters are allowed.';
+            nameError.innerHTML = 'Invalid name format.';
         }
     
         // Price validation
         const priceRegex = /^\d+(\.\d{1,2})?$/;
-        if (!price) {
+        if (price.trim()==='') {
             isValid = false;
             priceError.innerHTML = 'Price is required.';
         } else if (!priceRegex.test(price)) {
@@ -129,10 +128,4 @@
             form.submit();
         }
     });
-    const addAttributesButton = document.getElementById('add_atrubutes');
 
-if (addAttributesButton) {
-  addAttributesButton.addEventListener('click', () => {
-    $('#addAttributesModal').modal('show');
-  });
-}

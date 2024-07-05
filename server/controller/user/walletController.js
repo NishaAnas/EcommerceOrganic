@@ -2,9 +2,29 @@ const mongoose = require('mongoose');
 const user = require('../../modals/user');
 const wallet = require('../../modals/wallet');
 
+//Initialize wallet
+const initializeWallet = async (userId) => {
+    let Wallet = await wallet.findOne({ userId });
+
+    if (!Wallet) {
+        Wallet = new wallet({
+            userId,
+            balance: 0,
+            transactions: []
+        });
+        await Wallet.save();
+
+        await user.findByIdAndUpdate(userId, { walletId: Wallet._id });
+    }
+
+    return Wallet._id;
+};
+
 exports.creditWallet = async (userId, amount, reason, orderId = null) => {
     try {
-        const Wallet = await wallet.findOneAndUpdate({ userId },
+        const walletId = await initializeWallet(userId);
+        
+        const Wallet = await wallet.findOneAndUpdate({_id: walletId },
             {
                 $inc: { balance: amount },
                 $push: {
@@ -25,7 +45,9 @@ exports.creditWallet = async (userId, amount, reason, orderId = null) => {
 
 exports.debitWallet = async (userId, amount, reason, orderId = null) => {
     try {
-        const Wallet = await wallet.findOneAndUpdate({ userId },
+        const walletId = await initializeWallet(userId);
+
+        const Wallet = await wallet.findOneAndUpdate({ _id:walletId },
             {
                 $inc: { balance: -amount },
                 $push: {
@@ -61,21 +83,22 @@ exports.getWallet = async(req,res)=>{
             return res.redirect('/login');
         }
         const userData = req.session.userLoggedInData;
-
         const userDetails = await user.findById(userId).lean();
-        const Wallet = await wallet.findOne({ userId }).lean();
+        const WalletId = await initializeWallet(userId);
+        const Wallet = await wallet.findById(WalletId ).lean();
+        console.log(Wallet);
 
-        if (!Wallet) {
-            return res.render('user/wallet/wallet', { 
-                userData,
-                userDetails,
-                balance: 0, 
-                transactions: [] ,
-                currentPage: 1,
-                totalPages: 1,
-                layout:'userAccountLayout'
-            });
-        }
+        // if (!Wallet) {
+        //     return res.render('user/wallet/wallet', { 
+        //         userData,
+        //         userDetails,
+        //         balance: 0, 
+        //         transactions: [] ,
+        //         currentPage: 1,
+        //         totalPages: 1,
+        //         layout:'userAccountLayout'
+        //     });
+        // }
 
 
         //const walletDetails=Wallet.transactions;
@@ -91,8 +114,9 @@ exports.getWallet = async(req,res)=>{
         const transactions = Wallet.transactions.slice(skip, skip + limit);
 
         res.render('user/wallet/wallet', {
+            userData,
             userDetails,
-            balance: wallet.balance,
+            balance: Wallet.balance,
             walletDetails: transactions,
             currentPage: page,
             totalPages: totalPages,

@@ -51,15 +51,20 @@ exports.addCoupon = async(req,res)=>{
     const {name,discount,description,expiryDate,minAmount,firstPurchase } = req.body; 
     console.log(req.body);
     const existingCoupon = await coupon.findOne({ name });
+    
+    if(discount > 100){
+        req.falsh('error','coupon discount cant be graeter than 100');
+    }
+
     if (existingCoupon) {
         const existingCoupon = existingCoupon.name.toLowerCase().trim();
         const addingCoupon = req.body.name.toLowerCase().trim();
-
         if (existingCoupon === addingCoupon) {
             req.flash('error', 'coupon name already exists');
             return res.redirect(`/admin/couponManage`);
         }
     }
+
 
     const newCoupon = new coupon({
         name,

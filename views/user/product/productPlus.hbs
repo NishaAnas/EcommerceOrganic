@@ -1,4 +1,5 @@
 <link rel="stylesheet" href="/stylesheets/productlisting.css">
+
 <main>
     {{#if error}}
             <div id="flash-message" class="alert alert-danger" role="alert">
@@ -28,10 +29,10 @@
                     Sort By
                 </button>
                 <ul class="dropdown-menu list-dropdown item-dropdown">
-                    <li><a class="dropdown-item sort-option" href="#" data-sort="asc">Aa-Zz</a></li>
-                    <li><a class="dropdown-item sort-option" href="#" data-sort="desc">Zz-Aa</a></li>
-                    <li><a class="dropdown-item sort-option" href="#" data-sort="price-low-high">price low-high</a></li>
-                    <li><a class="dropdown-item sort-option" href="#" data-sort="price-high-low">price high-low</a></li>
+                    <li><a class="dropdown-item sort-option" href="#" data-sort="asc" value="name_asc">Aa-Zz</a></li>
+                    <li><a class="dropdown-item sort-option" href="#" data-sort="desc" value="name_desc">Zz-Aa</a></li>
+                    <li><a class="dropdown-item sort-option" href="#" data-sort="price-low-high" value="price_asc">price low-high</a></li>
+                    <li><a class="dropdown-item sort-option" href="#" data-sort="price-high-low" value="price_desc">price high-low</a></li>
                 </ul>
             </div>
         </div>
@@ -49,16 +50,15 @@
                                     href="/productList/{{categoryId}}">{{categoryName}}</a></li>
                             <li
                                 class="breadcrumb-item active">{{baseProduct.name}}</li>
+                                <input type="hidden" id="product-id" value="{{baseProduct._id}}">
                         </ol>
                     </nav>
                 </div>
             </div>
         </div>
         <div class="container py-5">
-        <h4 class="text-center">
-            <strong>Shop For</strong>
-        </h4>
-        <div class="row">
+        <h4 class="text-center"><strong>Shop For</strong></h4>
+        <div id="product-list" class="row">
             {{#each productList}}
 	            <div class="col-md-4">
                     <hr>
@@ -68,16 +68,36 @@
                                     {{attributeValue}}
                                 </div>
                                 <div class="profile-username">
-                                    Buy At: {{price}}
+                                    <div class="price">
+                        {{#if this.discountedPrice}}
+                        <span>   Rs.{{this.discountedPrice}} </span>
+                            <span class="original-price  text-secondary" style="text-decoration: line-through; z-index: 2;">{{this.actualPrice}}</span>
+                        {{else}}
+                            Rs.{{this.actualPrice}}
+                        {{/if}}
+                    </div>
                                 </div>
                             </div>
                         </a>
                 </div>
             {{/each}}
         </div>
+        <div class="pagination-container d-flex flex-row align-items-center justify-content-between m-4">
+                    <div class="pagination-summary text-primary">
+                        Page {{ currentPage }} of {{ totalPages }}
+                        <input type="hidden" id="current-page" value="{{currentPage}}">
+                    </div>
+                    <div class="pagination-links d-flex flex-row align-items-center justify-content-between gap-3">
+                        {{#if (gt currentPage 1)}}
+                        <a href="/productPlus/{{baseProduct._id}}?page={{ subtract currentPage 1 }}" class="pagination-link text-primary">Previous</a>
+                        {{/if}}
+                        {{#if (lt currentPage totalPages)}}
+                        <a href="/productPlus/{{baseProduct._id}}?page={{ add currentPage 1 }}" class="pagination-link text-primary">Next</a>
+                        {{/if}}
+                    </div>
+                </div>
     </div>
     </div>
-    
 </main>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="/javascripts/productplus.js"></script>

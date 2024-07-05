@@ -76,7 +76,7 @@ const form = document.getElementById('addCategoryForm')
       categoryname_error.innerHTML = 'Category name must be between 3 to 20 characters long';
     }
     const categoryname_regex1= /^[a-zA-Z]/
-    const categoryname_regex2 = /^[a-zA-Z][a-zA-Z0-9_]*$/;
+    const categoryname_regex2 = /^[a-zA-Z][a-zA-Z0-9_ -$&()]*$/;
 
     if(!categoryname_regex1.test(categoryName)){
       isValid = false;

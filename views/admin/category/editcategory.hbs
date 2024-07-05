@@ -41,11 +41,13 @@ action="/admin/editCategory/{{categoryDetailsViewing._id}}?_method=PUT" method="
         <div class="col">
             <label for="categoryName"><b>Category Name</b></label>
             <input type="text" class="form-control" id="categoryName"name="categoryName"value="{{categoryDetailsViewing.name }}"
-                placeholder="Category Name" required>
+                placeholder="Category Name" >
+                <span id="categoryname_error" style="color: red;"></span>
         </div>
         <div class="col">
             <label for="categoryDetails"><b>Category Details</b></label>
-            <textarea class="form-control mt-3" id="categoryDetails" name="categoryDetails" placeholder="Category Details" rows="4" required>{{categoryDetailsViewing.description }}</textarea>
+            <textarea class="form-control mt-3" id="categoryDetails" name="categoryDetails" placeholder="Category Details" rows="4" >{{categoryDetailsViewing.description }}</textarea>
+            <span id="description_error" style="color: red;"></span>
         </div>
     </div>
         <div class="row form-group mb-4 p-3 gap-4">
@@ -69,7 +71,7 @@ action="/admin/editCategory/{{categoryDetailsViewing._id}}?_method=PUT" method="
                                             <h4>Upload Images</h4>
                                             <form action="#" class="form" id="form">
                                                 <input type="file" name="image" id="product-image" multiple class="d-none" onchange="image_select()">
-                                                <button class="btn btn-sm btn-primary" type="button"onclick="document.getElementById('product-image').click()">
+                                                <button class="btn btn-sm btn-success" type="button"onclick="document.getElementById('product-image').click()">
                                                 Change Images
                                             </button>
                                             </form>
@@ -83,7 +85,8 @@ action="/admin/editCategory/{{categoryDetailsViewing._id}}?_method=PUT" method="
                                 </div>
                         </div>
         <div class="form-group mb-4 d-flex flex-row align-items-center justify-content-center">
-            <button type="submit" form="editcategoryForm" class="btn btn-primary">Update Category</button>
+            <span id="form_error" style="color: red;" ></span>
+            <button type="submit" form="editcategoryForm" class="btn btn-success" style="width: 50%;">Update Category</button>
         </div>
     </form>
     </body>

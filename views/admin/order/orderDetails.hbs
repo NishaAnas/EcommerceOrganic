@@ -42,23 +42,47 @@
         <h2>Order Details <small class="text-muted">Order ID: {{orderDetails.newOrderId}}</small></h2>
         
         <div class="order-info">
-            <strong>User:</strong> {{orderDetails.userId.email}} ({{orderDetails.userId.name}})
-        </div>
-        <div class="order-info">
-            <strong>Order Date:</strong> {{orderDetails.orderDate}}
-        </div>
-        <div class="order-info">
-            <strong>Status:</strong> {{orderDetails.orderStatus}}
-        </div>
-        <div class="order-info">
-            <strong>Coupon Code (Amount):</strong> {{orderDetails.couponCode}} ({{orderDetails.discountAmount}})
-        </div>
-        <div class="order-info">
-            <strong>Total Amount:</strong> Rs. {{orderDetails.totalAmount}}
-        </div>
-        <div class="order-info">
-            <strong>Address:</strong> {{orderDetails.address.street}}, {{orderDetails.address.city}}, {{orderDetails.address.state}}, {{orderDetails.address.zip}}
-        </div>
+    <div class="row">
+        <div class="col-md-4"><strong>User:</strong></div>
+        <div class="col-md-8">{{orderDetails.userId.userName}}</div>
+    </div>
+</div>
+<div class="order-info">
+    <div class="row">
+        <div class="col-md-4"><strong>Order Date:</strong></div>
+        <div class="col-md-8"><span class="order-date">{{orderDetails.orderDate}}</span></div>
+    </div>
+</div>
+<div class="order-info">
+    <div class="row">
+        <div class="col-md-4"><strong>Status:</strong></div>
+        <div class="col-md-8">{{orderDetails.orderStatus}}</div>
+    </div>
+</div>
+<div class="order-info">
+    <div class="row">
+        <div class="col-md-4"><strong>Coupon Code (Amount):</strong></div>
+        <div class="col-md-8">{{orderDetails.couponCode}} ({{orderDetails.discountAmount}})</div>
+    </div>
+</div>
+<div class="order-info">
+    <div class="row">
+        <div class="col-md-4"><strong>Delivery Method (Amount):</strong></div>
+        <div class="col-md-8">{{orderDetails.delivery.method}} ({{deliveryCharge}})</div>
+    </div>
+</div>
+<div class="order-info">
+    <div class="row">
+        <div class="col-md-4"><strong>Total Amount:</strong></div>
+        <div class="col-md-8">Rs. {{orderDetails.totalAmount}}</div>
+    </div>
+</div>
+<div class="order-info">
+    <div class="row">
+        <div class="col-md-4"><strong>Address:</strong></div>
+        <div class="col-md-8">{{orderDetails.address.street}}, {{orderDetails.address.city}}, {{orderDetails.address.state}}, {{orderDetails.address.zip}}</div>
+    </div>
+</div>
         <h3 class="mt-4">Items:</h3>
         <ul class="order-items">
             <div class="table-responsive" style="font-size: 75%;">
@@ -67,7 +91,7 @@
                     <tr>
                         <th>Product Name</th>
                         <th>Quantity</th>
-                        <th>Price</th>
+                        <th>Price/unit</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -82,4 +106,6 @@
 </table>
         <a href="/admin/ordermanage" class="btn btn-primary mt-3">Back to Orders</a>
     </div>
+
+    <script src="/javascripts/orderManagement.js"></script>
     </body>

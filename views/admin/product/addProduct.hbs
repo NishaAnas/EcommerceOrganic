@@ -29,7 +29,7 @@
         enctype="multipart/form-data">
         <div class="row form-group mb-4 p-3 gap-4">
             <div class="col">
-                <label for="product-sku" class="col-form-label">Product SKU:</label>
+                <label for="product-sku" class="col-form-label"><span style="color: red;">*</span>Product SKU:</label>
                 <div class="col-sm-10">
                     <input type="text" id="product-sku" name="sku"
                         class="form-control"  >
@@ -38,7 +38,7 @@
             </div>
             <div class="col">
                 <label for="product-title"
-                    class="col-sm-2 col-form-label">Title:</label>
+                    class="col-sm-2 col-form-label"><span style="color: red;">*</span>Title:</label>
                 <div class="col-sm-10">
                     <input type="text" id="product-title" name="title"
                         class="form-control"  >
@@ -47,9 +47,9 @@
             </div>
             <div class="col">
                 <label for="product-name"
-                    class="col-sm-2 col-form-label">Name:</label>
+                    class="col-sm-2 col-form-label"><span style="color: red;">*</span>Name:</label>
                 <div class="col-sm-10">
-                    <input type="text" id="product-name" name="product-name"
+                    <input type="text" id="product-name" name="name"
                         class="form-control"  >
                     <span id="name_error" style="color: red;"></span>
                 </div>
@@ -57,14 +57,14 @@
         </div>
             <div class="row form-group mb-4 p-3 gap-4">
                 <div class="col">
-                    <label for="product-price" class="col-sm-2 col-form-label">Price:</label>
+                    <label for="product-price" class="col-sm-2 col-form-label"><span style="color: red;">*</span>Price:</label>
                     <div class="col-sm-10">
                         <input type="number" id="product-price" name="price" class="form-control"  >
                         <span id="price_error" style="color: red;"></span>
                     </div>
                 </div>
                 <div class="col">
-                    <label for="product-category"class="col-sm-2 col-form-label">Category:</label>
+                    <label for="product-category"class="col-sm-2 col-form-label"><span style="color: red;">*</span>Category:</label>
                     <div class="col-sm-10">
                         <select id="product-category" name="categoryId"class="form-select"  >
                             {{#each categories}}<option value="{{this._id}}">{{this.name}}</option>
@@ -76,7 +76,7 @@
             </div>
             <div class="row form-group mb-4 p-3 gap-4">
                 <div class="col">
-                    <label for="isActive" class="col-sm-2 col-form-check-label">isActive:</label>
+                    <label for="isActive" class="col-sm-2 col-form-check-label"><span style="color: red;">*</span>isActive:</label>
                         <div class="col-sm-10 form-check form-switch" style="padding-left: 4.5em;">
                             <input class="form-check-input" name="isActive"  type="checkbox" role="switch" id="isActive" style="min-height: 70%; ">
                         </div>
@@ -86,10 +86,10 @@
             <div class="container mt-3 w-100 py-4">
                 <div class="card shadow-sm w-100">
                     <div class="card-header d-flex justify-content-between">
-                        <h4>Upload Images</h4>
+                        <h4><span style="color: red;">*</span>Upload Images</h4>
                             <form action="#" class="form" id="form"> 
                                 <input type="file" name="image" id="product-image" multiple class="d-none" onchange="image_select()" >
-                                    <button class="btn btn-sm btn-primary" type="button" onclick="document.getElementById('product-image').click()">
+                                    <button class="btn btn-sm btn-success" type="button" onclick="document.getElementById('product-image').click()">
                                         Choose Images
                                     </button>
                             </form>
@@ -102,14 +102,15 @@
 
             <span id="image_error" style="color: red;"></span>
                 <div class="row">
-                    <div class="col-sm-10 offset-sm-2">
-                        <button type="submit" name="addProduct"class="btn btn-primary p-3"style="width: 100%; background-color: #6A9739;">Add
-                            Product</button>
+                    <div class="form-group mb-4 d-flex flex-row align-items-center justify-content-center">
+                        <span id="form_error" style="color: red;" ></span>
+                        <button type="submit" form="addProductForm" class="btn btn-success " style="width: 50%; " >Add Product</button>
                     </div>
                 </div>
+                <span style="color: red;">* <span class="text-muted">(All fields are mandatory)</span></span>
         </div>
     </form>
 </div>
-</body> 
-    <script src="/javascripts/addProduct.js"></script>
     
+    <script src="/javascripts/addProduct.js"></script>
+</body> 

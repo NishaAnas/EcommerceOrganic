@@ -18,6 +18,9 @@ const passport = require('passport');
 const flash = require('connect-flash');
 const Swal = require('sweetalert2');
 const RazorPay = require('razorpay');
+const jsPDF = require('jspdf');
+const html2canvas = require('html2canvas');
+const Chart = require('chart.js');
 
 
 var userRouter = require('./server/routes/user');
@@ -79,6 +82,7 @@ const add = function(a,b) {
   return a+b;
 }
 
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.engine('hbs', hbs.engine({ // use hbs.engine() instead of hbs()
@@ -92,9 +96,10 @@ app.engine('hbs', hbs.engine({ // use hbs.engine() instead of hbs()
     lt:lessThan,
     range:range,
     subtract:subtract,
-    add:add
+    add:add,
   }
 }));
+
 
 
 // Serve static files from the 'public/uploads' directory
