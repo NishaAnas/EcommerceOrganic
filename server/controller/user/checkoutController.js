@@ -44,6 +44,7 @@ exports.getcheckOut = async (req, res) => {
         const existingUser = await user.findById(userId);
         if (existingUser.isBlocked) {
             req.flash('error', 'Your account is blocked by Admin.');
+            req.flash('error', 'Your account is blocked by Admin.');
             return res.redirect('/login');
         }
 
@@ -106,6 +107,14 @@ exports.placeOrder = async (req, res) => {
         return res.status(400).json({ error: 'Payment option is required.' });
     }
 
+    if (!shippingAddress) {
+        return res.status(400).json({ error: 'Shipping address is required.' });
+    }
+
+    if (!paymentOption) {
+        return res.status(400).json({ error: 'Payment option is required.' });
+    }
+
     try {
         //function to generate 16 digit orderId
         const newOrderId = uuidv4();
@@ -152,6 +161,9 @@ exports.placeOrder = async (req, res) => {
 
         // Check payment option
         if (paymentOption === 'cod') {
+            if(totalAmount > 1000){
+                return res.status(400).json({ error: 'COD orders above Rs. 1000 are not allowed.' });
+            }
             if(totalAmount > 1000){
                 return res.status(400).json({ error: 'COD orders above Rs. 1000 are not allowed.' });
             }
@@ -301,6 +313,11 @@ exports.getOrderDetails = async (req, res) => {
     console.log(orderId);
 
     try {
+        if (!req.session.userLoggedInData || !req.session.userLoggedInData.userloggedIn) {
+            req.flash('error', 'To access the OrderDetails, please log in first.');
+            return res.redirect('/login');
+        }
+
         if (!req.session.userLoggedInData || !req.session.userLoggedInData.userloggedIn) {
             req.flash('error', 'To access the OrderDetails, please log in first.');
             return res.redirect('/login');

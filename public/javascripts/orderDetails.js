@@ -1,3 +1,6 @@
+// import html2canvas from 'html2canvas';
+// import jsPDF from 'jspdf';
+
 $(document).ready(function(){
 
     //Cancel the complete order

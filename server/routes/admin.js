@@ -38,6 +38,7 @@ router.get('/downloadReport', authController.downloadReport);
 //sales report page
 router.get('/salesReport',authController.getSalesReportPage);
 
+
 //GET AddCategory  page
 router.get('/addcategory',categoryController.getaddCategoryPage)
 
