@@ -313,13 +313,13 @@ exports.editVarientDetails = async (req, res) => {
         }
 
         await prodVariation.findByIdAndUpdate(variantId, {
-            sku: req.body.esku,
+            sku: req.body.sku,
             productId: req.body.productId,
-            attributeName: req.body.eattributeName,
-            attributeValue: req.body.eattributeValue,
+            attributeName: req.body.attributeName,
+            attributeValue: req.body.attributeValue,
             images: imagePath,
-            price: req.body.eprice,
-            stock: req.body.estock
+            price: req.body.price,
+            stock: req.body.stock
         });
 
         req.flash('success', 'Variant updated successfully');

@@ -13,7 +13,6 @@ const coupon = require('../../modals/coupon');
 const { jsPDF } = require("jspdf");
 const html2canvas = require('html2canvas');
 
-
 // Initialize Razorpay instance
 const razorpayInstance = new RazorPay({
     key_id: process.env.RAZORPAY_ID_KEY,
@@ -63,7 +62,7 @@ exports.getcheckOut = async (req, res) => {
             return res.redirect('/cart');
         }
 
-        //console.log(req.session.cartDetails);
+        console.log(req.session.cartDetails.cartitems);
 
         return res.render('user/checkout/checkout', {
             userData,

@@ -18,20 +18,25 @@ $(document).ready(function() {
                 //$('.quantity-increase[data-variant-id="' + variantId + '"]').prop('disabled', false);
 
                 if (response.error === 'Insufficient stock available.') {
-                    //if ($('#stock-error-' + variantId).length === 0) {
-                        showErrorMessage(variantId, 'Insufficient stock available. Please reduce the quantity.');
-                    //}
-                    $('.quantity-increase[data-variant-id="' + variantId + '"]').prop('disabled', true);
-                } 
+                    showErrorMessage(variantId, 'Insufficient stock available. Please reduce the quantity.');
+                    toastr.error('Insufficient stock available. Please reduce the quantity.');
+                    setTimeout(function() {
+                        window.location.href = '/cart';
+                    }, 1000);
+                    //showErrorModal('Insufficient stock available. Please reduce the quantity.');
+                } else{
+                    $('.quantity-increase[data-variant-id="' + variantId + '"]').prop('disabled', false);
+                }
             },
             error: function(xhr, status, error) {
                 const response = JSON.parse(xhr.responseText);
                 if (response.error === 'Insufficient stock available.') {
-                    //if ($('#stock-error-' + variantId).length === 0) {
-                        const errorMessage = '<span id="stock-error-' + variantId + '" class="text-danger">Insufficient stock available. Please reduce the quantity.</span>';
-                        $('#quantity-' + variantId).closest('td').append(errorMessage);
-                    //}
-                    $('.quantity-increase[data-variant-id="' + variantId + '"]').prop('disabled', true);
+                    showErrorMessage(variantId, 'Insufficient stock available. Please reduce the quantity.');
+                    toastr.error('Insufficient stock available. Please reduce the quantity.');
+                    setTimeout(function() {
+                        window.location.href = '/cart';
+                    }, 1000);
+                    //showErrorModal('Insufficient stock available. Please reduce the quantity.');
                 } else {
                     console.error('Error updating cart item:', error);
                 }
@@ -39,10 +44,21 @@ $(document).ready(function() {
         });
     }
 
+    function showErrorModal(message) {
+        $('#errorMessage').text(message);
+        $('#errorModal').modal('show');
+    }
+
+    $('#reloadButton').click(function() {
+        window.location.href = '/cart';
+    });
+    
+
     $('.quantity-increase').click(function() {
         const variantId = $(this).closest('.quantity-controls').data('variant-id');
         let quantity = parseInt($(this).siblings('.quantity-input').val());
-        if (quantity < 5) {
+        
+        if (quantity < 5 ) {
             quantity += 1;
             $(this).siblings('.quantity-input').val(quantity);
             updateQuantity(variantId, quantity);
@@ -62,6 +78,7 @@ $(document).ready(function() {
             $(this).siblings('.quantity-input').val(quantity);
             updateQuantity(variantId, quantity);
             $('#stock-error-' + variantId).remove();
+            $('.quantity-increase[data-variant-id="' + variantId + '"]').prop('disabled', false);
         } else if (quantity <= 1) {
             $(this).siblings('.quantity-input').val(1);
             if ($('#stock-error-' + variantId).length === 0) {

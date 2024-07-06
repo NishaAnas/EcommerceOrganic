@@ -137,7 +137,7 @@ exports.addToCart = async(req,res)=>{
         }
         const variantId = req.body.variantId;
         let existingShoppingCart = await shoppingCart.findOne({ user: userId });
-
+        
         // If the user doesn't have a shopping cart, create a new one
         if (!existingShoppingCart) {
             existingShoppingCart = await shoppingCart.create({ user: userId, items: [] });
@@ -214,8 +214,8 @@ exports.deleteCartProduct = async(req,res)=>{
     }
 }
 
-//Update Cart Product
-exports.updateCartItem = async(req,res)=>{
+// Update Cart Product
+exports.updateCartItem = async (req, res) => {
     try {
         const { variantId, quantity } = req.body;
 
@@ -224,39 +224,69 @@ exports.updateCartItem = async(req,res)=>{
             return res.status(400).json({ error: 'Invalid variant ID or quantity.' });
         }
 
-        // Find the product to get its price
+        // Find the product to get its price and stock
         const variant = await prodVariation.findById(variantId);
-        //Check for available stock
         if (!variant || variant.stock < quantity) {
             return res.status(400).json({ error: 'Insufficient stock available.', stock: variant ? variant.stock : 0 });
         }
+
         // Find the base product to get its price
         const baseProduct = await Product.findById(variant.productId);
-        console.log(baseProduct)
-
-        // Calculate the total price
         const actualPrice = baseProduct.price + variant.price;
-        //console.log(totalPrice)
-        const prodtotalPrice = actualPrice*quantity;
+        const prodtotalPrice = actualPrice * quantity;
         const userId = req.session.userLoggedInData.userId;
 
         // Update the quantity and total price of the product in the shopping cart
         const updatedCartItem = await shoppingCart.findOneAndUpdate(
             { user: userId, 'items.product': variantId },
-            { $set: { 'items.$.quantity': quantity, 'items.$.totalPrice': prodtotalPrice} },
+            { $set: { 'items.$.quantity': quantity, 'items.$.totalPrice': prodtotalPrice } },
             { new: true }
         );
-        
+
         if (updatedCartItem) {
-            // Calculate the new total price of all products
-            const totalQuantity = updatedCartItem.items.reduce((acc, item) => acc + item.quantity, 0);
-            const totalPriceOfAllProducts = updatedCartItem.items.reduce((acc, item) => acc + item.totalPrice, 0);
+            // Fetch additional details for each item in the cart
+            const cartitems = await Promise.all(updatedCartItem.items.map(async (item) => {
+                const variant = await prodVariation.findById(item.product);
+                const baseProduct = await Product.findById(variant.productId);
+                const categories = await category.findById(baseProduct.categoryId);
+                const image = variant.images.length > 0 ? variant.images[0] : '';
+
+                return {
+                    variantId: item.product,
+                    stock: variant.stock,
+                    productName: baseProduct.name,
+                    baseProduct: baseProduct.name,
+                    category: categories.name,
+                    basePrice: variant.basePrice,
+                    actualPrice: actualPrice,
+                    productImage: image,
+                    quantity: item.quantity,
+                    totalPrice: item.totalPrice
+                };
+            }));
+
+            // Calculate the new total quantity and total price of all products
+            const totalQuantity = cartitems.reduce((acc, item) => acc + item.quantity, 0);
+            const totalPriceOfAllProducts = cartitems.reduce((acc, item) => acc + item.totalPrice, 0);
+
+            // Update the session with detailed cart item information
+            req.session.cartDetails = {
+                cartitems: cartitems,
+                totalQuantity: totalQuantity,
+                totalPriceOfAllProducts: totalPriceOfAllProducts,
+                discountAmount: req.session.cartDetails.discountAmount || 0,
+                afterDiscountTotal: totalPriceOfAllProducts - (req.session.cartDetails.discountAmount || 0),
+                couponName: req.session.cartDetails.couponName || ""
+            };
 
             // Send the updated total price and quantity back to the client
-            res.json({ totalPriceOfAllProducts, totalQuantity ,prodtotalPrice});
+            res.json({ totalPriceOfAllProducts, totalQuantity, prodtotalPrice });
+        } else {
+            res.status(400).json({ error: 'Cart item not found.' });
         }
     } catch (error) {
         console.error('Error updating cart item:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
-}
+};
+

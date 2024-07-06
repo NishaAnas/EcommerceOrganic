@@ -81,7 +81,7 @@ $(document).ready(function() {
                                 },
                                 body: JSON.stringify(razorData)
                             });
-
+                            
                             if (!razorResponse.ok) {
                                 throw new Error('Network response was not ok during Razorpay confirmation');
                             }

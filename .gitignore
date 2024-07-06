@@ -3,3 +3,7 @@
 
 #Ignore environment files
 .env
+
+# Node.js
+node_modules
+
