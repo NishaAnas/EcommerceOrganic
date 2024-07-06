@@ -1,19 +1,12 @@
-const user = require('../../modals/user')
 const category = require('../../modals/categories')
 const product = require('../../modals/product')
-const admin = require ('../../modals/admin')
-const prodVariation =require('../../modals/productVariation');
 const offer = require('../../modals/offer'); 
-const { upload, resizeImages } = require('../../config/multer');
-const mongoose = require('mongoose')
-const bcrypt = require('bcrypt')
-const path = require('path');
 
 
 exports.getOfferManage = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = 10; // Number of users per page
+        const limit = 10; 
         const skip = (page - 1) * limit;
     
         const offers = await offer.find({}).skip(skip).limit(limit).lean();
@@ -55,6 +48,10 @@ exports.getCategories = async (req, res) => {
 exports.addOffers = async (req, res) => {
     const{title,type,applicableItems,discountType,discountValue,startDate,endDate} = req.body
     console.log(req.body);
+    if(discountType==='Percentage' && discountValue > 90){
+        return res.status(400).json({error:'For percentage Type discount cant be grater than 90% '});
+    }
+
 
     //create new offer object
     const newOffer = new offer({

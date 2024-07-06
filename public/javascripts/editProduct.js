@@ -168,16 +168,16 @@ $(document).ready(function(){
             method: 'GET',
             success: function(data) {
                 $('#variantId').val(variantId);
-                $('#evarientsku').val(data.variant.sku);
-                $('#evarientName').val(data.variant.attributeName);
-                $('#evarientValue').val(data.variant.attributeValue);
-                $('#evarientPrice').val(data.variant.price);
-                $('#evarientStock').val(data.variant.stock);
+                $('#edit_variant_sku').val(data.variant.sku);
+                $('#edit_attributeName').val(data.variant.attributeName);
+                $('#edit_attributeValue').val(data.variant.attributeValue);
+                $('#edit_variantPrice').val(data.variant.price);
+                $('#edit_stock').val(data.variant.stock);
                 // Set isActive checkbox
                 if (data.variant.isActive) {
-                    $('#eisActive').prop('checked', true);
+                    $('#edit_isActive').prop('checked', true);
                 } else {
-                    $('#eisActive').prop('checked', false);
+                    $('#edit_isActive').prop('checked', false);
                 }
                 $('#editImageContainer').empty(); // Clear existing images
                 data.variant.images.forEach(function (imageURL) {
@@ -197,7 +197,7 @@ function alertFunction () {
    let deleteForm = document.getElementById('deleteform');
    swal({
     title: "Are you sure?",
-    text: "But you will still be able to retrieve this file.",
+    text: "But you will still be able to retrieve this file. deleteForm",
     type: "warning",
     showCancelButton: true,
     confirmButtonColor: "#DD6B55",
@@ -219,7 +219,7 @@ $(document).ready(function() {
     $("#delete_attributes").click(function() {
         Swal.fire({
             title: "Are you sure?",
-            text: "Once deleted, you will not be able to recover this variant!",
+            text: "Once deleted delete_attributes, you will not be able to recover this variant!",
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#d33",

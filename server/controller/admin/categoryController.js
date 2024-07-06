@@ -133,7 +133,7 @@ exports.editPutcategory = async (req, res) => {
             req.flash('error', 'Category name already exists');
             return res.redirect(`/admin/editCategory/${req.params._id}`);
         }
-
+        
         //image path definition
         let imagePath = [];
         if (req.resizedImages && req.resizedImages.length > 0) {

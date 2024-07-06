@@ -2,12 +2,11 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <body>
     <div class="container">
-        <div
-            class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h1 class="h2">Editing: {{ productDetailsViewing.title }}</h1>
             <div class="btn-toolbar mb-2 mb-md-0">
                 <div class="btn-group me-2">
-                    <button class="btn btn-sm btn-outline-secondary"  id="add_attributes" data-bs-toggle="modal" data-bs-target="#addAttributesModal">+ADD VARIENT</button>
+                    <button class="btn btn-sm btn-outline-secondary" id="add_attributes" data-bs-toggle="modal" data-bs-target="#addAttributesModal">+ADD VARIENT</button>
                 </div>
             </div>
         </div>
@@ -16,11 +15,8 @@
                 <div class="col">
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a
-                                    href="/admin/product">Product
-                                    Management</a></li>
-                            <li
-                                class="breadcrumb-item active">{{productDetailsViewing.title}}</li>
+                            <li class="breadcrumb-item"><a href="/admin/product">Product Management</a></li>
+                            <li class="breadcrumb-item active">{{productDetailsViewing.title}}</li>
                         </ol>
                     </nav>
                 </div>
@@ -33,343 +29,425 @@
             <div class="alert alert-danger">
                 {{error}}
             </div>
-            {{/if}}
-            {{#if success}}
+        {{/if}}
+        {{#if success}}
             <div class="alert alert-success">
                 {{success}}
             </div>
-            {{/if}}
-        <form id="editProductForm"
-            action="/admin/editProduct/{{productDetailsViewing._id}}?_method=PUT"
-            method="POST" enctype="multipart/form-data">
+        {{/if}}
+        <form id="editProductForm" action="/admin/editProduct/{{productDetailsViewing._id}}?_method=PUT" method="POST" enctype="multipart/form-data">
             <div class="row form-group mb-4 p-3 gap-4">
                 <div class="col">
                     <label for="sku"><b>Product SKU</b></label>
-                    <input type="text" class="form-control" id="sku"
-                        name="sku"
-                        value="{{productDetailsViewing.sku }}" sku
-                        placeholder="sku" required>
+                    <input type="text" class="form-control" id="sku" name="sku" value="{{productDetailsViewing.sku }}" placeholder="sku" >
+                    <span id="sku_error" style="color: red;"></span>
                 </div>
                 <div class="col">
-                        <label for="producttitle"><b>Product Title</b></label>
-                        <input type="text" class="form-control"
-                            id="producttitle"
-                            name="producttitle"
-                            value="{{productDetailsViewing.title }}"
-                            placeholder="product Title" required>
+                    <label for="producttitle"><b>Product Title</b></label>
+                    <input type="text" class="form-control" id="producttitle" name="producttitle" value="{{productDetailsViewing.title }}" placeholder="product Title" >
+                    <span id="title_error" style="color: red;"></span>
                 </div>
                 <div class="col">
-                        <label for="productname"><b>Product Name</b></label>
-                        <input type="text" class="form-control"
-                            id="productname"
-                            name="productname"
-                            value="{{productDetailsViewing.name }}"
-                            placeholder="product Name" required>
+                    <label for="productname"><b>Product Name</b></label>
+                    <input type="text" class="form-control" id="productname" name="productname" value="{{productDetailsViewing.name }}" placeholder="product Name" >
+                    <span id="name_error" style="color: red;"></span>
                 </div>
             </div>
-
-                
-                <div class="row form-group mb-4 p-3 gap-4">
-                    <div class="col">
-                            <label for="productPrice"><b>Product
-                                    Price</b></label>
-                            <input type="text" class="form-control"
-                                id="productPrice"
-                                name="productPrice"
-                                value="{{productDetailsViewing.price}}"
-                                placeholder="product Price" required>
-                        </div>
-                        <div class="col">
-                                <label for="category Name"><b>Category</b></label>
-                                <input type="hidden" id="product-categoryId" value="{{productDetailsViewing.categoryId}}">
-                                <select id="categoryId" name="categoryId" class="form-select" required>
-                                    {{#each productCategory}}
-            <option value="{{this._id}}">{{this.name}}</option>
-        {{/each}}
-                                </select>
-                            </div>
+            <div class="row form-group mb-4 p-3 gap-4">
+                <div class="col">
+                    <label for="productPrice"><b>Product Price</b></label>
+                    <input type="text" class="form-control" id="productPrice" name="productPrice" value="{{productDetailsViewing.price}}" placeholder="product Price" >
+                    <span id="price_error" style="color: red;"></span>
                 </div>
-                <div class="row form-group mb-4 p-3 gap-4">
-                    <div class="col">
-                                        <label for="isActive"
-                                            class="col-sm-2 col-form-check-label">isActive:</label>
-                                        <div
-                                            class="col-sm-10 form-check form-switch"
-                                            style="padding-left: 4.5em;">
-                                            <input class="form-check-input"
-                                                name="isActive" type="checkbox"
-                                                role="switch" id="isActive"
-                                                {{#if
-                                                productDetailsViewing.isActive}}checked{{/if}}
-                                                style="min-height: 70%;">
-                                        </div>
-                                    </div>
-                                    <div class="col">
-                                        <label for="isDeleted"
-                                            class="col-sm-2 col-form-check-label">isDeleted:</label>
-                                        <div
-                                            class="col-sm-10 form-check form-switch"
-                                            style="padding-left: 4.5em;">
-                                            <input class="form-check-input"
-                                                name="isDeleted" type="checkbox"
-                                                role="switch" id="isDeleted"
-                                                {{#if
-                                                productDetailsViewing.isDeleted}}checked{{/if}}
-                                                style="min-height: 70%;">
-                                        </div>
-                                    </div>
+                <div class="col">
+                    <label for="category Name"><b>Category</b></label>
+                    <input type="hidden" id="product-categoryId" value="{{productDetailsViewing.categoryId}}">
+                    <select id="categoryId" name="categoryId" class="form-select">
+                        {{#each productCategory}}
+                            <option value="{{this._id}}">{{this.name}}</option>
+                        {{/each}}
+                    </select>
                 </div>
-                                <div class="container mt-3 w-100 py-4">
-                                    <div class="card shadow-sm w-100">
-                                        <div class="card-header d-flex justify-content-between">
-                                            <h4>Upload Images</h4>
-                                            <form action="#" class="form" id="form">
-                                                <input type="file" name="image" id="product-image" multiple class="d-none" onchange="image_select()">
-                                                <button class="btn btn-sm btn-primary" type="button"onclick="document.getElementById('product-image').click()">
-                                                Change Images
-                                            </button>
-                                            </form>
-                                        </div>
-                                            <div class="card-body d-flex flex-wrap justify-content-start" id="container">
-                                            {{#each productDetailsViewing.images}}
-                                            <div class="image-container d-flex justify-content-around postion-absolute">
-                                                <img src="/{{ this }}" alt="Product Image">
-                                            </div>
-                                    {{/each}}
-                                            </div>
-                                    </div>
-                                </div>
-
-                                <table class="table table-striped responsiveTable">
-                                    <thead >
-                                        <tr >
-                                            <th scope="col" class="col-1">SKU</th>
-                                            <th scope="col" class="col-2">Attribute Name</th>
-                                            <th scope="col" class="col-3">Attribute Value</th>
-                                            <th scope="col" class="col-4">Price</th>
-                                            <th scope="col" class="col-5">Stock</th>
-                                            <th scope="col" class="col-6">Image</th>
-                                            <th scope="col" class="col-7">is Active</th>
-                                            <th scope="col" class="col-8">Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {{#each productVariations}}
-                                        <tr>
-                                                <td class="col-1">{{this.sku}}</td>
-                                                <td class="col-2">{{this.attributeName}}</td>
-                                                <td class="col-3">{{this.attributeValue}}</td>
-                                                <td class="col-4">{{this.price}}</td>
-                                                <td class="col-5">{{this.stock}}</td>
-                                                <td class="col-6"><img style="width: 50px; height: 50px;" src="/{{this.images.[0]}}" alt="varient Image"></td>
-                                                <td class="col-7"><label class="{{#if this.isActive}}Vactive{{else}}Vdeactive{{/if}}">
-                                                    {{#if this.isActive}}Active{{else}}Deactive{{/if}}
-                                                    </label>
-                                                </td>
-                                                <td class="col-8 actionButtons"> 
-                                                <button type="button" class="btn btn-sm btn-outline-primary editVariantButton" data-bs-toggle="modal" data-bs-target="#editAttributesModal" data-variantid="{{this._id}}">
-                                                    <i class="bi bi-pencil"></i>
-                                                </button>
-                                                    <form action="/admin/deleteVariant/{{this._id}}?_method=PUT" method="POST" id="deleteform">
-                                                        <button type="submit" id="delete_attributes">
-                                                            <i class="bi bi-trash"></i>
-                                                        </button>
-                                                    </form>
-                                                </td>
-                                            </th>
-                                        </tr>
-                                        {{/each}}
-                                        </tbody>
-                                </table>
-                            <div class="form-group mb-4 d-flex flex-row align-items-center justify-content-evenly">
-                                <button type="submit" form="editProductForm" class="btn btn-primary">Update Product</button>
-                            </div>
-                        </form>
+            </div>
+            <div class="row form-group mb-4 p-3 gap-4">
+                <div class="col">
+                    <label for="isActive" class="col-sm-2 col-form-check-label">isActive:</label>
+                    <div class="col-sm-10 form-check form-switch" style="padding-left: 4.5em;">
+                        <input class="form-check-input" name="isActive" type="checkbox" role="switch" id="isActive" {{#if productDetailsViewing.isActive}}checked{{/if}} style="min-height: 70%;">
                     </div>
-                    <!--Add Attribute Modal -->
-    <div class="modal fade" id="addAttributesModal" tabindex="-1" role="dialog" aria-labelledby="addAttributesModalLabel" aria-hidden="true" > 
-        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-    <div class="modal-content">
-        <div class="modal-header">
-        <h5 class="modal-title" id="addAttributesModalLabel">Add Variant of {{productDetailsViewing.title}} </h5>
-        <div class="col text-end fw-lighter">
-                    <b>Product ID:</b> {{ productDetailsViewing._id }}
                 </div>
-                <button type="button" class="close" onclick="closeModal()" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-        </div>
-        <div class="modal-body">
-        <form id="attributeForm" action="/admin/addVariation/{{productDetailsViewing._id}}" method="post"
-        enctype="multipart/form-data">
-            <div class="form-group">
-            <label for="varientsku">SKU of the Variant:</label>
-            <input type="text" class="form-control varientInput" id="varientsku" name="sku">
-            </div>
-            <div class="row mb-4 py-4">
-            <div class="col-sm-6">
-                <div class="form-group">
-                <label for="varientName">Name of the Variant:</label>
-                <input type="text" class="form-control varientInput" id="varientName" name="attributeName">
+                <div class="col">
+                    <label for="isDeleted" class="col-sm-2 col-form-check-label">isDeleted:</label>
+                    <div class="col-sm-10 form-check form-switch" style="padding-left: 4.5em;">
+                        <input class="form-check-input" name="isDeleted" type="checkbox" role="switch" id="isDeleted" {{#if productDetailsViewing.isDeleted}}checked{{/if}} style="min-height: 70%;">
+                    </div>
                 </div>
-            </div>
-            <div class="col-sm-6">
-                <div class="form-group">
-                <label for="varientValue">Value of the Variant:</label>
-                <input type="text" class="form-control varientInput" id="varientValue" name="attributeValue">
-                </div>
-            </div>
-            </div>
-            <div class="row mb-4 py-4">
-            <div class="col-sm-6">
-                <div class="form-group">
-                <label for="varientPrice">Price of the Variant:</label>
-                <input type="number" class="form-control varientInput" id="varientPrice" name="price">
-                </div>
-            </div>
-            <div class="col-sm-6">
-                <div class="form-group">
-                <label for="varienteStock">Stock of the Variant:</label>
-                <input type="number" class="form-control varientInput" id="varientStock" name="stock">
-                </div>
-            </div>
-            </div>
-            <div class="row mb-4 py-4">
-            <div class="col-sm-4">
-                <label for="isActive" class="col-form-label">isActive:</label>
-                <div class="form-check form-switch" >  
-                <input class="form-check-input" name="isActive" type="checkbox" role="switch" id="isActive" style="min-height: 70%;">
-                </div>
-            </div>
             </div>
             <div class="container mt-3 w-100 py-4">
-            <div class="card shadow-sm w-100">
-                <div class="card-header d-flex justify-content-between">
-                <h4>Upload Images</h4>
-                <form action="#" class="form" id="form">
-                    <input type="file" name="image" id="variantImage" multiple class="d-none" onchange="vimage_select()" >
-                        <button class="btn btn-sm btn-primary" type="button" onclick="document.getElementById('variantImage').click()">
-                        Choose Images
+                <div class="card shadow-sm w-100">
+                    <div class="card-header d-flex justify-content-between">
+                        <h4>Upload Images</h4>
+                        <input type="file" name="image" id="product-image" multiple class="d-none" onchange="image_select()">
+                        <button class="btn btn-sm btn-primary" type="button" onclick="document.getElementById('product-image').click()">
+                            Change Images
                         </button>
-                </form>
-                </div>
-                <div class="card-body d-flex flex-wrap justify-content-start" id="variant_container">
-                    
-                </div>
-            </div>
-            </div>
-        </form>
-        </div>
-        <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" onclick="closeModal()">Close</button>
-        <button type="submit" form="attributeForm" class="btn btn-primary">Add Variant</button>
-        </div>
-    </div>
-    </div>
-</div>
-
-<!--Edit Attribute Modal -->
-    <div class="modal fade" id="editAttributesModal" tabindex="-1" role="dialog" aria-labelledby="addAttributesModalLabel" aria-hidden="true" > 
-        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-    <div class="modal-content">
-        <div class="modal-header">
-        <h5 class="modal-title" id="addAttributesModalLabel">Editing Variant of: {{productDetailsViewing.title}} </h5>
-        <div class="col text-end fw-lighter">
-                    <b>Product ID:</b> {{ productDetailsViewing._id }}
-                    
-                </div>
-                <button type="button" class="close" onclick="closeeditModal()" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-        </button>
-        </div>
-        <div class="modal-body">
-        <form id="editattributeForm" action="/admin/editVariation/variantId?_method=PUT"
-            method="POST" enctype="multipart/form-data">
-        <input type="hidden" id="variantId" name="variantId">
-            <div class="form-group">
-            <label for="varientsku">SKU of the Variant:</label>
-            <input type="text" class="form-control varientInput" id="evarientsku" name="esku" >
-            </div>
-            <div class="row mb-4 py-4">
-            <div class="col-sm-6">
-                <div class="form-group">
-                <label for="varientName">Name of the Variant:</label>
-                <input type="text" class="form-control varientInput" id="evarientName" name="eattributeName" >
-                </div>
-            </div>
-            <div class="col-sm-6">
-                <div class="form-group">
-                <label for="varientValue">Value of the Variant:</label>
-                <input type="text" class="form-control varientInput" id="evarientValue" name="eattributeValue" >
-                </div>
-            </div>
-            </div>
-            <div class="row mb-4 py-4">
-            <div class="col-sm-6">
-                <div class="form-group">
-                <label for="varientPrice">Price of the Variant:</label>
-                <input type="number" class="form-control varientInput" id="evarientPrice" name="eprice" >
-                </div>
-            </div>
-            <div class="col-sm-6">
-                <div class="form-group">
-                <label for="varienteStock">Stock of the Variant:</label>
-                <input type="number" class="form-control varientInput" id="evarientStock" name="estock" >
-                </div>
-            </div>
-            </div>
-            <div class="row mb-4 py-4">
-            <div class="col-sm-4">
-                <label for="isActive" class="col-form-label">isActive:</label>
-                <div class="col-sm-10 form-check form-switch" style="padding-left: 4.5em;">
-                    <input class="form-check-input" name="eisActive" type="checkbox" role="switch" id="eisActive"
-                        style="min-height: 70%;">
-                </div>
-            </div>
-            <div class="col-sm-4">
-                <label for="isDeleted" class="col-form-label">isDeleted:</label>
-                <div class="col-sm-10 form-check form-switch" style="padding-left: 4.5em;">
-                    <input class="form-check-input" name="eisDeleted" type="checkbox" role="switch" id="eisDeleted"
-                        style="min-height: 70%;">
-                </div>
-            </div>
-            </div>
-                <div class="container mt-3 w-100 py-4">
-                    <div class="card shadow-sm w-100">
-                        <div class="card-header d-flex justify-content-between">
-                            <h4>Upload Images</h4>
-                                <form action="#" class="form" id="form">
-                                    <input type="file" name="image" id="editVariantImage" multiple class="d-none" onchange="eimage_select()">
-                                        <button class="btn btn-sm btn-primary" type="button" onclick="document.getElementById('editVariantImage').click()"> Change Images
-                                        </button>
-                                </form>
-                        </div>
-                        <div class="card-body d-flex flex-wrap justify-content-start" id="editImageContainer">
-                            
-                        </div>
+                    </div>
+                    <div class="card-body d-flex flex-wrap justify-content-start" id="container">
+                        {{#each productDetailsViewing.images}}
+                            <div class="image-container d-flex justify-content-around postion-absolute" id="product_image_container">
+                                <img src="/{{ this }}" alt="Product Image">
+                            </div>
+                        {{/each}}
                     </div>
                 </div>
+                <span id="image_error" style="color: red;"></span>
+            </div>
+            <table class="table table-striped responsiveTable">
+                <thead>
+                    <tr>
+                        <th scope="col" class="col-1">SKU</th>
+                        <th scope="col" class="col-2">Attribute Name</th>
+                        <th scope="col" class="col-3">Attribute Value</th>
+                        <th scope="col" class="col-4">Price</th>
+                        <th scope="col" class="col-5">Stock</th>
+                        <th scope="col" class="col-6">Image</th>
+                        <th scope="col" class="col-7">is Active</th>
+                        <th scope="col" class="col-8">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each productVariations}}
+                        <tr>
+                            <td class="col-1">{{this.sku}}</td>
+                            <td class="col-2">{{this.attributeName}}</td>
+                            <td class="col-3">{{this.attributeValue}}</td>
+                            <td class="col-4">{{this.price}}</td>
+                            <td class="col-5">{{this.stock}}</td>
+                            <td class="col-6"><img style="width: 50px; height: 50px;" src="/{{this.images.[0]}}" alt="varient Image"></td>
+                            <td class="col-7"><label class="{{#if this.isActive}}Vactive{{else}}Vdeactive{{/if}}">{{#if this.isActive}}Active{{else}}Deactive{{/if}}</label></td>
+                            <td class="col-8 actionButtons">
+                                <button type="button" class="btn btn-sm btn-outline-primary editVariantButton" data-bs-toggle="modal" data-bs-target="#editAttributesModal" data-variantid="{{this._id}}">
+                                    <span id="form_error" style="color: red;"></span>
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <form action="/admin/deleteVariant/{{this._id}}?_method=PUT" method="POST" id="deleteform">
+                                    <button type="submit" id="delete_attributes">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+            <div class="form-group mb-4 d-flex flex-row align-items-center justify-content-evenly">
+                <button type="submit" form="editProductForm" class="btn btn-primary">Update Product</button>
+            </div>
         </form>
-        </div>
-        <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" onclick="closeeditModal()">Close</button>
-        <button type="submit" form="editattributeForm" class="btn btn-primary">Update Variant</button>
-        </div>
     </div>
-    </div>
-</div>
 
-                <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-                <script src="/javascripts/editProduct.js"></script>
-                <script>
-                    document.addEventListener("DOMContentLoaded", function() {
-                    const categoryId = document.getElementById('product-categoryId').value.trim()
-                    const categorySelect = document.getElementById("categoryId")
-                    Array.from(categorySelect.options).forEach(option => {
-                        if (option.value === categoryId) {
-                        option.selected = true;
-                        }
-                    });
-                });
-                </script>
-                </body>
+    <!-- Add Attribute Modal -->
+    <div class="modal fade" id="addAttributesModal" tabindex="-1" role="dialog" aria-labelledby="addAttributesModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addAttributesModalLabel">Add Variant</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addAttributesForm" action="/admin/addVariation/{{productDetailsViewing._id}}" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="productId" value="{{productDetailsViewing._id}}">
+                        <div class="row form-group mb-4 p-3 gap-4">
+                            <div class="col">
+                                <label for="variant_sku"><b>SKU</b></label>
+                                <input type="text" class="form-control" id="variant_sku" name="sku" placeholder="sku" >
+                                <span id="variant_sku_error" style="color: red;"></span>
+                            </div>
+                            <div class="col">
+                                <label for="attributeName"><b>Attribute Name</b></label>
+                                <input type="text" class="form-control" id="attributeName" name="attributeName" placeholder="Attribute Name" >
+                                <span id="attribute_name_error" style="color: red;"></span>
+                            </div>
+                            <div class="col">
+                                <label for="attributeValue"><b>Attribute Value</b></label>
+                                <input type="text" class="form-control" id="attributeValue" name="attributeValue" placeholder="Attribute Value" >
+                                <span id="attribute_value_error" style="color: red;"></span>
+                            </div>
+                        </div>
+                        <div class="row form-group mb-4 p-3 gap-4">
+                            <div class="col">
+                                <label for="variantPrice"><b>Price</b></label>
+                                <input type="text" class="form-control" id="variantPrice" name="price" placeholder="Variant Price" >
+                                <span id="variant_price_error" style="color: red;"></span>
+                            </div>
+                            <div class="col">
+                                <label for="stock"><b>Stock</b></label>
+                                <input type="text" class="form-control" id="stock" name="stock" placeholder="Stock" >
+                                <span id="variant_stock_error" style="color: red;"></span>
+                            </div>
+                        </div>
+                        <div class="container mt-3 w-100 py-4">
+                            <div class="card shadow-sm w-100">
+                                <div class="card-header d-flex justify-content-between">
+                                    <h4>Upload Images</h4>
+                                    <input type="file" name="image" id="variantImage" multiple class="d-none" onchange="vimage_select()">
+                                    <button class="btn btn-sm btn-primary" type="button" onclick="document.getElementById('variantImage').click()">
+                                        Change Images
+                                    </button>
+                                </div>
+                                <div class="card-body d-flex flex-wrap justify-content-start" id="variant_container">
+                                    <!-- Images will be displayed here -->
+                                </div>
+                            </div>
+                            <span id="variant_image_error" style="color: red;"></span>
+                        </div>
+                        <div class="form-group mb-4 d-flex flex-row align-items-center justify-content-evenly">
+                            <button type="submit" form="addAttributesForm" class="btn btn-primary">Add Variant</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Attribute Modal -->
+    <div class="modal fade" id="editAttributesModal" tabindex="-1" role="dialog" aria-labelledby="editAttributesModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editAttributesModalLabel">Edit Variant</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editAttributesForm" action="/admin/editVariation/variantId?_method=PUT" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="productId" value="{{productDetailsViewing._id}}">
+                        <input type="hidden" id="variantId" name="variantId" value="">
+                        <div class="row form-group mb-4 p-3 gap-4">
+                            <div class="col">
+                                <label for="edit_variant_sku"><b>SKU</b></label>
+                                <input type="text" class="form-control" id="edit_variant_sku" name="sku" placeholder="sku" >
+                                <span id="edit_variant_sku_error" style="color: red;"></span>
+                            </div>
+                            <div class="col">
+                                <label for="edit_attributeName"><b>Attribute Name</b></label>
+                                <input type="text" class="form-control" id="edit_attributeName" name="attributeName" placeholder="Attribute Name" >
+                                <span id="edit_attribute_name_error" style="color: red;"></span>
+                            </div>
+                            <div class="col">
+                                <label for="edit_attributeValue"><b>Attribute Value</b></label>
+                                <input type="text" class="form-control" id="edit_attributeValue" name="attributeValue" placeholder="Attribute Value" >
+                                <span id="edit_attribute_value_error" style="color: red;"></span>
+                            </div>
+                        </div>
+                        <div class="row form-group mb-4 p-3 gap-4">
+                            <div class="col">
+                                <label for="edit_variantPrice"><b>Price</b></label>
+                                <input type="text" class="form-control" id="edit_variantPrice" name="price" placeholder="Variant Price" >
+                                <span id="edit_variant_price_error" style="color: red;"></span>
+                            </div>
+                            <div class="col">
+                                <label for="edit_stock"><b>Stock</b></label>
+                                <input type="text" class="form-control" id="edit_stock" name="stock" placeholder="Stock" >
+                                <span id="edit_variant_stock_error" style="color: red;"></span>
+                            </div>
+                        </div>
+                        <div class="container mt-3 w-100 py-4">
+                            <div class="card shadow-sm w-100">
+                                <div class="card-header d-flex justify-content-between">
+                                    <h4>Upload Images</h4>
+                                    <input type="file" name="image" id="edit-variant-image" multiple class="d-none" onchange="eimage_select()">
+                                    <button class="btn btn-sm btn-primary" type="button" onclick="document.getElementById('edit-variant-image').click()">
+                                        Change Images
+                                    </button>
+                                </div>
+                                <div class="card-body d-flex flex-wrap justify-content-start" id="editImageContainer">
+                                    <!-- Images will be displayed here -->
+                                </div>
+                            </div>
+                            <span id="edit_variant_image_error" style="color: red;"></span>
+                        </div>
+                        <div class="form-group mb-4 d-flex flex-row align-items-center justify-content-evenly">
+                            <button type="submit" form="editAttributesForm" class="btn btn-primary">Edit Variant</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/javascripts/editProduct.js"></script>
+</body>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Set the selected category
+        const selectedCategoryId = document.getElementById('product-categoryId').value;
+        document.getElementById('categoryId').value = selectedCategoryId;
+    });
+
+    // Form validation and submission
+    document.getElementById('editProductForm').addEventListener('submit', function (event) {
+        let isValid = true;
+
+        // Clear previous error messages
+        document.getElementById('sku_error').innerText = '';
+        document.getElementById('title_error').innerText = '';
+        document.getElementById('name_error').innerText = '';
+        document.getElementById('price_error').innerText = '';
+        document.getElementById('image_error').innerText = '';
+
+        // Validate SKU
+        const sku = document.getElementById('sku').value;
+        if (!sku) {
+            document.getElementById('sku_error').innerText = 'SKU is required';
+            isValid = false;
+        }
+
+        // Validate Title
+        const title = document.getElementById('producttitle').value;
+        if (!title) {
+            document.getElementById('title_error').innerText = 'Title is required';
+            isValid = false;
+        }
+
+        // Validate Name
+        const name = document.getElementById('productname').value;
+        if (!name) {
+            document.getElementById('name_error').innerText = 'Name is required';
+            isValid = false;
+        }
+
+        // Validate Price
+        const price = document.getElementById('productPrice').value;
+        if (!price || isNaN(price)) {
+            document.getElementById('price_error').innerText = 'Valid price is required';
+            isValid = false;
+        }
+
+        // Validate Image
+        //const image = document.getElementById('product-image').files;
+        //if (image.length === 0) {
+        //    document.getElementById('image_error').innerText = 'Image is required';
+        //    isValid = false;
+       // }
+
+        if (!isValid) {
+            event.preventDefault(); // Prevent form submission if not valid
+        }
+    });
+
+    document.getElementById('addAttributesForm').addEventListener('submit', function (event) {
+        let isValid = true;
+
+        // Clear previous error messages
+        document.getElementById('variant_sku_error').innerText = '';
+        document.getElementById('attribute_name_error').innerText = '';
+        document.getElementById('attribute_value_error').innerText = '';
+        document.getElementById('variant_price_error').innerText = '';
+        document.getElementById('variant_stock_error').innerText = '';
+        document.getElementById('variant_image_error').innerText = '';
+
+        // Validate SKU
+        const sku = document.getElementById('variant_sku').value;
+        if (!sku) {
+            document.getElementById('variant_sku_error').innerText = 'SKU is required';
+            isValid = false;
+        }
+
+        // Validate Attribute Name
+        const attributeName = document.getElementById('attributeName').value;
+        if (!attributeName) {
+            document.getElementById('attribute_name_error').innerText = 'Attribute Name is required';
+            isValid = false;
+        }
+
+        // Validate Attribute Value
+        const attributeValue = document.getElementById('attributeValue').value;
+        if (!attributeValue) {
+            document.getElementById('attribute_value_error').innerText = 'Attribute Value is required';
+            isValid = false;
+        }
+
+        // Validate Price
+        const price = document.getElementById('variantPrice').value;
+        if (!price || isNaN(price)) {
+            document.getElementById('variant_price_error').innerText = 'Valid price is required';
+            isValid = false;
+        }
+
+        // Validate Stock
+        const stock = document.getElementById('stock').value;
+        if (!stock || isNaN(stock)) {
+            document.getElementById('variant_stock_error').innerText = 'Valid stock is required';
+            isValid = false;
+        }
+
+        // Validate Image
+        const image = document.getElementById('variant-image').files;
+        if (image.length === 0) {
+            document.getElementById('variant_image_error').innerText = 'Image is required';
+            isValid = false;
+        }
+
+        if (!isValid) {
+            event.preventDefault(); // Prevent form submission if not valid
+        }
+    });
+
+    document.getElementById('editAttributesForm').addEventListener('submit', function (event) {
+        let isValid = true;
+
+        // Clear previous error messages
+        document.getElementById('edit_variant_sku_error').innerText = '';
+        document.getElementById('edit_attribute_name_error').innerText = '';
+        document.getElementById('edit_attribute_value_error').innerText = '';
+        document.getElementById('edit_variant_price_error').innerText = '';
+        document.getElementById('edit_variant_stock_error').innerText = '';
+        document.getElementById('edit_variant_image_error').innerText = '';
+
+        // Validate SKU
+        const sku = document.getElementById('edit_variant_sku').value;
+        if (!sku) {
+            document.getElementById('edit_variant_sku_error').innerText = 'SKU is required';
+            isValid = false;
+        }
+
+        // Validate Attribute Name
+        const attributeName = document.getElementById('edit_attributeName').value;
+        if (!attributeName) {
+            document.getElementById('edit_attribute_name_error').innerText = 'Attribute Name is required';
+            isValid = false;
+        }
+
+        // Validate Attribute Value
+        const attributeValue = document.getElementById('edit_attributeValue').value;
+        if (!attributeValue) {
+            document.getElementById('edit_attribute_value_error').innerText = 'Attribute Value is required';
+            isValid = false;
+        }
+
+        // Validate Price
+        const price = document.getElementById('edit_variantPrice').value;
+        if (!price || isNaN(price)) {
+            document.getElementById('edit_variant_price_error').innerText = 'Valid price is required';
+            isValid = false;
+        }
+
+        // Validate Stock
+        const stock = document.getElementById('edit_stock').value;
+        if (!stock || isNaN(stock)) {
+            document.getElementById('edit_variant_stock_error').innerText = 'Valid stock is required';
+            isValid = false;
+        }
+
+        // Validate Image
+        const image = document.getElementById('edit-variant-image').files;
+        if (image.length === 0) {
+            document.getElementById('edit_variant_image_error').innerText = 'Image is required';
+            isValid = false;
+        }
+
+        if (!isValid) {
+            event.preventDefault(); // Prevent form submission if not valid
+        }
+    });
+</script>
+</html>

@@ -1,20 +1,13 @@
-const user = require('../../modals/user')
-const category = require('../../modals/categories')
-const product = require('../../modals/product')
-const admin = require ('../../modals/admin')
-const prodVariation =require('../../modals/productVariation')
-const { upload, resizeImages } = require('../../config/multer');
 const coupon = require('../../modals/coupon')
 const mongoose = require('mongoose')
-const bcrypt = require('bcrypt')
-const path = require('path');
+
 
 exports.getCoupons = async(req,res)=>{
     const successMessage = req.flash('success');
     const errorMessage = req.flash('error');
     try{
         const page = parseInt(req.query.page) || 1;
-        const limit = 10; // Number of users per page
+        const limit = 10; 
         const skip = (page - 1) * limit;
 
         const Coupons = await coupon.find({}).skip(skip).limit(limit).lean();
@@ -50,21 +43,23 @@ exports.getCoupons = async(req,res)=>{
 exports.addCoupon = async(req,res)=>{
     const {name,discount,description,expiryDate,minAmount,firstPurchase } = req.body; 
     console.log(req.body);
-    const existingCoupon = await coupon.findOne({ name });
-    
-    if(discount > 100){
-        req.falsh('error','coupon discount cant be graeter than 100');
-    }
 
+    const existingCoupon = await coupon.findOne({ name });
     if (existingCoupon) {
         const existingCoupon = existingCoupon.name.toLowerCase().trim();
         const addingCoupon = req.body.name.toLowerCase().trim();
         if (existingCoupon === addingCoupon) {
             req.flash('error', 'coupon name already exists');
-            return res.redirect(`/admin/couponManage`);
+            return res.status(400).json({ error: 'coupon name already exists' });
         }
     }
-
+    if(discount > 90){
+        return res.status(400).json({ error: 'Coupon discount cannot be greater than 90%' });
+    }
+    if(minAmount<=100){
+        return res.status(400).json({ error: 'Minimum purchase amount should be greater than 100' });
+        
+    }
 
     const newCoupon = new coupon({
         name,
@@ -100,7 +95,15 @@ exports.getCoupon = async (req, res) => {
 // Edit Coupon Details
 exports.editCoupon=async(req,res)=>{
     
-        const { firstPurchase, minAmount } = req.body;
+        const { discount, minAmount } = req.body;
+
+        if(discount > 90){
+            return res.status(400).json({ error: 'Coupon discount cannot be greater than 90%' });
+        }
+        if(minAmount<=100){
+            return res.status(400).json({ error: 'Minimum purchase amount should be greater than 100' });
+            
+        }
     try {
         const updatedCoupon = await coupon.findByIdAndUpdate(req.params._id, req.body, 
             { new: true });
