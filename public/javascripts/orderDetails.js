@@ -1,5 +1,3 @@
-// import html2canvas from 'html2canvas';
-// import jsPDF from 'jspdf';
 
 $(document).ready(function(){
 
@@ -211,65 +209,7 @@ $(document).ready(function(){
         });
     });
 
-    $('[data-bs-target="#invoiceModal"]').on('click', function() {
-        var orderId = $(this).data('orderid');
-        $.ajax({
-            url: `/displayInvoice/${orderId}`,
-            method: 'GET',
-            dataType: 'json',
-            success: function(invoiceData) {
-                $('#invoiceNumber').text(invoiceData.invoiceNumber);
-                $('#paymentStatus').text(invoiceData.paymentStatus);
-                $('#storeAddress').text(invoiceData.storeAddress);
-                $('#storeEmail').text(invoiceData.storeEmail);
-                $('#storePhone').text(invoiceData.storePhone);
-                $('#billedToName').text(invoiceData.billedTo.name);
-                $('#billedToAddress').text(`${invoiceData.billedTo.address.street}, ${invoiceData.billedTo.address.city}, ${invoiceData.billedTo.address.state}, ${invoiceData.billedTo.address.pincode}`);
-                $('#invoiceDate').text(invoiceData.invoiceDate);
-                $('#orderNumber').text(invoiceData.orderNumber);
-
-                let discountAmount = invoiceData.discountAmount === 0 ? '-' : `₹${invoiceData.discountAmount}`;
-                $('#discountAmount').text(discountAmount);
-
-                let orderSummaryHTML = '';
-                $.each(invoiceData.items, function(index, item) {
-                    orderSummaryHTML += `
-                        <tr>
-                            <th scope="row">${index + 1}</th>
-                            <td>${item.item}</td>
-                            <td>₹${item.price}</td>
-                            <td>${item.quantity}</td>
-                            <td class="text-end">₹${item.total}</td>
-                        </tr>`;
-                });
-                orderSummaryHTML += `
-                    <tr>
-                        <th scope="row" colspan="4" class="text-end">Sub Total</th>
-                        <td class="text-end">₹${invoiceData.subTotal}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row" colspan="4" class="text-end">Discount</th>
-                        <td class="text-end">- ₹${invoiceData.discountAmount}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row" colspan="4" class="text-end">Shipping Charge</th>
-                        <td class="text-end">+ ₹${invoiceData.deliveryFee}</td>
-                    </tr>
-                    <tr>
-                        <th scope="row" colspan="4" class="text-end">Total</th>
-                        <td class="text-end"><h4 class="m-0 fw-semibold">₹${invoiceData.totalAmount}</h4></td>
-                    </tr>`;
-                $('#orderSummary').html(orderSummaryHTML);
-
-                $('#downloadInvoice').on('click', function() {
-                    generatePDF();
-                });
-            },
-            error: function(xhr, status, error) {
-                console.error('Error fetching invoice data:', error);
-            }
-        });
-    });
+    
 
     $('.order-date').each(function(){
         var date = new Date($(this).text());
@@ -387,18 +327,3 @@ function changePage(page) {
     window.location.href = `/acctorderDetails?page=${page}`;
 }
 
-function generatePDF() {
-    var invoiceElement = document.getElementById('invoiceContent');
-    if (invoiceElement) {
-        html2canvas(invoiceElement).then(canvas => {
-            const imgData = canvas.toDataURL('image/png');
-            const pdf = new jsPDF();
-            pdf.addImage(imgData, 'PNG', 5, 5);
-            pdf.save('invoice.pdf');
-        }).catch(error => {
-            console.error('Error generating PDF:', error);
-        });
-    } else {
-        console.error('Invoice content element not found');
-    }
-}
