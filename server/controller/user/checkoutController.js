@@ -309,7 +309,7 @@ exports.getOrderDetails = async (req, res) => {
     const errorMessage = req.flash('error');
     const userData = req.session.userLoggedInData;
     const orderId = req.params._id;
-    console.log(orderId);
+    //console.log(orderId);
 
     try {
         if (!req.session.userLoggedInData || !req.session.userLoggedInData.userloggedIn) {
@@ -351,7 +351,7 @@ exports.getOrderDetails = async (req, res) => {
             items: itemsWithImages
         };
 
-        console.log(orderWithItemsAndImages);
+        //console.log(orderWithItemsAndImages);
 
         return res.render('user/checkout/orderdetails', { 
             order: orderWithItemsAndImages, 
@@ -426,7 +426,7 @@ exports.displayInvoice = async(req,res)=>{
             storeEmail: "xyz@987.com",
             storePhone: "+91-012-345-6789",
         };
-
+        console.log(invoiceData)
         res.json(invoiceData);
     } catch (err) {
         console.error(err);

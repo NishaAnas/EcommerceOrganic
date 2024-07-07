@@ -6,6 +6,7 @@ const pincode = require('../../modals/pincode');
 const order = require('../../modals/order');
 const WalletController = require('./walletController');
 const Razorpay = require('razorpay');
+const prodVariation = require('../../modals/productVariation')
 
 // Initialize Razorpay instance
 const razorpayInstance = new Razorpay({
@@ -319,6 +320,21 @@ exports.getOrderDetails = async (req, res) => {
     });
 }
 
+// Function to update stock in ProductVariation
+
+const updateStock = async (items) => {
+    const updatedProducts = await Promise.all(items.map(async (item) => {
+        const productDetail = await prodVariation.findById(item.productId);
+        if (productDetail) {
+            const updatedStock = productDetail.stock + item.quantity;
+            // Update the stock in the database
+            await prodVariation.findByIdAndUpdate(item.productId, { stock: updatedStock }, { new: true });
+            return { ...productDetail.toObject(), updatedStock }; // Return the updated product details
+        }
+        return null;
+    }));
+    return updatedProducts;
+};
 
 //Cancel Order
 exports.cancelOrder = async (req, res) => {
@@ -326,12 +342,19 @@ exports.cancelOrder = async (req, res) => {
         const { orderId } = req.body;
 
         const orderToCancel = await order.findById(orderId).populate('userId');
-        console.log(`orderToCancel:${orderToCancel}`);
+        //console.log(`orderToCancel:${orderToCancel}`);
 
         if (!orderToCancel) {
             return res.status(404).json({ message: 'Order not found' });
         }
-        if (orderToCancel.payment.method === 'cod') {
+
+        const items = orderToCancel.items.map((item) => ({
+            productId: item.productId,
+            quantity: item.quantity
+        }));
+
+        
+        if (orderToCancel.payment.method === 'COD') {
             const updatedOrder = await order.findOneAndUpdate(
                 { _id: orderId },
                 { orderStatus: 'Cancelled' },
@@ -340,6 +363,11 @@ exports.cancelOrder = async (req, res) => {
             if (!updatedOrder) {
                 return res.status(500).json({ message: 'Failed to update order status' });
             }
+
+            // Call updateStock function
+            await updateStock(items);
+            //console.log(updatedProducts); 
+
             return res.status(200).json({
                 message: 'Order cancelled successfully',
                 order: updatedOrder
@@ -353,11 +381,14 @@ exports.cancelOrder = async (req, res) => {
                     { orderStatus: 'Cancelled' },
                     { new: true }
                 )
-                console.log(`updatedOrder:${updatedOrder}`);
+                //console.log(`updatedOrder:${updatedOrder}`);
 
                 if (!updatedOrder) {
                     throw new Error('Failed to update order status');
                 }
+                // Call updateStock function
+                await updateStock(items);
+                //console.log(updatedProducts); 
                 const userId = orderToCancel.userId;
                 const totalAmount = orderToCancel.totalAmount;
                 const orId = orderToCancel._id;
@@ -374,11 +405,14 @@ exports.cancelOrder = async (req, res) => {
             const updatedOrder = await order.findOneAndUpdate({ _id: orderId },
                 { orderStatus: 'Cancelled' },
                 { new: true })
-            console.log(`updatedOrder:${updatedOrder}`);
+            //console.log(`updatedOrder:${updatedOrder}`);
 
             if (!updatedOrder) {
                 throw new Error('Failed to update order status');
             }
+            // Call updateStock function
+            await updateStock(items);
+            //console.log(updatedProducts);
 
             const userId = orderToCancel.userId;
             const totalAmount = orderToCancel.totalAmount;
@@ -441,6 +475,19 @@ exports.cancelReturn = async(req,res)=>{
     }
 }
 
+//Update Stock for each item
+const updateStockForItem = async (item) => {
+    const productDetail = await prodVariation.findById(item.productId);
+    if (productDetail) {
+        const updatedStock = productDetail.stock + item.quantity;
+        await prodVariation.findByIdAndUpdate(item.productId, { stock: updatedStock }, { new: true });
+        return { ...productDetail.toObject(), updatedStock };
+    }
+    return null;
+};
+
+
+//Cancel Single Item
 exports.cancelOrderItem = async (req, res) => {
     try {
         const { orderId, itemId } = req.body;
@@ -457,14 +504,18 @@ exports.cancelOrderItem = async (req, res) => {
         if (itemIndex === -1) {
             return res.status(404).json({ message: 'Item not found in the order' });
         }
-
         const itemToCancel = orderToCancelItem.items[itemIndex];
-
         //console.log(itemToCancel)
 
         const paymentMethod = orderToCancelItem.payment.method;
         const itemAmount = itemToCancel.quantity * itemToCancel.productId.price;
         let updateQuery = {};
+
+        // Update stock for the item to be canceled
+        const updatedProduct = await updateStockForItem(itemToCancel);
+        if (!updatedProduct) {
+            return res.status(500).json({ message: 'Failed to update stock for the item' });
+        }
 
         if (orderToCancelItem.items.length === 1) {
             // If it's the last item, cancel the entire order
@@ -514,6 +565,7 @@ exports.cancelOrderItem = async (req, res) => {
 };
 
 
+//Return individual item
 exports.returnOrderItem = async(req,res)=>{
     try {
         const { orderId, itemId } = req.body;
@@ -547,13 +599,7 @@ exports.returnOrderItem = async(req,res)=>{
                 $inc: { totalAmount: -itemAmount }
             };
         } else if (paymentMethod === 'Razorpay') {
-            console.log(orderToReturnItem.payment.transactionId)
-            // const refund = await razorpayInstance.payments.refund(orderToReturnItem.payment.transactionId, {
-            //     amount: itemAmount * 100
-            // });
-            // if (!refund) {
-            //     throw new Error('Failed to process refund');
-            // }
+            //console.log(orderToReturnItem.payment.transactionId)
             orderToReturnItem.items.splice(itemIndex, 1);
             updateQuery = { 
                 $set: { items: orderToReturnItem.items },
@@ -570,12 +616,6 @@ exports.returnOrderItem = async(req,res)=>{
         }else{
             return res.status(400).json({ message: 'Invalid payment method' });
         }
-        // orderToReturnItem.items.splice(itemIndex, 1);
-        // updateQuery = { 
-        //     $set: { items: orderToReturnItem.items },
-        //     $inc: { totalAmount: -itemAmount }
-        // };
-
         const updatedOrder = await order.findOneAndUpdate(
             { _id: orderId },
             updateQuery,
