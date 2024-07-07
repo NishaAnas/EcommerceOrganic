@@ -39,7 +39,9 @@ router.get('/downloadReport', authController.downloadReport);
 router.get('/salesReport',authController.getSalesReportPage);
 
 //Revenue Data
-router.get('/revenueData', authController.getRevenueData);
+router.get('/Daily', authController.getDailyRevenue);
+router.get('/Monthly', authController.getMonthlyRevenue);
+router.get('/Yearly', authController.getYearlyRevenue);
 
 
 //GET AddCategory  page

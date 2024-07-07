@@ -43,6 +43,7 @@ exports.getOrdermanager = async(req,res)=>{
     }
 };
 
+//Change order status
 exports.changeOrderStatus = async (req, res) => {
     try {
         const { orderId, status } = req.body;

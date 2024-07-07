@@ -176,7 +176,7 @@ exports.getAdminhomePage = async(req, res) => {
             const totalRevenueChange = calculatePercentageChange(todaystotalRevenue, yesterdayTotalRevenue);
             const totalCouponDiscountChange = calculatePercentageChange(todaystotalCouponDiscount, yesterdayTotalCouponDiscount);
             
-            const chartData = await getChartData('weekly');
+            // const chartData = await getChartData('weekly');
 
                 res.render('admin/Authentication/dashbord', { 
                     layout: 'adminlayout' , 
@@ -188,7 +188,7 @@ exports.getAdminhomePage = async(req, res) => {
                     totalOrdersChange,
                     totalRevenueChange,
                     totalCouponDiscountChange,
-                    chartData,
+                    //chartData: JSON.stringify(chartData),
                     successMessage: successMessage , 
                     errorMessage: errorMessage });            
         } else {
@@ -202,58 +202,100 @@ exports.getAdminhomePage = async(req, res) => {
 }
 
 
-// Function to get chart data
-const getChartData = async (type) => {
-    let startDate, endDate;
-    switch (type) {
-        case 'weekly':
-            startDate = moment().startOf('isoWeek');
-            endDate = moment().endOf('isoWeek');
-            break;
-        case 'monthly':
-            startDate = moment().startOf('month');
-            endDate = moment().endOf('month');
-            break;
-        case 'yearly':
-            startDate = moment().startOf('year');
-            endDate = moment().endOf('year');
-            break;
-        default:
-            startDate = moment().startOf('isoWeek');
-            endDate = moment().endOf('isoWeek');
-    }
-
-    const orders = await order.find({
-        orderDate: { $gte: startDate.toDate(), $lte: endDate.toDate() }
-    });
-
-    // Group data by date and calculate revenue
-    const revenueData = {};
-    orders.forEach(order => {
-        const date = moment(order.orderDate).format('YYYY-MM-DD');
-        if (!revenueData[date]) {
-            revenueData[date] = 0;
-        }
-        revenueData[date] += order.totalAmount;
-    });
-
-    // Format the data 
-    const labels = Object.keys(revenueData);
-    const data = Object.values(revenueData);
-
-    return { labels, data };
-};
-
-exports.getRevenueData = async (req, res) => {
+exports.getDailyRevenue = async (req, res) => {
     try {
-        const { filter } = req.query;
-        const chartData = await getChartData(filter);
-        res.json(chartData);
+        const now = new Date();
+        const startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 9); // Last 10 days
+
+        const orders = await order.aggregate([
+            {
+                $match: {
+                    orderDate: { $gte: startDate, $lt: now },
+                    orderStatus: 'Completed'
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                        $dateToString: { format: "%Y-%m-%d", date: "$orderDate" }
+                    },
+                    totalRevenue: { $sum: "$totalAmount" }
+                }
+            },
+            {
+                $sort: { _id: -1 }
+            }
+        ]);
+
+        res.json(orders);
     } catch (error) {
-        console.error('Error fetching revenue data:', error);
-        res.status(500).json({ error: 'Server Error' });
+        console.error('Error fetching daily revenue:', error);
+        res.status(500).json({ error: 'Failed to fetch daily revenue' });
     }
 };
+
+exports.getMonthlyRevenue = async (req, res) => {
+    try {
+        const now = new Date();
+        const startDate = new Date(now.getFullYear(), 0, 1); // Start of the current year
+        const endDate = new Date(now.getFullYear() + 1, 0, 1); // Start of the next year
+
+        const orders = await order.aggregate([
+            {
+                $match: {
+                    orderDate: { $gte: startDate, $lt: endDate },
+                    orderStatus: 'Completed'
+                }
+            },
+            {
+                $group: {
+                    _id: { $month: "$orderDate" },
+                    totalRevenue: { $sum: "$totalAmount" }
+                }
+            },
+            {
+                $sort: { _id: 1 }
+            }
+        ]);
+
+        res.json(orders);
+    } catch (error) {
+        console.error('Error fetching monthly revenue:', error);
+        res.status(500).json({ error: 'Failed to fetch monthly revenue' });
+    }
+};
+
+
+exports.getYearlyRevenue = async (req, res) => {
+    try {
+        const startDate = new Date(2020, 0, 1); // Start of 2020
+        const now = new Date();
+
+        const orders = await order.aggregate([
+            {
+                $match: {
+                    orderDate: { $gte: startDate, $lt: now },
+                    orderStatus: 'Completed'
+                }
+            },
+            {
+                $group: {
+                    _id: { $year: "$orderDate" },
+                    totalRevenue: { $sum: "$totalAmount" }
+                }
+            },
+            {
+                $sort: { _id: 1 }
+            }
+        ]);
+
+        res.json(orders);
+    } catch (error) {
+        console.error('Error fetching yearly revenue:', error);
+        res.status(500).json({ error: 'Failed to fetch yearly revenue' });
+    }
+};
+
 
 
 
