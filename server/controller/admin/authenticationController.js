@@ -176,6 +176,8 @@ exports.getAdminhomePage = async(req, res) => {
             const totalRevenueChange = calculatePercentageChange(todaystotalRevenue, yesterdayTotalRevenue);
             const totalCouponDiscountChange = calculatePercentageChange(todaystotalCouponDiscount, yesterdayTotalCouponDiscount);
             
+            const chartData = await getChartData('weekly');
+
                 res.render('admin/Authentication/dashbord', { 
                     layout: 'adminlayout' , 
                     adminData,
@@ -186,6 +188,7 @@ exports.getAdminhomePage = async(req, res) => {
                     totalOrdersChange,
                     totalRevenueChange,
                     totalCouponDiscountChange,
+                    chartData,
                     successMessage: successMessage , 
                     errorMessage: errorMessage });            
         } else {
@@ -197,6 +200,61 @@ exports.getAdminhomePage = async(req, res) => {
         console.error(error);
         } 
 }
+
+
+// Function to get chart data
+const getChartData = async (type) => {
+    let startDate, endDate;
+    switch (type) {
+        case 'weekly':
+            startDate = moment().startOf('isoWeek');
+            endDate = moment().endOf('isoWeek');
+            break;
+        case 'monthly':
+            startDate = moment().startOf('month');
+            endDate = moment().endOf('month');
+            break;
+        case 'yearly':
+            startDate = moment().startOf('year');
+            endDate = moment().endOf('year');
+            break;
+        default:
+            startDate = moment().startOf('isoWeek');
+            endDate = moment().endOf('isoWeek');
+    }
+
+    const orders = await order.find({
+        orderDate: { $gte: startDate.toDate(), $lte: endDate.toDate() }
+    });
+
+    // Group data by date and calculate revenue
+    const revenueData = {};
+    orders.forEach(order => {
+        const date = moment(order.orderDate).format('YYYY-MM-DD');
+        if (!revenueData[date]) {
+            revenueData[date] = 0;
+        }
+        revenueData[date] += order.totalAmount;
+    });
+
+    // Format the data 
+    const labels = Object.keys(revenueData);
+    const data = Object.values(revenueData);
+
+    return { labels, data };
+};
+
+exports.getRevenueData = async (req, res) => {
+    try {
+        const { filter } = req.query;
+        const chartData = await getChartData(filter);
+        res.json(chartData);
+    } catch (error) {
+        console.error('Error fetching revenue data:', error);
+        res.status(500).json({ error: 'Server Error' });
+    }
+};
+
 
 
 const getOrders = async (type, startDate, endDate) => {

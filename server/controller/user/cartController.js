@@ -68,11 +68,11 @@ exports.showShoppingCart = async(req,res)=>{
                 totalPrice: item.totalPrice
             }
         }))
-        //console.log(cartitems);
+        console.log(cartitems);
         const totalQuantity = cart.items.reduce((acc, item) => acc + item.quantity, 0);
         const totalPriceOfAllProducts = cartitems.reduce((acc, item) => acc + item.totalPrice, 0);
        // console.log(totalQuantity);
-       // console.log(totalPriceOfAllProducts);
+            console.log(totalPriceOfAllProducts);
          // Store cart details in the session for checkout page
         req.session.cartDetails = {
             cartitems,

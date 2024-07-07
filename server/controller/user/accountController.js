@@ -499,6 +499,10 @@ exports.cancelOrderItem = async (req, res) => {
         if (!orderToCancelItem) {
             return res.status(404).json({ message: 'Order not found' });
         }
+        //console.log(orderToCancelItem);
+        if(orderToCancelItem.discountAmount){
+            return res.status(400).json({ message: 'For orders which applied coupons individual order cannot be cancelled' });
+        }
 
         const itemIndex = orderToCancelItem.items.findIndex(item => item._id.toString() === itemId);
         if (itemIndex === -1) {

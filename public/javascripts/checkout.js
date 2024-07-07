@@ -82,11 +82,12 @@ $(document).ready(function() {
                                 body: JSON.stringify(razorData)
                             });
                             
-                            if (!razorResponse.ok) {
-                                throw new Error('Network response was not ok during Razorpay confirmation');
+                            const razorResult = await razorResponse.json();
+                            if (!razorResponse.ok || razorResult.error) {
+                                throw new Error(razorResult.error || 'Network response was not ok during Razorpay confirmation');
                             }
 
-                            const razorResult = await razorResponse.json();
+                            //const razorResult = await razorResponse.json();
                             Swal.fire({
                                 title: 'Success!',
                                 text: razorResult.message,

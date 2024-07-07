@@ -91,6 +91,7 @@ exports.placeOrder = async (req, res) => {
     const userData = req.session.userLoggedInData;
     const shippingAddress = req.session.addressDetails;
     const cartDetails = req.session.cartDetails;
+    console.log(cartDetails.cartitems);
     const { deliveryOption, paymentOption} = req.body;
 
     if (!cartDetails) {
@@ -157,6 +158,8 @@ exports.placeOrder = async (req, res) => {
             delivery: delivery,
             orderStatus: 'Pending'
         };
+
+        console.log(orderData.items);
 
         // Check payment option
         if (paymentOption === 'cod') {
@@ -283,6 +286,7 @@ exports.payemntVerification = async (req, res) => {
     try {
         const { razorpayPaymentId, razorpayOrderId, razorpaySignature, orderId } = req.body;
         const paymentDocument = await razorpayInstance.payments.fetch(razorpayPaymentId);
+        console.log(paymentDocument);
 
         if (paymentDocument.status === 'captured') {
             await order.findByIdAndUpdate(orderId, {
@@ -295,7 +299,10 @@ exports.payemntVerification = async (req, res) => {
                 orderId: orderId
             });
         } else {
-            throw new Error('Payment not captured');
+            res.status(400).json({
+                error: 'Razorpay payment Failed',
+                orderId: orderId
+            });
         }
     } catch (error) {
         console.error('Error verifying payment:', error);
@@ -350,7 +357,6 @@ exports.getOrderDetails = async (req, res) => {
             ...orderDetails.toObject(),
             items: itemsWithImages
         };
-
         //console.log(orderWithItemsAndImages);
 
         return res.render('user/checkout/orderdetails', { 
@@ -426,7 +432,7 @@ exports.displayInvoice = async(req,res)=>{
             storeEmail: "xyz@987.com",
             storePhone: "+91-012-345-6789",
         };
-        console.log(invoiceData)
+        //console.log(invoiceData)
         res.json(invoiceData);
     } catch (err) {
         console.error(err);

@@ -1,3 +1,23 @@
+function removeCoupon() {
+    $('.coupon').val('');
+    $('.discount-with-coupon').text('- 00.00');
+    const originalTotal = parseFloat($('.total-price-of-all-products').text()).toFixed(2);
+    $('.total-price-with-discount-products').text(originalTotal);
+    $('.btn-remove-coupon').html('<i class="bi bi-eye"></i>').removeClass('btn-remove-coupon').addClass('btn-apply-coupon');
+
+    $.ajax({
+        url: '/updateCartTotal',
+        method: 'POST',
+        data: { newTotal: originalTotal },
+        success: function(response) {
+            console.log(response.message);
+        },
+        error: function(error) {
+            console.log('Error updating cart total:', error);
+        }
+    });
+}
+
 $(document).ready(function() {
     function updateQuantity(variantId, newQuantity) {
         $.ajax({
@@ -12,9 +32,9 @@ $(document).ready(function() {
                 $('#quantity-' + variantId).text(newQuantity);
                 $('#productquantity-' + variantId).text(newQuantity);
                 $('#total-price-' + variantId).text(response.prodtotalPrice.toFixed(2));
-                $('#total-price-of-all-products').text(response.totalPriceOfAllProducts.toFixed(2));
-                $('.total-quantity').text(response.totalQuantity);
                 $('.total-price-of-all-products').text(response.totalPriceOfAllProducts.toFixed(2));
+                $('.total-quantity').text(response.totalQuantity);
+                $('.total-price-with-discount-products').text(response.totalPriceOfAllProducts.toFixed(2));
                 //$('.quantity-increase[data-variant-id="' + variantId + '"]').prop('disabled', false);
 
                 if (response.error === 'Insufficient stock available.') {
@@ -26,6 +46,10 @@ $(document).ready(function() {
                     //showErrorModal('Insufficient stock available. Please reduce the quantity.');
                 } else{
                     $('.quantity-increase[data-variant-id="' + variantId + '"]').prop('disabled', false);
+                }
+                if ($('.coupon').val()) {
+                    removeCoupon();
+                    //alert('coupon applied')
                 }
             },
             error: function(xhr, status, error) {

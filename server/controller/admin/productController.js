@@ -68,7 +68,7 @@ try {
 
 //POST Add Product
 exports.postAddProduct= async(req,res)=>{
-const {sku,title,name,price,categoryId,isActive } = req.body; 
+const {sku,title,name,price,categoryId } = req.body; 
 
 const existingProduct = await product.findOne({ title: req.body.title });
         
@@ -95,8 +95,7 @@ const newProduct = new product({
     name:name,
     price:price,
     images:imagePaths,
-    categoryId:categoryId,
-    isActive: isActive === 'on' ? true : false, 
+    categoryId:categoryId, 
     createdAt: new Date(),
     updatedAt: null,
 });
@@ -312,15 +311,17 @@ exports.editVarientDetails = async (req, res) => {
             res.redirect(`/admin/editProduct/${req.params._id}`);
         }
 
-        await prodVariation.findByIdAndUpdate(variantId, {
+        const updatedVariation = await prodVariation.findByIdAndUpdate(variantId, {
             sku: req.body.sku,
             productId: req.body.productId,
             attributeName: req.body.attributeName,
             attributeValue: req.body.attributeValue,
             images: imagePath,
             price: req.body.price,
-            stock: req.body.stock
-        });
+            stock: req.body.stock,
+            isActive: req.body.stock > 0
+        }, { new: true });
+        
 
         req.flash('success', 'Variant updated successfully');
         res.redirect(`/admin/editProduct/${prodId}`);
