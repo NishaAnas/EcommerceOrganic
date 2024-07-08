@@ -597,3 +597,166 @@ const generateExcelReport = (orders, res) => {
     });
 };
 
+
+// Function to get best selling categories
+const getBestSellingCategories = async () => {
+    try {
+        const bestSellingCategories = await order.aggregate([
+            { $unwind: "$items" },
+            { $lookup: {
+                from: 'productvariations',
+                localField: 'items.productId',
+                foreignField: '_id',
+                as: 'productVariation'
+            }},
+            { $unwind: '$productVariation' },
+            { $lookup: {
+                from: 'products',
+                localField: 'productVariation.productId',
+                foreignField: '_id',
+                as: 'product'
+            }},
+            { $unwind: '$product' },
+            { $lookup: {
+                from: 'categories',
+                localField: 'product.categoryId',
+                foreignField: '_id',
+                as: 'category'
+            }},
+            { $group: {
+                _id: '$category._id',
+                categoryName: { $first: '$category.name' },
+                totalQuantity: { $sum: '$items.quantity' }
+            }},
+            { $sort: { totalQuantity: -1 } },
+            { $limit: 5 }
+        ]);
+
+        return bestSellingCategories;
+    } catch (error) {
+        throw new Error(error);
+    }
+};
+
+// Route for getting best selling categories
+exports.bestCategories = async (req, res) => {
+    try {
+        const bestSellingCategories = await getBestSellingCategories();
+        res.json(bestSellingCategories);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to retrieve best selling categories' });
+    }
+};
+
+
+// Function to get best selling products
+const getBestSellingProducts = async () => {
+    try {
+        const bestSellingProducts = await order.aggregate([
+            { $unwind: "$items" },
+            { $group: {
+                _id: "$items.productId",
+                totalQuantity: { $sum: "$items.quantity" }
+            }},
+            { $lookup: {
+                from: 'productvariations',
+                localField: '_id',
+                foreignField: '_id',
+                as: 'productVariation'
+            }},
+            { $unwind: '$productVariation' },
+            { $lookup: {
+                from: 'products',
+                localField: 'productVariation.productId',
+                foreignField: '_id',
+                as: 'product'
+            }},
+            { $unwind: '$product' },
+            { $lookup: {
+                from: 'categories',
+                localField: 'product.categoryId',
+                foreignField: '_id',
+                as: 'category'
+            }},
+            { $project: {
+                productName: '$product.name',
+                categoryName: '$category.name',
+                totalQuantity: '$totalQuantity'
+            }},
+            { $sort: { totalQuantity: -1 } },
+            { $limit: 5 }
+        ]);
+
+        return bestSellingProducts;
+    } catch (error) {
+        throw new Error(error);
+    }
+};
+
+// Route for getting best selling products
+exports.bestProducts = async (req, res) => {
+    try {
+        const bestSellingProducts = await getBestSellingProducts();
+        res.json(bestSellingProducts);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to retrieve best selling products' });
+    }
+};
+
+
+// Function to get best selling product variations
+const getBestSellingProductVariations = async () => {
+    try {
+        const bestSellingProductVariations = await order.aggregate([
+            { $unwind: "$items" },
+            { $group: {
+                _id: "$items.productId",
+                totalQuantity: { $sum: "$items.quantity" }
+            }},
+            { $lookup: {
+                from: 'productvariations',
+                localField: '_id',
+                foreignField: '_id',
+                as: 'productVariation'
+            }},
+            { $unwind: '$productVariation' },
+            { $lookup: {
+                from: 'products',
+                localField: 'productVariation.productId',
+                foreignField: '_id',
+                as: 'product'
+            }},
+            { $unwind: '$product' },
+            { $lookup: {
+                from: 'categories',
+                localField: 'product.categoryId',
+                foreignField: '_id',
+                as: 'category'
+            }},
+            { $project: {
+                productVariationSKU: '$productVariation.sku',
+                productName: '$productVariation.attributeValue',
+                categoryName: '$category.name',
+                totalQuantity: '$totalQuantity'
+            }},
+            { $sort: { totalQuantity: -1 } },
+            { $limit: 5 }
+        ]);
+
+        return bestSellingProductVariations;
+    } catch (error) {
+        throw new Error(error);
+    }
+};
+
+// Route for getting best selling product variations
+exports.bestVariations =async (req, res) => {
+    try {
+        const bestSellingProductVariations = await getBestSellingProductVariations();
+        res.json(bestSellingProductVariations);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to retrieve best selling product variations' });
+    }
+};
+
+

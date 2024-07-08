@@ -40,8 +40,18 @@ router.get('/salesReport',authController.getSalesReportPage);
 
 //Revenue Data
 router.get('/Daily', authController.getDailyRevenue);
+
 router.get('/Monthly', authController.getMonthlyRevenue);
+
 router.get('/Yearly', authController.getYearlyRevenue);
+
+
+//Finding Best sellers
+router.get('/bestCategory',authController.bestCategories);
+
+router.get('/bestProducts',authController.bestProducts);
+
+router.get('/bestVariations',authController.bestVariations);
 
 
 //GET AddCategory  page

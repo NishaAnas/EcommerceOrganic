@@ -9,6 +9,7 @@ const bcrypt = require('bcrypt')
 const path = require('path');
 
 
+
 //Get Product Management Page
 exports.getProductPage = async(req, res) => {
     try {

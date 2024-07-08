@@ -1,19 +1,23 @@
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+ <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <link rel="stylesheet" href="/stylesheets/dashboard.css">
-    <body>
-        <div class="container mt-4">
+<body>
+    <div class="container mt-4">
         <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4">
             <div class="col">
-                <div class="card radius-10 border-start border-0 border-3 border-info">
+                <div
+                    class="card radius-10 border-start border-0 border-3 border-info">
                     <div class="card-body">
                         <div class="d-flex align-items-center">
                             <div>
                                 <p class="mb-0 text-secondary">Total Orders</p>
-                                <h4 class="my-1 text-info" id="totalOrders">{{totalOrders}}</h4>
-                                <p class="mb-0 font-13">{{totalOrdersChange}} from last day</p>
+                                <h4 class="my-1 text-info"
+                                    id="totalOrders">{{totalOrders}}</h4>
+                                <p class="mb-0 font-13">{{totalOrdersChange}}
+                                    from last day</p>
                             </div>
-                            <div class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
+                            <div
+                                class="widgets-icons-2 rounded-circle bg-gradient-scooter text-white ms-auto">
                                 <i class="fa fa-shopping-cart"></i>
                             </div>
                         </div>
@@ -21,15 +25,19 @@
                 </div>
             </div>
             <div class="col">
-                <div class="card radius-10 border-start border-0 border-3 border-danger">
+                <div
+                    class="card radius-10 border-start border-0 border-3 border-danger">
                     <div class="card-body">
                         <div class="d-flex align-items-center">
                             <div>
                                 <p class="mb-0 text-secondary">Total Revenue</p>
-                                <h4 class="my-1 text-danger" id="totalRevenue">{{totalRevenue}}</h4>
-                                <p class="mb-0 font-13">{{totalRevenueChange}} from last day</p>
+                                <h4 class="my-1 text-danger"
+                                    id="totalRevenue">{{totalRevenue}}</h4>
+                                <p class="mb-0 font-13">{{totalRevenueChange}}
+                                    from last day</p>
                             </div>
-                            <div class="widgets-icons-2 rounded-circle bg-gradient-bloody text-white ms-auto">
+                            <div
+                                class="widgets-icons-2 rounded-circle bg-gradient-bloody text-white ms-auto">
                                 <i class="fa fa-inr"></i>
                             </div>
                         </div>
@@ -37,15 +45,21 @@
                 </div>
             </div>
             <div class="col">
-                <div class="card radius-10 border-start border-0 border-3 border-success">
+                <div
+                    class="card radius-10 border-start border-0 border-3 border-success">
                     <div class="card-body">
                         <div class="d-flex align-items-center">
                             <div>
-                                <p class="mb-0 text-secondary">Coupon Discount</p>
-                                <h4 class="my-1 text-success" id="totalCouponDiscount">{{totalCouponDiscount}}</h4>
-                                <p class="mb-0 font-13">{{totalCouponDiscountChange}} from last day</p>
+                                <p class="mb-0 text-secondary">Coupon
+                                    Discount</p>
+                                <h4 class="my-1 text-success"
+                                    id="totalCouponDiscount">{{totalCouponDiscount}}</h4>
+                                <p
+                                    class="mb-0 font-13">{{totalCouponDiscountChange}}
+                                    from last day</p>
                             </div>
-                            <div class="widgets-icons-2 rounded-circle bg-gradient-ohhappiness text-white ms-auto">
+                            <div
+                                class="widgets-icons-2 rounded-circle bg-gradient-ohhappiness text-white ms-auto">
                                 <i class="fa fa-gift"></i>
                             </div>
                         </div>
@@ -53,15 +67,19 @@
                 </div>
             </div>
             <div class="col">
-                <div class="card radius-10 border-start border-0 border-3 border-warning">
+                <div
+                    class="card radius-10 border-start border-0 border-3 border-warning">
                     <div class="card-body">
                         <div class="d-flex align-items-center">
                             <div>
-                                <p class="mb-0 text-secondary">Total Customers</p>
-                                <h4 class="my-1 text-warning" id="totalCustomers">{{totalCustomers}}</h4>
+                                <p class="mb-0 text-secondary">Total
+                                    Customers</p>
+                                <h4 class="my-1 text-warning"
+                                    id="totalCustomers">{{totalCustomers}}</h4>
                                 <p class="mb-0 font-13">+8.4% from last week</p>
                             </div>
-                            <div class="widgets-icons-2 rounded-circle bg-gradient-blooker text-white ms-auto">
+                            <div
+                                class="widgets-icons-2 rounded-circle bg-gradient-blooker text-white ms-auto">
                                 <i class="fa fa-users"></i>
                             </div>
                         </div>
@@ -71,66 +89,46 @@
         </div>
     </div>
 
-
-<div class="row">
-    {{!-- Graph details --}}
+    <div class="row">
+        {{!-- Graph details --}}
         <div class="col-md-8">
             <div class="d-flex  align-items-center justify-content-end">
-                <select class="graphSales" style="background-color: antiquewhite; border-radius: 4px;">
-                <option selected disabled>Daily</option>
-                <option value="Daily">Daily</option>
-                <option value="Monthly">Monthly</option>
-                <option value="Yearly">Yearly</option>
-            </select>
+                <select class="graphSales"
+                    style="background-color: antiquewhite; border-radius: 4px;">
+                    <option selected disabled>Daily</option>
+                    <option value="Daily">Daily</option>
+                    <option value="Monthly">Monthly</option>
+                    <option value="Yearly">Yearly</option>
+                </select>
                 <button class="btn btn-success ms-2 graphChange">Apply</button>
             </div>
-                <canvas class="myChart mt-4" width="400" height="200"></canvas>
+            <canvas class="myChart mt-4" width="400" height="200"></canvas>
         </div>
 
         {{!-- best Sellers table --}}
-    <div class="col-md-4">
-            <div class="table-responsive">
-                <h3>Bestsellers</h3>
-                <table class="table table-bordered">
+        <div class="col-md-4">
+            <div class="container">
+                <h1>Best Sellers</h1>
+                <select id="bestSellersDropdown"
+                    style="background-color: antiquewhite; border-radius: 4px; margin-bottom: 10px;">
+                    <option value="category">Category</option>
+                    <option value="product">Product</option>
+                    <option value="variation">Product Variation</option>
+                </select>
+                <table id="bestSellersTable" class="table table-bordered">
                     <thead class="thead-light">
-                        <tr>
-                            <th>Product Name</th>
-                            <th>Orders Count</th>
+                        <tr id="tableHeaders">
+                            <!-- Headers  -->
                         </tr>
+                        <tbody id="bestSellersTableBody">
+                            <!-- Table rows  -->
+                        </tbody>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>Organic Apples</td>
-                            <td>25</td>
-                        </tr>
-                        <tr>
-                            <td>Fresh Avocados</td>
-                            <td>20</td>
-                        </tr>
-                        <tr>
-                            <td>Natural Almonds</td>
-                            <td>18</td>
-                        </tr>
-                        <tr>
-                            <td>Handmade Soap</td>
-                            <td>15</td>
-                        </tr>
-                        <tr>
-                            <td>Pure Honey</td>
-                            <td>12</td>
-                        </tr>
-                    </tbody>
                 </table>
             </div>
         </div>
-    </div>
-
-                        
-                    
-</body>
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-
+    </body>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', () => {
     const fetchAndDisplayData = (url, chartLabel) => {
@@ -224,5 +222,84 @@
         }
     });
 });
+
+    // Function to fetch best selling categories
+        const fetchBestSellers = (type) => {
+            let url = '';
+                if (type === 'category') url = '/admin/bestCategory';
+                if (type === 'product') url = '/admin/bestProducts';
+                if (type === 'variation') url = '/admin/bestVariations';
+
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function(data) {
+                displayBestSellers(data, type);
+                },
+                error: function(err) {
+                    console.error(`Error fetching best selling ${type}s:`, err);
+                }
+            });
+            };
+
+            // Function to display best sellers based on type (category, product, variation)
+            const displayBestSellers = (data, type) => {
+                let headersHtml = '';
+                let rowsHtml = '';
+
+                if (type === 'category') {
+                    headersHtml = `
+                        <th>Category Name</th>
+                        <th>Total Orders</th>
+                    `;
+                    data.forEach(item => {
+                        rowsHtml += `
+                            <tr>
+                                <td>${item.categoryName}</td>
+                                <td>${item.totalQuantity}</td>
+                            </tr>
+                        `;
+                    });
+                } else if (type === 'product') {
+                    headersHtml = `
+                        <th>Product Name</th>
+                        <th>Total Orders</th>
+                    `;
+                    data.forEach(item => {
+                        rowsHtml += `
+                            <tr>
+                                <td>${item.productName}</td>
+                                <td>${item.totalQuantity}</td>
+                            </tr>
+                        `;
+                    });
+                } else if (type === 'variation') {
+                    headersHtml = `
+                        <th>Attribute Name</th>
+                        <th>Total Orders</th>
+                    `;
+                    data.forEach(item => {
+                        rowsHtml += `
+                            <tr>
+                                <td>${item.productName}</td>
+                                <td>${item.totalQuantity}</td>
+                            </tr>
+                        `;
+                    });
+                }
+
+                $('#tableHeaders').html(headersHtml);
+                $('#bestSellersTableBody').html(rowsHtml);
+            };
+
+            // Fetch best selling categories on page load
+            fetchBestSellers('category');
+
+            // Event listener for the dropdown to select best sellers type
+            $('#bestSellersDropdown').change(function() {
+                const selectedValue = $(this).val();
+                fetchBestSellers(selectedValue);
+            });
+
 
     </script>
