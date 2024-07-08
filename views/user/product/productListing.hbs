@@ -190,20 +190,8 @@
                     <span id="new-category-name" style="display: none;">{{Category.name}}</span>
                 </h4>
                 <div class="d-flex flex-column justify-content-center align-items-start gap-3">
-                {{#if selectedCategories}}
-                    <div class="selected-categories" style="display: block;">
-                        <strong>Selected Categories:</strong>
-                        {{#each selectedCategoriesNames}}
-                            <span class="selected-category-label">{{this.name}}<strong> / </strong></span> 
-                        {{/each}}
-                    </div>
-                {{/if}}
-                {{#if maxPrice}}
-                    <div class="selected-max-price" style="display: block;">
-                        <strong>Selected Max Price:</strong>
-                        <span class="selected-max-price-label">Rs{{maxPrice}}</span>
-                    </div>
-                {{/if}}
+                    <div class="selected-categories" style="display: none;"></div>
+                    <div class="selected-max-price" style="display: none;"></div>
                 </div>
                 <div id="search-error" style="display: none; color: red;">This product is not in the filtered list.</div>
                 <input type="hidden" id="category-id" value="{{Category._id}}">

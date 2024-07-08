@@ -17,12 +17,6 @@ $(document).ready(function () {
         fetchFilteredProducts();
     });
 
-    $('.pagination-link').click(function (event) {
-        event.preventDefault(); 
-        const page = $(this).data('page');
-        fetchFilteredProducts(page);
-    });
-
     $('#filter-form').submit(function(event) {
         event.preventDefault();
         fetchFilteredProducts();
@@ -54,17 +48,43 @@ $(document).ready(function () {
                 if (response.products.length > 0) {
                     $('#search-error').hide();
                     renderProducts(response.products);
-                    updatePagination(response.currentPage, response.totalPages);
+                    updatePagination(response.currentPage, response.totalPages, response.filters);
                 } else {
                     $('#search-error').show();
                     $('#product-list').html('');
-                    updatePagination(1, 1);
+                    updatePagination(1, 1, {});
                 }
+                console.log('Selected Categories Names:', response.selectedCategoriesNames);
+            console.log('Max Price:', response.maxPrice);
+
+            // Update selected categories and max price
+            updateSelectedFilters(response.selectedCategoriesNames, response.maxPrice);
             },
             error: function() {
                 $('#search-error').show();
             }
         });
+    }
+
+    function updateSelectedFilters(selectedCategoriesNames, maxPrice) {
+        if (selectedCategoriesNames.length > 0) {
+            let categoriesHtml = '<div class="selected-categories" style="display: block;"><strong>Selected Categories:</strong>';
+            selectedCategoriesNames.forEach(category => {
+                categoriesHtml += `<span class="selected-category-label">${category.name}<strong> / </strong></span>`;
+            });
+            categoriesHtml += '</div>';
+            $('.selected-categories').html(categoriesHtml).show();
+        } else {
+            $('.selected-categories').hide();
+        }
+    
+        // Update max price
+        if (maxPrice) {
+            const maxPriceHtml = `<div class="selected-max-price" style="display: block;"><strong>Selected Max Price:</strong><span class="selected-max-price-label">Rs${maxPrice}</span></div>`;
+            $('.selected-max-price').html(maxPriceHtml).show();
+        } else {
+            $('.selected-max-price').hide();
+        }
     }
 
     function renderProducts(products) {
@@ -96,21 +116,33 @@ $(document).ready(function () {
         });
     }
 
-    function updatePagination(currentPage, totalPages) {
-        const paginationContainer = $('.pagination-container');
+    function updatePagination(currentPage, totalPages, filters) {
         const paginationSummary = $('.pagination-summary');
         const paginationLinks = $('.pagination-links');
 
         paginationSummary.text(`Page ${currentPage} of ${totalPages}`);
         paginationLinks.empty();
 
+        const filterParams = $.param(filters);
+
         if (currentPage > 1) {
-            paginationLinks.append(`<a href="#" class="pagination-link text-primary" data-page="${currentPage - 1}">Previous</a>`);
+            paginationLinks.append(`<a href="#" class="pagination-link text-primary" data-page="${currentPage - 1}" data-filters="${filterParams}">Previous</a>`);
+        }
+
+        for (let i = 1; i <= totalPages; i++) {
+            const activeClass = i === currentPage ? 'active' : '';
+            paginationLinks.append(`<a href="#" class="pagination-link text-primary ${activeClass}" data-page="${i}" data-filters="${filterParams}">${i}</a>`);
         }
 
         if (currentPage < totalPages) {
-            paginationLinks.append(`<a href="#" class="pagination-link text-primary" data-page="${currentPage + 1}">Next</a>`);
+            paginationLinks.append(`<a href="#" class="pagination-link text-primary" data-page="${currentPage + 1}" data-filters="${filterParams}">Next</a>`);
         }
+
+        $('.pagination-link').click(function (event) {
+            event.preventDefault();
+            const page = $(this).data('page');
+            fetchFilteredProducts(page);
+        });
     }
 
     // Fetch initial products on page load

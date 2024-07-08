@@ -14,15 +14,7 @@ exports.getCategories = async (req, res) => {
    
    const userData = req.session.userLoggedInData;
    let categories = await category.find().lean();
-   req.session.categoryOffers = {};
-   for (let category of categories) {
-      const offer = await offers.findOne({ applicableItems: category.name }).lean();
-      if (offer) {
-         category.offer = offer;
-         req.session.categoryOffers[category._id] = offer; 
-      }
-   }
-   console.log(categories)
+   
    res.render('user/product/categorylisting', { 
       categories,
       userData, 
@@ -42,7 +34,6 @@ exports.getCategories = async (req, res) => {
          if (!categoryId) {
             return res.status(400).json({ error: 'Error in fetching Category Id' });
          }
-         const offerDetails = req.session.categoryOffers || {};
 
          const page = parseInt(req.query.page) || 1;
          const limit = 5;
@@ -78,34 +69,22 @@ exports.getCategories = async (req, res) => {
             .limit(limit)
             .lean();
 
-            const discount = {};
-            for (let product of products) {
-               const categoryOffer = offerDetails[categoryId];
-               if (categoryOffer) {
-                  product.categoryOfferoffer = categoryOffer;
-                  product.discount = calculateDiscountedPrice(product.price, categoryOffer);
-                  product.discountedPrice = product.price -product.discount;
-                  discount[product._id] = product.discount;
-               }
-         }
-               req.session.productDiscount =  discount;
-               console.log(products)
-
          const totalProducts = await product.countDocuments({ categoryId, ...categoryCondition, ...searchCondition, ...priceCondition });
          const totalPages = Math.ceil(totalProducts / limit);
+
+         const categoryName = await category.findOne({ _id: categoryId }, 'name').lean();
+         const selectedCategoriesNames = await category.find({ _id: { $in: selectedCategories } }, 'name').lean();
+         console.log(selectedCategoriesNames)
 
          if (req.xhr) {
             return res.json({
                   products,
                   currentPage: page,
-                  totalPages
+                  totalPages,
+                  selectedCategoriesNames,
+                  maxPrice
             });
          }
-
-         const categoryName = await category.findOne({ _id: categoryId }, 'name').lean();
-         const selectedCategoriesNames = await category.find({ _id: { $in: selectedCategories } }, 'name').lean();
-
-         //console.log(products)
 
          res.render('user/product/productListing', {
             title: 'Products Listing',
