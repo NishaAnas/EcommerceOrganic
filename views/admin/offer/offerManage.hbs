@@ -185,8 +185,6 @@
                                     <select class="form-control" id="editType" name="type">
                                         <option value="Product">Product</option>
                                         <option value="Category">Category</option>
-                                        <option value="Referral">Referral</option>
-                                        <option value="General">General</option>
                                     </select>
                                 </div>
                             </div>
@@ -268,8 +266,6 @@
                             });
                         }
                     });
-                } else {
-                    applicableItems.prop('disabled', true);
                 }
             });
 
@@ -284,7 +280,7 @@
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
-                        text: 'Start Date is after End Date'
+                        text: 'Date Error check Start Date and End Date'
                     });
                     return;
                 }
@@ -367,7 +363,7 @@
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
-                text: 'Start Date is after End Date'
+                text: 'Date Error check Start Date and End Date'
             });
             return;
         }

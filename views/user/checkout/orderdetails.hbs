@@ -25,7 +25,10 @@
                 </div>
                 <div class="row">
                     <div class="col">Final Amount:</div>
-                    <div class="col total-amount">₹{{  order.totalAmount }}  <a href="#" data-orderid="{{ order._id }}" style="color:blue; text-decoration: underline;" data-bs-toggle="modal" data-bs-target="#invoiceModal">View Invoice</a></div>
+                    <div class="col total-amount">₹{{  order.totalAmount }} 
+                        {{#if (isEqual order.orderStatus "Completed")}}
+                        <a href="#" data-orderid="{{ order._id }}" style="color:blue; text-decoration: underline;" data-bs-toggle="modal" data-bs-target="#invoiceModal">View Invoice</a></div>
+                        {{/if}}
                     
                 </div>
                 <div class="row">

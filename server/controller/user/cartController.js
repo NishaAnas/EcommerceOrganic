@@ -62,10 +62,10 @@ exports.showShoppingCart = async(req,res)=>{
                 baseProduct:baseProduct.title,
                 category:categories.name,
                 basePrice:baseProduct.price,
-                actualPrice:variant.price+baseProduct.price,
+                actualPrice:variant.offerPrice ? variant.offerPrice : variant.price+baseProduct.price,
                 productImage:image,
                 quantity: item.quantity,
-                totalPrice: item.totalPrice
+                totalPrice: item.totalPrice.toFixed(2)
             }
         }))
         console.log(cartitems);
@@ -155,13 +155,15 @@ exports.addToCart = async(req,res)=>{
         const baseProduct = await Product.findById(variant.productId);
         //console.log(baseProduct)
 
+
         // Calculate the total price
-        const totalPrice = baseProduct.price + variant.price;
+        let totalPrice =0;
+        const offerPrice = variant.offerPrice;
+        variant.offerPrice ? totalPrice = offerPrice : baseProduct.price + variant.price
         //console.log(totalPrice)
         
         // Check if the item already exists in the cart
         const existingItemIndex = existingShoppingCart.items.findIndex(item => item.product.equals(variantId));
-
         if (existingItemIndex !== -1) {
             // If the item already exists,
             req.flash('error', 'This item is already in your cart.');
@@ -231,10 +233,10 @@ exports.updateCartItem = async (req, res) => {
 
         // Find the base product to get its price
         const baseProduct = await Product.findById(variant.productId);
-        const actualPrice = baseProduct.price + variant.price;
+        const actualPrice = variant.offerPrice ? variant.offerPrice : variant.price+baseProduct.price
         const prodtotalPrice = actualPrice * quantity;
         const userId = req.session.userLoggedInData.userId;
-
+        
         // Update the quantity and total price of the product in the shopping cart
         const updatedCartItem = await shoppingCart.findOneAndUpdate(
             { user: userId, 'items.product': variantId },

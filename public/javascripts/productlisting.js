@@ -100,8 +100,8 @@ $(document).ready(function () {
                             <img src="/${product.images[0]}" alt="${product.title}" loading="lazy" class="img img-responsive">
                             <div class="profile-name">${product.name}</div>
                             <div class="profile-username"><div class="price">
-                                ${product.discountedPrice ? `
-                                    Rs.${product.discountedPrice}
+                                ${product.finalPrice ? `
+                                    Rs.${product.finalPrice}
                                     <span class="original-price text-muted" style="text-decoration: line-through;">Rs.${product.price}</span>
                                 ` : `
                                     Rs.${product.price}

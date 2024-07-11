@@ -10,8 +10,20 @@ exports.getOfferManage = async (req, res) => {
         const skip = (page - 1) * limit;
     
         const offers = await offer.find({}).skip(skip).limit(limit).lean();
+        // Update the status of offers based on their end date
+        const currentDate = new Date();
+        offers.forEach(async (Offer) => {
+            if (new Date(Offer.endDate) < currentDate) {
+                Offer.isActive = false;
+                await offer.updateOne({ _id: Offer._id }, { isActive: false });
+            }else{
+                Offer.isActive = true;
+                await offer.updateOne({ _id: Offer._id }, { isActive: true });
+            }
+        });
         const totaloffers = await offer.countDocuments({});
         const totalPages = Math.ceil(totaloffers / limit);
+
 
         res.render('admin/offer/offerManage', {
             layout: 'adminlayout',
@@ -51,6 +63,8 @@ exports.addOffers = async (req, res) => {
     if(discountType==='Percentage' && discountValue > 90){
         return res.status(400).json({error:'For percentage Type discount cant be grater than 90% '});
     }
+    const currentDate = new Date();
+    const isActive = (new Date(startDate) <= currentDate && new Date(endDate) >= currentDate);
 
 
     //create new offer object
@@ -61,10 +75,28 @@ exports.addOffers = async (req, res) => {
         discountType,
         discountValue,
         startDate,
-        endDate
+        endDate,
+        isActive
     })
     try{
-        await offer.create(newOffer);
+        const savedOffer = await offer.create(newOffer);
+
+        // Update the categoryOffer field and productOffer field
+        if (type === 'Category') {
+            const categories = await category.find({ name: { $in: applicableItems } }).select('_id');
+            const categoryIds = categories.map(category => category._id);
+            await product.updateMany(
+                { categoryId: { $in: categoryIds } },
+                { categoryOffer: savedOffer._id }
+            );
+        } else if (type === 'Product') {
+            const products = await product.find({ name: { $in: applicableItems } }).select('_id');
+            const productIds = products.map(product => product._id);
+            await product.updateMany(
+                { _id: { $in: productIds } },
+                { productOffer: savedOffer._id }
+            );
+        }
         res.status(200).json('Offer Added Successfully');
     }catch(error){
         console.log(error);
@@ -82,6 +114,7 @@ exports.getOffer = async (req, res) => {
         console.log(offers);
         res.json(offers);
     } catch (err) {
+        console.log(err)
         res.status(500).json({ error: 'Server error' });
     }
 };
@@ -91,9 +124,10 @@ exports.editOffer = async (req, res) => {
     const { title, type, applicableItems, discountType, discountValue, startDate, endDate, isActive } = req.body;
     //console.log(req.body);
     const offerId = req.params._id;
-    console.log(offerId);
+    //console.log(offerId);
     try {
         const existingOfferCheck = await offer.findOne({ title });
+        //if not the same document
         if (existingOfferCheck && existingOfferCheck._id.toString() !== offerId) {
             const existingOfferName = existingOfferCheck.title.toLowerCase().trim();
             const requestedOfferName = req.body.title.toLowerCase().trim();
@@ -103,19 +137,38 @@ exports.editOffer = async (req, res) => {
                 res.status(400).json()
             }
         }
-        await offer.findByIdAndUpdate(req.params._id, {
+
+        const currentDate = new Date();
+        const newIsActive = (new Date(startDate) <= currentDate && new Date(endDate) >= currentDate);
+
+        const updatedOffer = await offer.findByIdAndUpdate(req.params._id, {
             title,
             type,
             applicableItems,
             discountType,
             discountValue,
             startDate,
-            endDate
-
+            endDate,
+            isActive: newIsActive
         })
+
+        // Clear previous offer from products
+        if (type === 'Category') {
+            await product.updateMany({ categoryOffer: offerId },{ categoryOffer: null });
+            const categories = await category.find({ name: { $in: applicableItems } }).select('_id');
+            const categoryIds = categories.map(category => category._id);
+            await product.updateMany({ categoryId: { $in: categoryIds } },{ categoryOffer: updatedOffer._id });
+        } else if (type === 'Product') {
+            await product.updateMany({ productOffer: offerId },{ productOffer: null });
+            const products = await product.find({ name: { $in: applicableItems } }).select('_id');
+            const productIds = products.map(product => product._id);
+            await product.updateMany({ _id: { $in: productIds } },{ productOffer: updatedOffer._id });
+        }
+
         req.flash('success', 'Offers updated successfully');
         res.status(200).send('Offer updated successfully!');
     } catch (error) {
+        console.log(error);
         res.status(500).send('Failed to update offer');
     }
 };

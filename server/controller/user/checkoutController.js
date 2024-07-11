@@ -62,7 +62,7 @@ exports.getcheckOut = async (req, res) => {
             return res.redirect('/cart');
         }
 
-        console.log(req.session.cartDetails.cartitems);
+        //console.log(req.session.cartDetails.cartitems);
 
         return res.render('user/checkout/checkout', {
             userData,
@@ -85,26 +85,19 @@ exports.getcheckOut = async (req, res) => {
     }
 }
 
+
 //POST Checkout (Place Order)
 exports.placeOrder = async (req, res) => {
     //console.log(req.body);
     const userData = req.session.userLoggedInData;
     const shippingAddress = req.session.addressDetails;
     const cartDetails = req.session.cartDetails;
-    console.log(cartDetails.cartitems);
+    console.log(`cartDetails : ${cartDetails}`);
     const { deliveryOption, paymentOption} = req.body;
 
     if (!cartDetails) {
         req.flash('error', 'Your cart is empty.');
         return res.redirect('/cart');
-    }
-
-    if (!shippingAddress) {
-        return res.status(400).json({ error: 'Shipping address is required.' });
-    }
-
-    if (!paymentOption) {
-        return res.status(400).json({ error: 'Payment option is required.' });
     }
 
     if (!shippingAddress) {
@@ -138,7 +131,7 @@ exports.placeOrder = async (req, res) => {
         }
 
         const totalAmount = cartDetails.afterDiscountTotal + deliveryFee;
-        //console.log(totalAmount);
+        console.log(`total Amount :${totalAmount}`);
 
         // Create delivery details
         const delivery = {
@@ -159,7 +152,7 @@ exports.placeOrder = async (req, res) => {
             orderStatus: 'Pending'
         };
 
-        console.log(orderData.items);
+        console.log(`order Data : ${orderData.items}`);
 
         // Check payment option
         if (paymentOption === 'cod') {
@@ -185,6 +178,7 @@ exports.placeOrder = async (req, res) => {
             });
         } else if (paymentOption === 'razorpay') {
             const amount = totalAmount * 100; // Convert to paise
+            console.log(`amount :${amount}`);
             const options = {
                 amount: amount,
                 currency: 'INR',

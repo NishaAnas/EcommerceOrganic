@@ -8,7 +8,7 @@ const offerSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        enum: ['Product', 'Category', 'Referral', 'General'],
+        enum: ['Product', 'Category'],
         required: true
     },
     applicableItems: {
@@ -41,5 +41,7 @@ const offerSchema = new mongoose.Schema({
         default:Date.now
     }
 });
+
+
 
 module.exports = mongoose.model('Offer', offerSchema);

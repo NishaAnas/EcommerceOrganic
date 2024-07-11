@@ -45,7 +45,15 @@
                     <span style="font-size: 12px;">{{categoryName}}</span>
                 </div>
                 <p><b>Product Details   : </b> {{productDetails.title}}</p>
-                <p><b>Price:</b>{{actualPrice}} Rupees</p>
+                <p>
+                    <b>Price:</b>
+                    {{#if offerPrice}}
+                    <span style="text-decoration: line-through; color: red;">{{actualPrice}} Rupees</span>
+                    <span>{{offerPrice}} Rupees</span>
+                    {{else}}
+                    <span>{{actualPrice}} Rupees</span>
+                    {{/if}}
+                </p>
                 <div class="d-flex align-items-baseline gap-4">
                     <!-- Display the stock details dynamically -->
                         {{#if (gt variantDetails.stock 0)}}

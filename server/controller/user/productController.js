@@ -4,7 +4,7 @@ const product = require('../../modals/product');
 const prodVariation = require('../../modals/productVariation');
 const shoppingCart = require('../../modals/shoppingCart');
 const wishlist = require('../../modals/wishlist');
-const offers = require('../../modals/offer');
+const offer = require('../../modals/offer');
 const crypto = require('crypto')
 
 // Get Category Page
@@ -13,16 +13,39 @@ exports.getCategories = async (req, res) => {
    const errorMessage = req.flash('error');
    
    const userData = req.session.userLoggedInData;
-   let categories = await category.find().lean();
-   
-   res.render('user/product/categorylisting', { 
-      categories,
-      userData, 
-      success: successMessage, 
-      error: errorMessage,
-   });
-};
+   try{
+      let categories = await category.find().lean();
 
+      const activeOffers = await offer.find({
+         isActive: true,
+         type: "Category",
+         startDate: { $lte: new Date() },
+         endDate: { $gte: new Date() }
+      }).lean();
+      //console.log(activeOffers);
+   
+     // Attach offers to respective categories
+      categories = categories.map(category => {
+         const categoryOffer = activeOffers.find(offer => offer.applicableItems.toString() === category.name.toString());
+         if (categoryOffer) {
+            category.offer = categoryOffer;
+         }
+         return category;
+      });
+      console.log(categories);
+
+      res.render('user/product/categorylisting', { 
+         categories,
+         userData, 
+         success: successMessage, 
+         error: errorMessage,
+      });
+   }catch(error){
+      console.log(error);
+         req.flash('error', 'Server Error');
+         res.redirect('/');
+   }
+};
 
 // GET Product Listing Page
    exports.productListing = async (req, res) => {
@@ -76,6 +99,28 @@ exports.getCategories = async (req, res) => {
          const selectedCategoriesNames = await category.find({ _id: { $in: selectedCategories } }, 'name').lean();
          console.log(selectedCategoriesNames)
 
+      // Apply category discount to each product if applicable
+      for (let prod of products) {
+         if (prod.categoryOffer) {
+            const categoryOffer = await offer.findById(prod.categoryOffer);
+
+            if (categoryOffer && categoryOffer.isActive) {
+               const categoryDiscount = categoryOffer.discountType === 'Percentage' ?
+                  (prod.price * categoryOffer.discountValue / 100) :
+                  categoryOffer.discountValue;
+
+               prod.offerDiscount = categoryDiscount;
+               prod.finalPrice = prod.price - categoryDiscount; 
+            } else {
+               prod.offerDiscount = 0;
+               prod.finalPrice = null; 
+            }
+         } else {
+            prod.finalPrice = null; 
+         }
+      }
+         console.log(products)
+
          if (req.xhr) {
             return res.json({
                   products,
@@ -107,14 +152,6 @@ exports.getCategories = async (req, res) => {
       }
    };
 
-   //calculate discount
-   function calculateDiscountedPrice(price, offer) {
-      if (offer.discountType === 'Percentage') {
-         return Math.floor((price * offer.discountValue / 100));
-      } else {
-         return  offer.discountValue;
-      }
-   }
 
 
 //GET Product Details Page
@@ -128,10 +165,33 @@ exports.productDetails = async (req, res) => {
       const variantDetails = await prodVariation.findById(req.params.variantId).lean();
       const productDetails = await product.findById(variantDetails.productId).lean();
       const actualPrice = productDetails.price + variantDetails.price;
+      
+      let offerPrice = 0;
+      // Calculate offer price if applicable
+      if (productDetails.categoryOffer || productDetails.productOffer) {
+         const categoryOffer = productDetails.categoryOffer ? await offer.findById(productDetails.categoryOffer).lean() : null;
+         const productOffer = productDetails.productOffer ? await offer.findById(productDetails.productOffer).lean() : null;
 
-      // Fetch discount prices from session
-      const discountedPrices = req.session.discountedPrices || {};
-      const variantDiscountPrice = discountedPrices[variantDetails._id] || actualPrice;
+         let maxDiscount = 0;
+         if (categoryOffer) {
+            const categoryDiscount = categoryOffer.discountType === 'Percentage' ? (actualPrice * categoryOffer.discountValue) / 100 : categoryOffer.discountValue;
+            maxDiscount = Math.max(maxDiscount, categoryDiscount);
+         }
+         if (productOffer) {
+            const productDiscount = productOffer.discountType === 'Percentage' ? (actualPrice * productOffer.discountValue) / 100 : productOffer.discountValue;
+            maxDiscount = Math.max(maxDiscount, productDiscount);
+         }
+         offerPrice = Number(actualPrice - maxDiscount).toFixed(1);
+      }
+
+      // Update the offerPrice in the productVariation collection
+      if(offerPrice!==0){
+         //offerPrice = Number(offerPrice.toFixed(1))
+         await prodVariation.findByIdAndUpdate(req.params.variantId, { offerPrice });
+      }
+
+      const products = await prodVariation.findByIdAndUpdate(req.params.variantId);
+      console.log(products);
 
       // Fetch category details
       const categoryId = productDetails.categoryId;
@@ -182,7 +242,8 @@ exports.productDetails = async (req, res) => {
          productDetails,
          categoryName, 
          variantDetails, 
-         actualPrice, 
+         actualPrice,
+         offerPrice, 
          userData,
          sixRandomVariants, 
          rating, 
@@ -240,38 +301,6 @@ exports.getProductPlus = async (req, res) => {
       //console.log(productList);
       const totalProducts = await prodVariation.countDocuments(query);
       const totalPages = Math.ceil(totalProducts / limit);
-
-      const productDiscount = req.session.productDiscount || {};
-      const discountedPrices = {};
-      console.log(productDiscount);
-
-      //calculate the discounted price of each product by subtarcing the discount with variation.price
-      //make this discounted price into session 
-      //if discounted product is there then calculate the variation.discounted price by 
-      //adding this discounted pirce with the base price
-      //if not no discount price
-
-      // productList.forEach(variation => {
-      //    variation.price = baseProduct.price + variation.price;
-      // });
-
-      productList.forEach(variation => {
-         const discount = productDiscount[baseProduct._id] || 0;
-         //console.log(`${variation._id} discount = ${discount}`);
-         variation.actualPrice = (baseProduct.price + variation.price);
-         variation.discountedPrice = variation.actualPrice - discount;
-
-         if (discount > 0) {
-            discountedPrices[variation._id] = variation.discountedPrice;
-         } else {
-            discountedPrices[variation._id] = variation.actualPrice;
-         }
-      });
-
-      req.session.finaldiscountedPrices = discountedPrices;
-      
-
-      console.log(productList)
 
       if (req.xhr) {
          return res.json({

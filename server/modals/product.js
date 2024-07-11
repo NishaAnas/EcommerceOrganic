@@ -51,6 +51,10 @@ const productSchema = new Schema({
       ref: 'Offer',
       default:null
     },
+    offerDiscount:{
+      type:Number,
+      default:0
+    }
   },{timestamps:true});
   
   module.exports = mongoose.model('product', productSchema);

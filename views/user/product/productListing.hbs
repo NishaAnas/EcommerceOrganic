@@ -211,14 +211,23 @@
                                     {{/if}}
                                 </span>
                                     {{/if}} --}}
-                                    <div class="d-flex flex-row align-items-start">
-                                        <div class="profile-name">
+                            <div class="d-flex flex-row align-items-start gap-2">
+                                <div class="profile-name">
                                     {{name}}
                                 </div>
                                 <div class="profile-username">
-                                    
-                                </div>
+                                    <div class="price">
+                                        {{#if this.finalPrice}}
+                                            Rs.{{this.finalPrice}}
+                                            <span class="original-price text-muted" style="text-decoration: line-through;">
+                                                Rs.{{this.price}}
+                                            </span>
+                                        {{else}}
+                                            Rs.{{this.price}}
+                                        {{/if}}
                                     </div>
+                                </div>
+                            </div>
                                 
                             </div>
                         </a>
