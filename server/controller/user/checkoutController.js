@@ -56,6 +56,7 @@ exports.getcheckOut = async (req, res) => {
 
         // Retrieve cart details from the session
         const cartDetails = req.session.cartDetails;
+        console.log(req.session.cartDetails);
 
         if (!cartDetails) {
             req.flash('error', 'Your cart is empty.');
@@ -92,7 +93,7 @@ exports.placeOrder = async (req, res) => {
     const userData = req.session.userLoggedInData;
     const shippingAddress = req.session.addressDetails;
     const cartDetails = req.session.cartDetails;
-    console.log(`cartDetails : ${cartDetails}`);
+    console.log(`cartDetails : ${cartDetails.afterDiscountTotal}`);
     const { deliveryOption, paymentOption} = req.body;
 
     if (!cartDetails) {
@@ -131,6 +132,7 @@ exports.placeOrder = async (req, res) => {
         }
 
         const totalAmount = cartDetails.afterDiscountTotal + deliveryFee;
+        
         console.log(`total Amount :${totalAmount}`);
 
         // Create delivery details

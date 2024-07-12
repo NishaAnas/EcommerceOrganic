@@ -55,24 +55,28 @@ exports.showShoppingCart = async(req,res)=>{
             const categories = await category.findById(baseProduct.categoryId);
             const image = variant.images.length > 0 ? variant.images[0] : '';
 
+            const basePrice = baseProduct.price;
+            const variantPrice = variant.price;
+            const actualPrice = variant.offerPrice ? variant.offerPrice : basePrice + variantPrice;
+
             return{
-                variantId:variant._id,
-                stock:variant.stock,
-                productName:variant.attributeValue,
-                baseProduct:baseProduct.title,
-                category:categories.name,
-                basePrice:baseProduct.price,
-                actualPrice:variant.offerPrice ? variant.offerPrice : variant.price+baseProduct.price,
-                productImage:image,
+                variantId: variant._id,
+                stock: variant.stock,
+                productName: variant.attributeValue,
+                baseProduct: baseProduct.title,
+                category: category.name,
+                basePrice: basePrice,
+                actualPrice: actualPrice,
+                productImage: image,
                 quantity: item.quantity,
-                totalPrice: item.totalPrice.toFixed(2)
+                totalPrice: parseFloat((item.quantity * actualPrice).toFixed(2))
             }
         }))
         console.log(cartitems);
         const totalQuantity = cart.items.reduce((acc, item) => acc + item.quantity, 0);
         const totalPriceOfAllProducts = cartitems.reduce((acc, item) => acc + item.totalPrice, 0);
        // console.log(totalQuantity);
-            console.log(totalPriceOfAllProducts);
+            //console.log(totalPriceOfAllProducts);
          // Store cart details in the session for checkout page
         req.session.cartDetails = {
             cartitems,
@@ -251,6 +255,7 @@ exports.updateCartItem = async (req, res) => {
                 const baseProduct = await Product.findById(variant.productId);
                 const categories = await category.findById(baseProduct.categoryId);
                 const image = variant.images.length > 0 ? variant.images[0] : '';
+                const itemActualPrice = variant.offerPrice ? variant.offerPrice : variant.price + baseProduct.price;
 
                 return {
                     variantId: item.product,
@@ -259,10 +264,10 @@ exports.updateCartItem = async (req, res) => {
                     baseProduct: baseProduct.name,
                     category: categories.name,
                     basePrice: variant.basePrice,
-                    actualPrice: actualPrice,
+                    actualPrice: itemActualPrice,
                     productImage: image,
                     quantity: item.quantity,
-                    totalPrice: item.totalPrice
+                    totalPrice: item.quantity * itemActualPrice
                 };
             }));
 
