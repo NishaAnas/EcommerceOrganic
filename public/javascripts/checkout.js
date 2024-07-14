@@ -9,6 +9,10 @@ $(document).ready(function() {
         $('#grand-total').text(grandTotal.toFixed(2));
     }
 
+    $('input[name="address"]').on('change', function() {
+        $('#selectedAddressId').val($(this).val());
+    });
+
     $('input[name="deliveryOption"]').change(function() {
         let deliveryPrice = 0;
 
@@ -36,6 +40,13 @@ $(document).ready(function() {
 
     $('#checkoutForm').on('submit', async function(event) {
         event.preventDefault();
+        const selectedAddressId = $('#selectedAddressId').val();
+
+        // Ensure an address is selected
+        if (!selectedAddressId) {
+            alert('Please select a shipping address.');
+            return;
+        }
 
         const form = event.target;
         const formData = new FormData(form);
@@ -116,6 +127,26 @@ $(document).ready(function() {
                 };
 
                 const rzp1 = new Razorpay(options);
+                rzp1.on('payment.failed', function (response) {
+                    Swal.fire({
+                        title: 'Payment Failed!',
+                        text: response.error.description,
+                        icon: 'error'
+                    }).then(() => {
+                        window.location.href = `/orderdetails/${result.orderId}`;
+                    });
+                
+                    fetch('/paymentFailed', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            orderId: result.orderId,
+                            error: response.error
+                        })
+                    });
+                });
                 rzp1.open();
             } else{   
                 Swal.fire({

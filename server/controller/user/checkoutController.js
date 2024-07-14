@@ -47,16 +47,22 @@ exports.getcheckOut = async (req, res) => {
             return res.redirect('/login');
         }
 
-        const addressRecord = await address.findOne({ userId: userId, isDefault: true });
-        const defaultAddress = addressRecord ? addressRecord.toObject() : null;
-        //console.log(defaultAddress);
+        // const addressRecord = await address.findOne({ userId: userId, isDefault: true });
+        // const defaultAddress = addressRecord ? addressRecord.toObject() : null;
+        // //console.log(defaultAddress);
 
-        //save shipping address to session
-        req.session.addressDetails = defaultAddress;
+        // //save shipping address to session
+        // req.session.addressDetails = defaultAddress;
+
+        // Fetch the first three addresses for the user
+        const addressRecords = await address.find({ userId: userId }).limit(3).lean();
+
+        // Set the default address
+        const defaultAddress = addressRecords.find(address => address.isDefault) || addressRecords[0] || null;
 
         // Retrieve cart details from the session
         const cartDetails = req.session.cartDetails;
-        console.log(req.session.cartDetails);
+        //console.log(req.session.cartDetails);
 
         if (!cartDetails) {
             req.flash('error', 'Your cart is empty.');
@@ -67,6 +73,7 @@ exports.getcheckOut = async (req, res) => {
 
         return res.render('user/checkout/checkout', {
             userData,
+            addressRecords,
             defaultAddress,
             razorpaykey:razorpayInstance.key_id,
             cartitems: cartDetails.cartitems,
@@ -91,17 +98,17 @@ exports.getcheckOut = async (req, res) => {
 exports.placeOrder = async (req, res) => {
     //console.log(req.body);
     const userData = req.session.userLoggedInData;
-    const shippingAddress = req.session.addressDetails;
+    //const shippingAddress = req.session.addressDetails;
     const cartDetails = req.session.cartDetails;
     console.log(`cartDetails : ${cartDetails.afterDiscountTotal}`);
-    const { deliveryOption, paymentOption} = req.body;
+    const { selectedAddressId, deliveryOption, paymentOption} = req.body;
 
     if (!cartDetails) {
         req.flash('error', 'Your cart is empty.');
         return res.redirect('/cart');
     }
 
-    if (!shippingAddress) {
+    if (!selectedAddressId) {
         return res.status(400).json({ error: 'Shipping address is required.' });
     }
 
@@ -110,6 +117,16 @@ exports.placeOrder = async (req, res) => {
     }
 
     try {
+
+        // Retrieve and save the selected address in the session
+        const shippingAddress = await address.findById(selectedAddressId);
+        if (!shippingAddress) {
+            return res.status(400).json({ error: 'Invalid shipping address.' });
+        }
+        req.session.addressDetails = shippingAddress;
+
+        //console.log(req.session.addressDetails)
+
         //function to generate 16 digit orderId
         const newOrderId = uuidv4();
         //console.log(newOrderId);
@@ -179,7 +196,7 @@ exports.placeOrder = async (req, res) => {
                 orderId: newOrder._id
             });
         } else if (paymentOption === 'razorpay') {
-            const amount = totalAmount * 100; // Convert to paise
+            const amount =  Math.round(totalAmount * 100); // Convert to paise
             console.log(`amount :${amount}`);
             const options = {
                 amount: amount,
@@ -305,6 +322,21 @@ exports.payemntVerification = async (req, res) => {
         res.status(500).json({ error: 'An error occurred while verifying the payment. Please try again.' });
     }
 };
+
+//Payemnt Failed
+exports.paymentFailed = async(req,res)=>{
+    const { orderId, error } = req.body;
+    try {
+        await order.findByIdAndUpdate(orderId, {
+            'payment.status': 'Failed',
+        });
+
+        res.status(200).json({ message: 'Payment failure logged successfully' });
+    } catch (error) {
+        console.error('Error logging payment failure:', error);
+        res.status(500).json({ error: 'An error occurred while logging the payment failure' });
+    }
+}
 
 //GET Order Details Page
 exports.getOrderDetails = async (req, res) => {

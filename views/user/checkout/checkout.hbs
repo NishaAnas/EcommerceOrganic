@@ -5,6 +5,7 @@
         <form id="checkoutForm">
             <div class="container d-flex flex-row ">
                 <div class="container d-flex flex-column ">
+                    
                     <!-- Address Section -->
                     <div class="card mb-4 position-relative">
                         <div class="card-header">
@@ -16,22 +17,26 @@
                             </a>
                         </div>
                         <div class="card-body">
-                            <p><b>Default Address</b></p>
-                            {{#if defaultAddress}}
-                            <p id="default-address"><b>Name
-                                    :</b>{{defaultAddress.name}} ,<br><b>Area :
-                                </b>{{defaultAddress.area}} , <b>Street :
-                                </b>{{defaultAddress.street}} , <b>City :
-                                </b>{{defaultAddress.city}} ,<br>
-                                <b>State : </b>{{defaultAddress.state}} ,
-                                <b>Country : </b>{{defaultAddress.country}}
-                                ,<br>
-                                <b>pincode : </b>{{defaultAddress.pincode}}</p>
-                            {{else}}
-                            <p id="default-address">No Default Address</p>
-                            {{/if}}
+                            <p><b>Select Address</b></p>
+                                {{#if addressRecords}}
+                                    {{#each addressRecords}}
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="radio" name="address" value="{{_id}}" id="address-{{_id}}"
+                                            {{#if ../defaultAddress}}{{#if (isEqual _id ../defaultAddress._id)}}checked{{/if}}{{/if}}>
+                                            <label class="form-check-label" for="address-{{_id}}">
+                                                </b>{{name}} ,<br><b>Area :</b> {{area}} , <b>Street :</b> {{street}} , <b>City :</b> {{city}} ,<br>
+                                                <b>State :</b> {{state}} , <b>Country :</b> {{country}} ,<br>
+                                                <b>pincode :</b> {{pincode}}</p>
+                                            </label>
+                                        </div>
+                                    {{/each}}
+                                    <input type="hidden" name="selectedAddressId" id="selectedAddressId" value="{{#if defaultAddress}}{{defaultAddress._id}}{{/if}}">
+                                {{else}}
+                                    <p>No addresses found.</p>
+                                {{/if}}
+                            </div>
                         </div>
-                    </div>
+
                     <!-- Delivery Options Section -->
                     <div class="card mb-4">
                         <div class="card-header">

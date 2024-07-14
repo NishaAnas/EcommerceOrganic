@@ -1,4 +1,3 @@
-
     $(document).ready(function() {
         $('.coupon-date').each(function() {
             var date = new Date($(this).text());
@@ -22,7 +21,7 @@
         // Add Coupon
         $('#addCouponForm').on('submit', function(e) {
             e.preventDefault();
-            var expiryDate = $('#expiryDate').val();
+            var expiryDate = $('#couponExpiryDate').val();
             if (!isValidDate(expiryDate)) {
                 Swal.fire({
                     title: 'Error!',
@@ -62,6 +61,8 @@
                 $('#editCouponExpiryDate').val(data.expiryDate.split('T')[0]);
                 $('#editCouponMinPurchaseAmount').val(data.minPurchaseAmount);
                 $('#editCouponUserFirstPurchase').prop('checked', data.userFirstPurchase);
+                $('#editCouponModalName').text(data.name);
+                $('#editCouponModalId').text(data._id);
                 $('#editCouponModal').modal('show');
             });
         });

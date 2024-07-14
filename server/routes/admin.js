@@ -164,6 +164,4 @@ router.post('/editOffer/:_id', offerController.editOffer);
 //Delete offers
 router.delete('/deleteOffer/:_id', offerController.deleteOffer);
 
-
-
 module.exports = router;

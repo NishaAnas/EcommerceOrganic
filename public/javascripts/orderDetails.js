@@ -1,18 +1,23 @@
-
 $(document).ready(function(){
+
+    $('.cancel-button').each(function() {
+        var paymentMethod = $(this).data('payment-method');
+        var paymentStatus = $(this).data('payment-status');
+
+        if (paymentMethod === 'Razorpay' && paymentStatus === 'Failed') {
+            $(this).text('Payment Failed');
+            $(this).removeClass('cancel-button').addClass('payment-failed-button btn-danger');
+            $(this).off('click');
+            $(this).click(function() {
+                toastr.error('Payment is Failed, cannot cancel the order.');
+            });
+        }
+    });
+    
     //Cancel the complete order
     $('.cancel-button').click(function() {
         var orderId = $(this).data('orderid');
-        var paymentMethod = $(this).data('payment-method');
-        var paymentStatus = $(this).data('payment-status');
-        // alert(paymentMethod);
-        // alert(paymentStatus);
 
-        if (paymentMethod === 'Razorpay' && paymentStatus === 'Pending') {
-            toastr.error('Payment is pending, cannot cancel the order.');
-            return;
-        }else{
-            //alert("cancelled Order");
             Swal.fire({
                 title: 'Are you sure?',
                 text: "You won't be able to revert this!",
@@ -47,9 +52,7 @@ $(document).ready(function(){
                         }
                     });
                 }
-            });
-        }
-        
+            });        
     });
 
 
@@ -134,14 +137,28 @@ $(document).ready(function(){
     });
 
     //Cancel Individual Items
+
+    $('.cancel-item-button').each(function() {
+        var paymentMethod = $(this).data('payment-method');
+        var paymentStatus = $(this).data('payment-status');
+
+        if (paymentMethod === 'Razorpay' && paymentStatus === 'Failed') {
+            $(this).html('<i class="bi bi-exclamation-triangle-fill"></i>');
+            $(this).addClass('btn-danger');
+            $(this).off('click');
+            $(this).click(function() {
+                toastr.error('Payment is Failed');
+            });
+        }
+    });
     $('.cancel-item-button').on('click', function(event) {
         var orderId = $(this).data('orderid');
         var itemId = $(this).data('itemid');
         var paymentMethod = $(this).data('payment-method');
         var paymentStatus = $(this).data('payment-status');
 
-        if (paymentMethod === 'Razorpay' && paymentStatus === 'Pending') {
-            toastr.error('Payment is pending, cannot cancel the item.');
+        if (paymentMethod === 'Razorpay' && paymentStatus === 'Failed') {
+            toastr.error('Payment is Failed.');
             return;
         }else{
             Swal.fire({

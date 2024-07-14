@@ -178,6 +178,9 @@ router.post('/placeOrder', checkoutController.placeOrder);
 //POST Payement verification
 router.post('/payementVerification',checkoutController.payemntVerification)
 
+//Payment Failed
+router.post('/paymentFailed',checkoutController.paymentFailed)
+
 //GET Order Details Page
 router.get('/orderDetails/:_id',checkoutController.getOrderDetails);
 

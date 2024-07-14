@@ -36,7 +36,7 @@
                     <div class="col">{{ order.payment.method}} ({{ order.payment.status}})
                         {{#if (isEqual order.orderStatus "Cancelled")}}
                         <span class="text-muted">Cancelled Order</span>
-                        {{else if (isEqual order.payment.status "Pending")}}
+                        {{else if (isEqual order.payment.status "Failed")}}
                             <a id="retryPaymentButton" href="#" data-orderid="{{ order._id }}" style="color:blue; text-decoration: underline;" data-bs-toggle="modal" data-bs-target="#retryPaymentModal">Retry Payment</a></div>
                     {{/if}}
                     </div>

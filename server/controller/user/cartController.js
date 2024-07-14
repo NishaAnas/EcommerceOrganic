@@ -66,13 +66,13 @@ exports.showShoppingCart = async(req,res)=>{
                 baseProduct: baseProduct.title,
                 category: category.name,
                 basePrice: basePrice,
-                actualPrice: actualPrice,
+                actualPrice: parseFloat(actualPrice.toFixed(2)),
                 productImage: image,
                 quantity: item.quantity,
                 totalPrice: parseFloat((item.quantity * actualPrice).toFixed(2))
             }
         }))
-        console.log(cartitems);
+        //console.log(cartitems);
         const totalQuantity = cart.items.reduce((acc, item) => acc + item.quantity, 0);
         const totalPriceOfAllProducts = cartitems.reduce((acc, item) => acc + item.totalPrice, 0);
        // console.log(totalQuantity);
@@ -81,16 +81,16 @@ exports.showShoppingCart = async(req,res)=>{
         req.session.cartDetails = {
             cartitems,
             totalQuantity,
-            totalPriceOfAllProducts,
+            totalPriceOfAllProducts:parseFloat(totalPriceOfAllProducts.toFixed(2)),
             discountAmount:0,
-            afterDiscountTotal:totalPriceOfAllProducts,
+            afterDiscountTotal: parseFloat(totalPriceOfAllProducts.toFixed(2)),
             couponName:""
         };
 
         res.render('user/shoppingCart/userShoppingCart' , {
             cartitems,
             totalQuantity,
-            totalPriceOfAllProducts,
+            totalPriceOfAllProducts : parseFloat(totalPriceOfAllProducts.toFixed(2)),
             quantity:cartitems.quantity, 
             userData, 
             success: successMessage, 
@@ -114,8 +114,8 @@ exports.updateTotal = async(req,res)=>{
     }
 
     // Update the session with the new total amount
-    req.session.cartDetails.afterDiscountTotal = Number(newTotal);
-    req.session.cartDetails.discountAmount=Number(discountAmount);
+    req.session.cartDetails.afterDiscountTotal = parseFloat(Number(newTotal).toFixed(2));
+    req.session.cartDetails.discountAmount=parseFloat(Number(discountAmount).toFixed(2));
     req.session.cartDetails.couponName=couponName;
 
     res.json({ message: 'Cart total updated successfully' });
@@ -161,9 +161,8 @@ exports.addToCart = async(req,res)=>{
 
 
         // Calculate the total price
-        let totalPrice =0;
-        const offerPrice = variant.offerPrice;
-        variant.offerPrice ? totalPrice = offerPrice : baseProduct.price + variant.price
+        let totalPrice = variant.offerPrice ? variant.offerPrice : baseProduct.price + variant.price;
+        totalPrice = parseFloat(totalPrice.toFixed(2));
         //console.log(totalPrice)
         
         // Check if the item already exists in the cart
@@ -208,7 +207,7 @@ exports.deleteCartProduct = async(req,res)=>{
             } else {
                 const totalQuantity = updatedCart.items.reduce((acc, item) => acc + item.quantity, 0);
                 const totalPriceOfAllProducts = updatedCart.items.reduce((acc, item) => acc + item.totalPrice, 0);
-                return res.status(200).json({ success: true, totalQuantity, totalPriceOfAllProducts });
+                return res.status(200).json({ success: true, totalQuantity, totalPriceOfAllProducts: parseFloat(totalPriceOfAllProducts.toFixed(2))   });
             }
         } else {
             return resstatus(400).json({ success: false, error: 'Error: Product not found in cart' });
@@ -238,7 +237,7 @@ exports.updateCartItem = async (req, res) => {
         // Find the base product to get its price
         const baseProduct = await Product.findById(variant.productId);
         const actualPrice = variant.offerPrice ? variant.offerPrice : variant.price+baseProduct.price
-        const prodtotalPrice = actualPrice * quantity;
+        const prodtotalPrice = parseFloat((actualPrice * quantity).toFixed(2));
         const userId = req.session.userLoggedInData.userId;
         
         // Update the quantity and total price of the product in the shopping cart
@@ -248,9 +247,9 @@ exports.updateCartItem = async (req, res) => {
             { new: true }
         );
 
-        if (updatedCartItem) {
-            // Fetch additional details for each item in the cart
-            const cartitems = await Promise.all(updatedCartItem.items.map(async (item) => {
+            if (updatedCartItem) {
+                // Fetch additional details for each item in the cart
+                const cartitems = await Promise.all(updatedCartItem.items.map(async (item) => {
                 const variant = await prodVariation.findById(item.product);
                 const baseProduct = await Product.findById(variant.productId);
                 const categories = await category.findById(baseProduct.categoryId);
@@ -264,10 +263,10 @@ exports.updateCartItem = async (req, res) => {
                     baseProduct: baseProduct.name,
                     category: categories.name,
                     basePrice: variant.basePrice,
-                    actualPrice: itemActualPrice,
+                    actualPrice: parseFloat(itemActualPrice.toFixed(2)),
                     productImage: image,
                     quantity: item.quantity,
-                    totalPrice: item.quantity * itemActualPrice
+                    totalPrice: parseFloat(item.totalPrice.toFixed(2))
                 };
             }));
 
@@ -279,9 +278,9 @@ exports.updateCartItem = async (req, res) => {
             req.session.cartDetails = {
                 cartitems: cartitems,
                 totalQuantity: totalQuantity,
-                totalPriceOfAllProducts: totalPriceOfAllProducts,
+                totalPriceOfAllProducts: parseFloat(totalPriceOfAllProducts.toFixed(2)),
                 discountAmount: req.session.cartDetails.discountAmount || 0,
-                afterDiscountTotal: totalPriceOfAllProducts - (req.session.cartDetails.discountAmount || 0),
+                afterDiscountTotal: parseFloat((totalPriceOfAllProducts - (req.session.cartDetails.discountAmount || 0)).toFixed(2)),
                 couponName: req.session.cartDetails.couponName || ""
             };
 

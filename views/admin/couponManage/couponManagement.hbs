@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 <body>
     <div class="container mt-5">
         <h2>Coupon Management</h2>
@@ -126,9 +128,11 @@
                     <div class="row mb-4 py-4">
                         <div class="col-sm-6">
                             <label for="firstPurchase" class="col-form-label">First Purchase</label>
-                                <div class="form-check form-switch" >  
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-check form-switch" >  
                                 <input class="form-check-input" name="firstPurchase" type="checkbox" role="switch" id="firstPurchase" style="min-height: 70%;">
-                                </div>
+                            </div>
                         </div>
                     </div>
                         <div class="modal-footer">
@@ -147,12 +151,12 @@
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
     <div class="modal-content">
         <div class="modal-header">
-        <h5 class="modal-title" id="editCouponModalLabel">Editing : {{Coupons.name}} </h5>
+        <h5 class="modal-title" id="editCouponModalLabel">Editing : <span id="editCouponModalName"></span> </h5>
         <div class="col text-end fw-lighter">
-                    <b>Coupon ID:</b> {{ Coupons._id }}
+                    <b>Coupon ID:</b> <span id="editCouponModalId"></span>
                     
                 </div>
-                <button type="button" class="close" onclick="closeeditModal()" aria-label="Close">
+                <button type="button" class="close" onclick="closeModal()" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
         </div>
@@ -196,9 +200,11 @@
                     <div class="row mb-4 py-4">
                         <div class="col-sm-6">
                             <label for="firstPurchase" class="col-form-label">First Purchase</label>
-                                <div class="form-check form-switch" >  
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="form-check form-switch" >  
                                 <input class="form-check-input" name="firstPurchase" type="checkbox" role="switch" id="editCouponUserFirstPurchase" style="min-height: 70%;">
-                                </div>
+                            </div>
                         </div>
                     </div>
                         <div class="modal-footer">
@@ -210,3 +216,9 @@
             </div>
         </div>
         <script src="/javascripts/couponMange.js"></script>
+
+        <script>
+            $('#couponExpiryDate, #editCouponExpiryDate').datepicker({
+            dateFormat: 'yy-mm-dd'
+        });
+        </script>
