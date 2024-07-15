@@ -42,7 +42,7 @@ exports.showShoppingCart = async(req,res)=>{
         }
         const userData = req.session.userLoggedInData;
         const cart = await shoppingCart.findOne({ user: userId });
-        //console.log(cart.items.length);
+        //////console.log(cart.items.length);
 
         if (!cart || cart.items.length === 0) {
             req.flash('error', 'Cart Empty');
@@ -72,11 +72,11 @@ exports.showShoppingCart = async(req,res)=>{
                 totalPrice: parseFloat((item.quantity * actualPrice).toFixed(2))
             }
         }))
-        //console.log(cartitems);
+        //////console.log(cartitems);
         const totalQuantity = cart.items.reduce((acc, item) => acc + item.quantity, 0);
         const totalPriceOfAllProducts = cartitems.reduce((acc, item) => acc + item.totalPrice, 0);
-       // console.log(totalQuantity);
-            //console.log(totalPriceOfAllProducts);
+       // ////console.log(totalQuantity);
+            //////console.log(totalPriceOfAllProducts);
          // Store cart details in the session for checkout page
         req.session.cartDetails = {
             cartitems,
@@ -106,7 +106,7 @@ exports.showShoppingCart = async(req,res)=>{
 //update the session variable
 exports.updateTotal = async(req,res)=>{
     const { newTotal,discountAmount,couponName} = req.body;
-    //console.log(req.body)
+    //////console.log(req.body)
 
     // Check if the user is logged in
     if (!req.session.userLoggedInData || !req.session.userLoggedInData.userloggedIn) {
@@ -133,7 +133,7 @@ exports.addToCart = async(req,res)=>{
         const userId = req.session.userLoggedInData.userId;
         //Check user is blocked or not
         const existingUser = await user.findById(userId);
-        console.log(existingUser.isBlocked)
+        ////console.log(existingUser.isBlocked)
         if (existingUser.isBlocked) {
             req.flash('error', 'Your account is blocked by Admin.');
             return res.redirect('/login');
@@ -147,7 +147,7 @@ exports.addToCart = async(req,res)=>{
         }
 
         const variant = await prodVariation.findById(variantId);
-        //console.log(variant)
+        //////console.log(variant)
 
         //Check for stock to add product to the cart
         if (!variant || variant.stock <= 0) {
@@ -157,34 +157,34 @@ exports.addToCart = async(req,res)=>{
 
         // Find the base product to get its price
         const baseProduct = await Product.findById(variant.productId);
-        //console.log(baseProduct)
+        //////console.log(baseProduct)
 
 
         // Calculate the total price
         let totalPrice = variant.offerPrice ? variant.offerPrice : baseProduct.price + variant.price;
         totalPrice = parseFloat(totalPrice.toFixed(2));
-        //console.log(totalPrice)
+        //////console.log(totalPrice)
         
         // Check if the item already exists in the cart
         const existingItemIndex = existingShoppingCart.items.findIndex(item => item.product.equals(variantId));
         if (existingItemIndex !== -1) {
             // If the item already exists,
             req.flash('error', 'This item is already in your cart.');
-            //console.log(' Items present')
+            //////console.log(' Items present')
         } else {
              // If the item doesn't exist, create a new cart item
             await shoppingCart.findOneAndUpdate(
                 { user: userId },
                 { $push: { items: { product: variantId, quantity: 1, totalPrice: totalPrice } } }
             );
-            //console.log('Items not Present')
+            //////console.log('Items not Present')
         }
-        //console.log('Product added to cart successfully')
+        //////console.log('Product added to cart successfully')
         req.flash('success', 'Product added to cart successfully');
         res.redirect(`/productDetails/${variantId}`); // Redirect to the product Details page
 
     }catch(error){
-        console.log(error);
+        ////console.log(error);
         console.error('Error adding product to cart:', error);
         req.flash('error', 'Server Error');
         res.redirect('/' ); // Redirect back to the Home page

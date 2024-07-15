@@ -7,7 +7,7 @@ exports.getUserManagement = async(req,res) =>{
         const skip = (page - 1) * limit;
     
         const Users = await user.find({}).skip(skip).limit(limit).lean();
-        console.log(Users);
+        //console.log(Users);
 
         const totalUsers = await user.countDocuments({});
         const totalPages = Math.ceil(totalUsers / limit);
@@ -21,7 +21,7 @@ exports.getUserManagement = async(req,res) =>{
                 success: successMessage, 
                 error: errorMessage})
     }catch(error){
-        console.log(error)
+        //console.log(error)
         req.flash('error', 'Server Error');
         res.render('admin/user/userManagement', { layout: 'adminlayout', error: error });
     }

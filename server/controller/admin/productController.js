@@ -7,6 +7,7 @@ const { upload, resizeImages } = require('../../config/multer');
 const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
 const path = require('path');
+const fs = require('fs');
 
 
 
@@ -43,7 +44,7 @@ exports.getProductPage = async(req, res) => {
             error: errorMessage 
         })
     } catch (error) {
-        console.log(error)
+        //console.log(error)
         req.flash('error', 'Server Error');
         res.redirect('/admin/product');
     }
@@ -57,11 +58,11 @@ try {
     
     // Fetch all categories from the database
     const categories = await category.find({ isActive: true, isDeleted: false }, 'name').lean();
-    console.log(categories);
+    //console.log(categories);
     
     res.render('admin/product/addProduct', { categories,layout: 'adminlayout',success: successMessage, error: errorMessage });
 } catch (error) {
-    console.log(error)
+    //console.log(error)
     req.flash('error', 'Server Error ');
     res.redirect('/admin/product/addProduct');
 }
@@ -87,9 +88,6 @@ const imagePaths = req.resizedImages.map(relativeImagePath => {
 return `uploads\\${path.basename(relativeImagePath)}`;
 });
 
-
-//console.log(`sku:${sku},title:${title}, description:${productDescription},price:${price},images:${imagePaths},categoryId:${categoryId},isActive:${isActive}`)
-
 const newProduct = new product({
     sku:sku,
     title:title,
@@ -102,13 +100,13 @@ const newProduct = new product({
 });
 try {
   await product.create(newProduct);
-  console.log('Product added successfully');
-  console.log('Product Added:', newProduct);
+  //console.log('Product added successfully');
+  //console.log('Product Added:', newProduct);
   req.flash('success', 'Added Successfully ');
     res.redirect('/admin/product');
   
 } catch (error) {
-  console.log(error);
+  //console.log(error);
   req.flash('error', 'server Error ');
 res.redirect(`/admin/product`);
 }
@@ -138,7 +136,7 @@ try {
         layout: 'adminlayout' 
     });
 } catch (error) {
-    console.log(error)
+    //console.log(error)
     req.flash('error', 'Server Error');
     res.redirect('/admin/product');
 }
@@ -147,10 +145,10 @@ try {
 //Edit Product Page
 exports.editPutProduct = async (req, res) => {
 
-console.log(req.body);
+//console.log(req.body);
 try {
     const existingProductCheck = await product.findOne({ title: req.body.producttitle });
-    console.log(existingProductCheck);
+    //console.log(existingProductCheck);
     // If another product with the same name exists and has a different ID
     if (existingProductCheck && existingProductCheck._id.toString() !== req.params._id) {
         const existingProductName = existingProductCheck.title.toLowerCase().trim();
@@ -171,7 +169,7 @@ if(req.resizedImages && req.resizedImages.length >0){
     const existingProduct = await product.findById(req.params._id);
     imagePath = existingProduct.images;
 }
-console.log(imagePath);
+//console.log(imagePath);
 
 if(imagePath.length !== 1 ){
     req.flash('error', 'Only 1 image is required');
@@ -188,8 +186,6 @@ await product.findByIdAndUpdate(req.params._id, {
     categoryId: req.body.categoryId,
     description: req.body.productDetails,
     images: imagePath,
-    isActive: req.body.isActive==='on',
-    isDeleted: req.body.isDeleted==='on',
 })
             req.flash('success', 'Product updated successfully');
             res.redirect(`/admin/product`);
@@ -205,7 +201,7 @@ await product.findByIdAndUpdate(req.params._id, {
 exports.postAddVariations = async (req,res)=>{
     try{
         const productId = req.params._id;
-        console.log(req.body);
+        //console.log(req.body);
         const { sku, attributeName, attributeValue, price, stock } = req.body;
 
         const existingVariation = await prodVariation.findOne({
@@ -244,7 +240,7 @@ exports.postAddVariations = async (req,res)=>{
                 $push: { variations: savedVariation._id }
             });
 
-            console.log('Varient of the Product Added:', newVariation);
+            //console.log('Varient of the Product Added:', newVariation);
             req.flash('success', 'Varient of the Product added successfully ');
             res.redirect(`/admin/editProduct/${req.params._id}`);
     }catch(error){
@@ -258,7 +254,7 @@ exports.postAddVariations = async (req,res)=>{
 exports.getVariantDetails = async (req, res) => {
     try {
         const variantId = req.params._id;
-        console.log(variantId);
+        //console.log(variantId);
 
         const variant = await prodVariation.findById(variantId);
         
@@ -266,7 +262,7 @@ exports.getVariantDetails = async (req, res) => {
 
             return res.status(404).json({ error: 'Variant not found' });
         }
-        console.log(variant)
+        //console.log(variant)
 
         res.json({ variant });
     } catch (error) {
@@ -275,16 +271,42 @@ exports.getVariantDetails = async (req, res) => {
     }
 };
 
+exports.removeImage = async(req,res)=>{
+    const { variantId, index } = req.body;
+    try{
+        const variant = await prodVariation.findById(variantId);
+
+        if (!variant) {
+            return res.status(404).json({ error: 'Variant not found' });
+        }
+        if (variant.images && variant.images.length > index) {
+            variant.images.splice(index, 1);
+        }
+
+        await variant.save();
+
+        res.status(200).json({ message: 'Image removed successfully from database' });
+    }catch(err){
+        //console.log(err);
+        res.status(500).json({ error: 'Server error' });
+    }
+}
+
 // Edit Variant Details
 exports.editVarientDetails = async (req, res) => {
     const variantId = req.body.variantId;
+    //console.log(variantId);
+    //console.log(req.body);
+    //console.log(req.body.imageURLs);
+    //console.log(`resized images:${req.resizedImages}`);
+    
 
     try {
         const existingVariant = await prodVariation.findOne({
             _id: { $ne: variantId }, // Exclude the current variant being edited
             productId: req.body.productId, 
-            attributeName: req.body.eattributeName,
-            attributeValue: req.body.eattributeValue
+            attributeName: req.body.attributeName,
+            attributeValue: req.body.attributeValue
         });
 
         if (existingVariant) {
@@ -292,26 +314,30 @@ exports.editVarientDetails = async (req, res) => {
             return res.redirect(`/admin/editProduct/${req.body.productId}`);
         }
 
-        let imagePath = [];
-        let prodId = '';
+        // Retrieve existing variant data
+        let updatedVariant = await prodVariation.findById(variantId);
+
+        // Handle image removal (if any)
+        let imagePath = updatedVariant.images || []; // Start with existing images or empty array
+
+        // Remove image if specified in request
+        if (req.body.removeImage) {
+            imagePath.splice(req.body.removeImage, 1); // Remove the image at specified index
+        }
 
         if (req.resizedImages && req.resizedImages.length > 0) {
-            imagePath = req.resizedImages.map(relativeImagePath => {
+            const resizedImagePaths = req.resizedImages.map(relativeImagePath => {
                 return `uploads\\${path.basename(relativeImagePath)}`
             });
-        } else {
-            const existingVariant = await prodVariation.findById(variantId);
-            if (existingVariant) {
-                imagePath = existingVariant.images;
-                prodId = existingVariant.productId;
-            } 
+            imagePath = imagePath.concat(resizedImagePaths); // Merge with existing images
         }
-        //console.log(prodId);
+        imagePath = Array.from(new Set(imagePath)); // Remove duplicates
+
+        //console.log(`imagePath :${imagePath}`);
         if(imagePath.length < 1 || imagePath.length > 4){
             req.flash('error', 'Number of images should be between 1 and 4');
             res.redirect(`/admin/editProduct/${req.params._id}`);
         }
-
         const updatedVariation = await prodVariation.findByIdAndUpdate(variantId, {
             sku: req.body.sku,
             productId: req.body.productId,
@@ -325,11 +351,11 @@ exports.editVarientDetails = async (req, res) => {
         
 
         req.flash('success', 'Variant updated successfully');
-        res.redirect(`/admin/editProduct/${prodId}`);
+        res.redirect(`/admin/editProduct/${req.body.productId}`);
     } catch (error) {
         console.error(error);
         req.flash('error', 'Server Error');
-        res.redirect(`/admin/editProduct/${prodId}`);
+        res.redirect(`/admin/editProduct/${req.body.productId}`);
     }
 }
 
@@ -342,15 +368,15 @@ exports.deleteVariant = async(req,res)=>{
         if (varientDetailsViewing) {
             prodId = varientDetailsViewing.productId;
         } else {
-            console.log("Variant not found");
+            //console.log("Variant not found");
         }
-        console.log(varientDetailsViewing)
+        //console.log(varientDetailsViewing)
         await prodVariation.findByIdAndUpdate(req.params._id, {
         $set: {
             isDeleted: true
         }
         });
-        console.log('Variation soft-deleted successfully');
+        //console.log('Variation soft-deleted successfully');
         req.flash('success', 'Variation soft-deleted successfully');
         res.redirect(`/admin/editProduct/${prodId}`);
         } catch (error) {
@@ -365,13 +391,13 @@ exports.markdeleteProduct = async (req, res) => {
 try {
     const productDetailsViewing = await product.findOne({ _id: req.params._id }).lean();
 
-    console.log(productDetailsViewing)
+    //console.log(productDetailsViewing)
     await product.findByIdAndUpdate(req.params._id, {
     $set: {
         isDeleted: true
     }
     });
-    console.log('Product soft-deleted successfully');
+    //console.log('Product soft-deleted successfully');
     req.flash('success', 'Product soft-deleted successfully');
     res.redirect('/admin/product');
     } catch (error) {

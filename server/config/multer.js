@@ -3,7 +3,7 @@ const sharp = require('sharp');
 const path = require('path');
 const fs = require('fs');
 
-
+const limits ={fileSize: 10 * 1024 * 1024}
 const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, callback) => {
@@ -14,7 +14,7 @@ const fileFilter = (req, file, callback) => {
     }
   };
 
-const upload = multer({ storage: storage, fileFilter: fileFilter });
+const upload = multer({ limits:limits, storage: storage, fileFilter: fileFilter });
 
         const resizeImages = async (req, res, next) => {
             if (!req.files || req.files.length === 0) {

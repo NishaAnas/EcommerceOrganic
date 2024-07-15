@@ -59,7 +59,7 @@ exports.getCategories = async (req, res) => {
 
 exports.addOffers = async (req, res) => {
     const{title,type,applicableItems,discountType,discountValue,startDate,endDate} = req.body
-    console.log(req.body);
+    //console.log(req.body);
     if(discountType==='Percentage' && discountValue > 90){
         return res.status(400).json({error:'For percentage Type discount cant be grater than 90% '});
     }
@@ -99,7 +99,7 @@ exports.addOffers = async (req, res) => {
         }
         res.status(200).json('Offer Added Successfully');
     }catch(error){
-        console.log(error);
+        //console.log(error);
         res.status(500).json('Server Error');
     }
     
@@ -111,10 +111,10 @@ exports.getOffer = async (req, res) => {
         if (!offers) {
             return res.status(404).json({ error: 'Offer not found' });
         }
-        console.log(offers);
+        //console.log(offers);
         res.json(offers);
     } catch (err) {
-        console.log(err)
+        //console.log(err)
         res.status(500).json({ error: 'Server error' });
     }
 };
@@ -122,9 +122,9 @@ exports.getOffer = async (req, res) => {
 // Edit an offer
 exports.editOffer = async (req, res) => {
     const { title, type, applicableItems, discountType, discountValue, startDate, endDate, isActive } = req.body;
-    //console.log(req.body);
+    ////console.log(req.body);
     const offerId = req.params._id;
-    //console.log(offerId);
+    ////console.log(offerId);
     try {
         const existingOfferCheck = await offer.findOne({ title });
         //if not the same document
@@ -168,7 +168,7 @@ exports.editOffer = async (req, res) => {
         req.flash('success', 'Offers updated successfully');
         res.status(200).send('Offer updated successfully!');
     } catch (error) {
-        console.log(error);
+        //console.log(error);
         res.status(500).send('Failed to update offer');
     }
 };

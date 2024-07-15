@@ -1,6 +1,10 @@
 <link rel="stylesheet" href="/stylesheets/editproduct.css">
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- Toastr CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+<!-- Toastr JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <body>
     <div class="container">
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
@@ -68,20 +72,6 @@
                             <option value="{{this._id}}">{{this.name}}</option>
                         {{/each}}
                     </select>
-                </div>
-            </div>
-            <div class="row form-group mb-4 p-3 gap-4">
-                <div class="col">
-                    <label for="isActive" class="col-sm-2 col-form-check-label">isActive:</label>
-                    <div class="col-sm-10 form-check form-switch" style="padding-left: 4.5em;">
-                        <input class="form-check-input" name="isActive" type="checkbox" role="switch" id="isActive" {{#if productDetailsViewing.isActive}}checked{{/if}} style="min-height: 70%;">
-                    </div>
-                </div>
-                <div class="col">
-                    <label for="isDeleted" class="col-sm-2 col-form-check-label">isDeleted:</label>
-                    <div class="col-sm-10 form-check form-switch" style="padding-left: 4.5em;">
-                        <input class="form-check-input" name="isDeleted" type="checkbox" role="switch" id="isDeleted" {{#if productDetailsViewing.isDeleted}}checked{{/if}} style="min-height: 70%;">
-                    </div>
                 </div>
             </div>
             <div class="container mt-3 w-100 py-4">
@@ -221,7 +211,7 @@
                 </div>
                 <div class="modal-body">
                     <form id="editAttributesForm" action="/admin/editVariation/variantId?_method=PUT" method="POST" enctype="multipart/form-data">
-                        <input type="hidden" name="productId" value="{{productDetailsViewing._id}}">
+                        <input type="hidden" id="productId" name="productId" value="{{productDetailsViewing._id}}">
                         <input type="hidden" id="variantId" name="variantId" value="">
                         <div class="row form-group mb-4 p-3 gap-4">
                             <div class="col">
@@ -323,13 +313,6 @@
             isValid = false;
         }
 
-        // Validate Image
-        //const image = document.getElementById('product-image').files;
-        //if (image.length === 0) {
-        //    document.getElementById('image_error').innerText = 'Image is required';
-        //    isValid = false;
-       // }
-
         if (!isValid) {
             event.preventDefault(); // Prevent form submission if not valid
         }
@@ -381,13 +364,6 @@
             isValid = false;
         }
 
-        // Validate Image
-        //const image = document.getElementById('variant-image').files;
-        //if (image.length === 0) {
-        //    document.getElementById('variant_image_error').innerText = 'Image is required';
-        //    isValid = false;
-        //}
-
         if (!isValid) {
             event.preventDefault(); // Prevent form submission if not valid
         }
@@ -438,13 +414,6 @@
             document.getElementById('edit_variant_stock_error').innerText = 'Valid stock is required';
             isValid = false;
         }
-
-        // Validate Image
-        //const image = document.getElementById('edit-variant-image').files;
-        //if (image.length === 0) {
-        //    document.getElementById('edit_variant_image_error').innerText = 'Image is required';
-        //    isValid = false;
-        //}
 
         if (!isValid) {
             event.preventDefault(); // Prevent form submission if not valid

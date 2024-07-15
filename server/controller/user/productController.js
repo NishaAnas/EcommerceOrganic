@@ -22,7 +22,7 @@ exports.getCategories = async (req, res) => {
          startDate: { $lte: new Date() },
          endDate: { $gte: new Date() }
       }).lean();
-      //console.log(activeOffers);
+      ////console.log(activeOffers);
    
      // Attach offers to respective categories
       categories = categories.map(category => {
@@ -32,7 +32,7 @@ exports.getCategories = async (req, res) => {
          }
          return category;
       });
-      console.log(categories);
+      //console.log(categories);
 
       res.render('user/product/categorylisting', { 
          categories,
@@ -41,7 +41,7 @@ exports.getCategories = async (req, res) => {
          error: errorMessage,
       });
    }catch(error){
-      console.log(error);
+      //console.log(error);
          req.flash('error', 'Server Error');
          res.redirect('/');
    }
@@ -97,7 +97,7 @@ exports.getCategories = async (req, res) => {
 
          const categoryName = await category.findOne({ _id: categoryId }, 'name').lean();
          const selectedCategoriesNames = await category.find({ _id: { $in: selectedCategories } }, 'name').lean();
-         console.log(selectedCategoriesNames)
+         //console.log(selectedCategoriesNames)
 
       // Apply category discount to each product if applicable
       for (let prod of products) {
@@ -119,7 +119,7 @@ exports.getCategories = async (req, res) => {
             prod.finalPrice = null; 
          }
       }
-         console.log(products)
+         //console.log(products)
 
          if (req.xhr) {
             return res.json({
@@ -146,7 +146,7 @@ exports.getCategories = async (req, res) => {
             sort: sortOption
          });
       } catch (error) {
-         console.log(error);
+         //console.log(error);
          req.flash('error', 'Error in fetching product listing');
          res.redirect('/');
       }
@@ -191,13 +191,13 @@ exports.productDetails = async (req, res) => {
       }
 
       const products = await prodVariation.findByIdAndUpdate(req.params.variantId);
-      console.log(products);
+      //console.log(products);
 
       // Fetch category details
       const categoryId = productDetails.categoryId;
       const categories = await category.findById(categoryId);
       const categoryName = categories.name;
-      //console.log(categories.name);
+      ////console.log(categories.name);
 
       // Fetch all product variations in the same category and shuffle to get six random variants
       const allVariants = await prodVariation.find({ productId: { $in: (await product.find({ categoryId: categoryId }).distinct('_id')) } }).lean();
@@ -237,7 +237,7 @@ exports.productDetails = async (req, res) => {
             productInWishlist = existingWishlist.products.some(item => item.product.equals(productId));
          }
       }
-      //console.log(productInWishlist);
+      ////console.log(productInWishlist);
       res.render('user/product/productDetails', { 
          productDetails,
          categoryName, 
@@ -298,7 +298,7 @@ exports.getProductPlus = async (req, res) => {
       }
 
       const productList = await prodVariation.find(query).skip(skip).limit(limit).sort(sort).lean();
-      //console.log(productList);
+      ////console.log(productList);
       const totalProducts = await prodVariation.countDocuments(query);
       const totalPages = Math.ceil(totalProducts / limit);
 

@@ -7,7 +7,7 @@ const wishlist = require('../../modals/wishlist')
 const shoppingCart = require('../../modals/shoppingCart');
 
 
-//Initialize wishlist
+//function to Initialize wishlist
 const initializeWishlist = async (userId) => {
     let existingWishlist = await wishlist.findOne({ userId });
 
@@ -18,6 +18,7 @@ const initializeWishlist = async (userId) => {
         });
         await existingWishlist.save();
 
+         // Update user document with wishlist reference
         await user.findByIdAndUpdate(userId, { wishlist: existingWishlist._id });
     }
 
@@ -25,21 +26,24 @@ const initializeWishlist = async (userId) => {
 };
 
 //Empty wishlist
-exports.getEmptyWishlist = async(req,res)=>{
+exports.getEmptyWishlist = async (req, res) => {
     const successMessage = req.flash('success');
     const errorMessage = req.flash('error');
     const userData = req.session.userLoggedInData;
     const categories = await category.find({}).lean();
-    res.render('user/Account/wishlistEmpty',{
+
+    // Render template with necessary data
+    res.render('user/Account/wishlistEmpty', {
         categories,
         userData,
-        layout:'userAccountLayout',
-        success: successMessage, 
-        error: errorMessage 
+        layout: 'userAccountLayout',
+        success: successMessage,
+        error: errorMessage
     });
 }
 
-exports.getWislist=async (req,res)=>{
+//Get the wishlist page
+exports.getWislist = async (req, res) => {
     const successMessage = req.flash('success');
     const errorMessage = req.flash('error');
     try {
@@ -51,7 +55,7 @@ exports.getWislist=async (req,res)=>{
 
         const userId = req.session.userLoggedInData.userId;
 
-        //Check user is blocked or not
+        //Check user is blocked
         const existingUser = await user.findById(userId);
         if (existingUser.isBlocked) {
             req.flash('error', 'Your account is blocked. Please contact the administrator for assistance.');
@@ -68,7 +72,7 @@ exports.getWislist=async (req,res)=>{
             req.flash('info', 'Your wishlist is empty.');
             return res.redirect('/emptyWishlist');
         }
-        
+
         // Retrieve product details for each product in the wishlist
         const detailedProducts = [];
         for (const item of Wishlist.products) {
@@ -92,31 +96,28 @@ exports.getWislist=async (req,res)=>{
             }
         }
 
-        console.log(detailedProducts);
-        res.render('user/Account/wishlist', { 
-            wishlist: detailedProducts, 
+        // Render wishlist page with detailed product information
+        res.render('user/Account/wishlist', {
+            wishlist: detailedProducts,
             userData,
-            layout:'userAccountLayout', 
-            success: successMessage, 
+            layout: 'userAccountLayout',
+            success: successMessage,
             error: errorMessage
         });
 
     } catch (error) {
         console.error('Error fetching wishlist:', error);
         req.flash('error', 'Server Error');
-        res.redirect('/'); 
+        res.redirect('/');  
     }
 }
 
-exports.addToWishlist = async(req,res)=>{
+//Add product variant to wishlist
+exports.addToWishlist = async (req, res) => {
     try {
         // Check if the user is logged in
         if (!req.session.userLoggedInData || !req.session.userLoggedInData.userloggedIn) {
             req.flash('error', 'To add items to the wishlist, please log in first.');
-            const refererUrl = req.headers.referer || '/';
-            const variantId = refererUrl.split('/').pop();
-            req.session.returnTo = refererUrl;
-            req.session.variantId = variantId;
             return res.redirect('/login');
         }
 
@@ -129,31 +130,31 @@ exports.addToWishlist = async(req,res)=>{
 
         const existingItem = existingWishlist.products.find(item => item.product.equals(variantId));
 
-            if (existingItem) {
-                req.flash('error', 'This item is already in your wishlist.');
-            } else {
-                // If the item doesn't exist, add it to the wishlist using an update query
-                await wishlist.updateOne(
-                    { userId: userId },
-                    { $push: { products: { product: variantId } } }
-                );
-                req.flash('success', 'Product added to wishlist successfully');
-            }
+        if (existingItem) {
+            req.flash('error', 'This item is already in your wishlist.');
+        } else {
+            // If the item doesn't exist, add it to the wishlist using an update query
+            await wishlist.updateOne(
+                { userId: userId },
+                { $push: { products: { product: variantId } } }
+            );
+            req.flash('success', 'Product added to wishlist successfully');
+        }
 
-        res.redirect(`/productDetails/${variantId}`); 
+        res.redirect(`/productDetails/${variantId}`);
 
     } catch (error) {
         console.error('Error adding product to wishlist:', error);
         req.flash('error', 'Server Error');
-        res.redirect('/'); 
+        res.redirect('/');
     }
 }
 
 //Remove from Wishlist
-exports.removefromWishlist = async(req,res)=>{
+exports.removefromWishlist = async (req, res) => {
     const userId = req.session.userLoggedInData.userId;
     const { variantId } = req.body;
-    console.log(variantId);
+    ////console.log(variantId);
     try {
         const removedItem = await wishlist.findOneAndUpdate(
             { 'products.product': variantId },
@@ -172,8 +173,8 @@ exports.removefromWishlist = async(req,res)=>{
 }
 
 //Add Products from Wishlist to cart
-exports.wishAddtoCart = async(req,res)=>{
-    try{
+exports.wishAddtoCart = async (req, res) => {
+    try {
         // Check if the user is logged in
         if (!req.session.userLoggedInData || !req.session.userLoggedInData.userloggedIn) {
             req.flash('error', 'To add items to the cart, please log in first.');
@@ -181,7 +182,6 @@ exports.wishAddtoCart = async(req,res)=>{
         }
         const userId = req.session.userLoggedInData.userId;
         const variantId = req.body.variantId;
-        //console.log(variantId);
 
         // Check if the user already has a shopping cart
         let existingShoppingCart = await shoppingCart.findOne({ user: userId });
@@ -192,39 +192,32 @@ exports.wishAddtoCart = async(req,res)=>{
         }
         // Find the product Variant to get its price
         const variant = await prodVariation.findById(variantId);
-        //console.log(variant)
 
         // Find the base product to get its price
         const baseProduct = await Product.findById(variant.productId);
-        console.log(baseProduct)
 
         // Calculate the total price
         const totalPrice = baseProduct.price + variant.price;
-        console.log(totalPrice)
-        
+
         // Check if the item already exists in the cart
         const existingItemIndex = existingShoppingCart.items.findIndex(item => item.product.equals(variantId));
 
         if (existingItemIndex !== -1) {
             // If the item already exists,
             req.flash('error', 'This item is already in your cart.');
-            console.log(' Items present')
         } else {
-             // If the item doesn't exist, create a new cart item
+            // If the item doesn't exist, create a new cart item
             await shoppingCart.findOneAndUpdate(
                 { user: userId },
                 { $push: { items: { product: variantId, quantity: 1, totalPrice: totalPrice } } }
             );
-            console.log('Items not Present')
         }
-        console.log('Product added to cart successfully')
         req.flash('success', 'Product added to cart successfully');
         res.redirect(`/wishlist`); // Redirect to the Wishlist page
 
-    }catch(error){
-        console.log(error);
+    } catch (error) {
         console.error('Error adding product to cart:', error);
         req.flash('error', 'Server Error');
-        res.redirect('/' ); // Redirect back to the Home page
+        res.redirect('/'); // Redirect back to the Home page
     }
 }

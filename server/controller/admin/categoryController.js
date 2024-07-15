@@ -31,7 +31,7 @@ exports.getCategoryPage = async (req, res) => {
             error: errorMessage 
         })
     } catch (error) {
-        console.log(error)
+        //console.log(error)
         req.flash('error', 'Server Error');
         res.redirect('/admin/category');
     }
@@ -52,7 +52,7 @@ exports.getaddCategoryPage = (req, res) => {
 //POST Add Category Page
 exports.postaddCategory = async (req, res) => {
     try {
-        //console.log(req.body)
+        ////console.log(req.body)
         const { name, description, isActive } = req.body;
 
         if (!req.resizedImages || req.resizedImages.length === 0) {
@@ -105,7 +105,7 @@ exports.editCategory = async (req, res) => {
         const successMessage = req.flash('success');
         const errorMessage = req.flash('error');
         const categoryDetailsViewing = await category.findOne({ _id: req.params._id }).lean();
-        //console.log(categoryDetailsViewing)
+        ////console.log(categoryDetailsViewing)
         res.render('admin/category/editCategory', 
             { 
             locals, 
@@ -117,14 +117,14 @@ exports.editCategory = async (req, res) => {
     } catch (error) {
         req.flash('error', 'Server Error');
         res.redirect('/admin/category');
-        console.log(error)
+        //console.log(error)
     }
 
 };
 /* POST Edit Product page.(UPDATE) */
 
 exports.editPutcategory = async (req, res) => {
-    console.log(req.body)
+    //console.log(req.body)
     try {
         const existingCategory = await category.findOne({ name: req.body.categoryName });
 
@@ -164,11 +164,11 @@ exports.editPutcategory = async (req, res) => {
             isDeleted: req.body.isDeleted === 'on',
         })
 
-        console.log('Category updated Successfully');
+        //console.log('Category updated Successfully');
         req.flash('success', 'Category updated successfully');
         res.redirect(`/admin/category`);
     } catch (error) {
-        console.log(error)
+        //console.log(error)
         req.flash('error', 'Server Error');
         res.redirect(`/admin/category`);
     }
@@ -183,11 +183,11 @@ exports.markdeleteCategory = async (req, res) => {
                 isDeleted: true
             }
         })
-        console.log('Category  marked as deleted Successfully');
+        //console.log('Category  marked as deleted Successfully');
         req.flash('success', 'Category deleted successfully');
         res.redirect('/admin/category');
     } catch (error) {
-        console.log(error)
+        //console.log(error)
         req.flash('error', 'Server Error');
         res.redirect('/admin/category');
     }

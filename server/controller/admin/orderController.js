@@ -28,7 +28,7 @@ exports.getOrdermanager = async(req,res)=>{
         const totalOrders = await order.countDocuments({});
         const totalPages = Math.ceil(totalOrders / limit);
         
-            //console.log(Orders);
+            ////console.log(Orders);
         res.render('admin/order/orderManagement', { 
             Orders, 
             currentPage: page,
@@ -107,7 +107,7 @@ exports.getOrderDetails = async(req,res)=>{
             deliveryCharge = 60;
         } 
 
-        console.log(orderDetails.items)
+        //console.log(orderDetails.items)
         res.render('admin/order/orderDetails', { 
             orderDetails,
             deliveryCharge, 

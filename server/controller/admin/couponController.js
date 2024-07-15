@@ -24,7 +24,7 @@ exports.getCoupons = async(req,res)=>{
                 coupons.isActive = isActive;
             }
         });
-        console.log(Coupons);
+        //console.log(Coupons);
     res.render('admin/couponManage/couponManagement',{
         layout:'adminlayout',
         Coupons,
@@ -34,7 +34,7 @@ exports.getCoupons = async(req,res)=>{
         error: errorMessage
     })
     }catch(error){
-        console.log(error);
+        //console.log(error);
         req.flash('error', 'Server Error');
         res.redirect('/admin/couponManage')
     } 
@@ -42,7 +42,7 @@ exports.getCoupons = async(req,res)=>{
 
 exports.addCoupon = async(req,res)=>{
     const {name,discount,description,expiryDate,minAmount,firstPurchase } = req.body; 
-    console.log(req.body);
+    //console.log(req.body);
 
     const existingCoupon = await coupon.findOne({ name });
     if (existingCoupon) {
@@ -72,12 +72,12 @@ exports.addCoupon = async(req,res)=>{
     });
         try {
         await coupon.create(newCoupon);
-        console.log('Coupon added successfully');
-        console.log('Coupon Added:', newCoupon);
+        //console.log('Coupon added successfully');
+        //console.log('Coupon Added:', newCoupon);
         req.flash('success', 'Added Successfully ');
         res.json({ success: 'Coupon added successfully' });
     }catch{
-        console.log(error);
+        //console.log(error);
         req.flash('Error', 'Adding failed ');
         res.status(500).json({ error: 'Failed to add coupon' });
     }

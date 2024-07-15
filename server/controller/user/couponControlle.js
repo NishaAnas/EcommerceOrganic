@@ -14,7 +14,7 @@ exports.getCoupons = async(req,res)=>{
             // Check if this is the user's first purchase
         const userOrders = await order.find({ userId });
         const isFirstPurchase = userOrders.length === 0;
-        //console.log(userOrders);
+        //////console.log(userOrders);
 
         let coupons;
 
@@ -39,6 +39,6 @@ exports.getCoupons = async(req,res)=>{
         res.json({ coupons });
 
     }catch(error){
-        console.log(error);
+        ////console.log(error);
     }
 }

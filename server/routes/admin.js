@@ -94,6 +94,7 @@ router.put('/deleteProduct/:_id', prodController.markdeleteProduct);
 
 
 
+
 // /* POST Add Variation page.(Delete) */
 router.post('/addVariation/:_id', upload.array('image'), resizeImages ,prodController.postAddVariations)
 
@@ -106,7 +107,7 @@ router.put('/editVariation/:varientId', upload.array('image'), resizeImages ,pro
 //Delete The Varient Details
 router.put('/deleteVariant/:_id', prodController.deleteVariant);
 
-
+router.post('/removeImage',prodController.removeImage);
 
 //GET User Management Page
 router.get('/user',userController.getUserManagement)

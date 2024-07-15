@@ -86,7 +86,7 @@ exports.getWallet = async(req,res)=>{
         const userDetails = await user.findById(userId).lean();
         const WalletId = await initializeWallet(userId);
         const Wallet = await wallet.findById(WalletId ).lean();
-        console.log(Wallet);
+        //console.log(Wallet);
 
         // if (!Wallet) {
         //     return res.render('user/wallet/wallet', { 
@@ -102,7 +102,7 @@ exports.getWallet = async(req,res)=>{
 
 
         //const walletDetails=Wallet.transactions;
-        //console.log(Wallet.transactions);
+        ////console.log(Wallet.transactions);
 
         // Pagination 
         const page = parseInt(req.query.page) || 1;

@@ -17,7 +17,7 @@ const Chart = require('chart.js');
 //GET Admin Login
 exports.getAdminLogin = (req,res)=>{
     const isAdmin = true;
-    console.log(req.session.adminLoggedInData)
+    //console.log(req.session.adminLoggedInData)
     if (! req.session.adminLoggedInData) {
     res.render('admin/Authentication/adminLogin',{isAdmin,success: req.flash('success'),error: req.flash('error'), layout:'athenticationlayout'});
 }
@@ -25,7 +25,7 @@ exports.getAdminLogin = (req,res)=>{
 
 //POST Admin Login
 exports.postAdminLogin = async(req,res)=>{
-    console.log("entered routes For Login POST")
+    //console.log("entered routes For Login POST")
 
     try {
     const { email, password } = req.body;
@@ -43,7 +43,7 @@ exports.postAdminLogin = async(req,res)=>{
         return res.redirect(`/admin/adminlogin`);
     }
     else{
-        console.log('Admin found');
+        //console.log('Admin found');
         req.session.adminLoggedInData = {
             adminloggedIn: true,
             email: email,
@@ -69,11 +69,11 @@ exports.postAdminSignup = async(req,res)=>{
 try{
     // Destructure request body
 const {email, password, conformpassword} = req.body;
-console.log(`${email} ${password} ${conformpassword}`)
+//console.log(`${email} ${password} ${conformpassword}`)
 
 // Validate password and confirmation
 if (password !== conformpassword) {
-    console.log('password does not match');
+    //console.log('password does not match');
     req.flash('error', 'Password does not match');
     return res.redirect(`/admin/adminsignup`);
     }
@@ -361,13 +361,13 @@ exports.getSalesReportPage = async(req,res)=>{
                             totalRevenue: totalRevenue,
                             totalDiscountGiven: totalDiscountGiven
                         };
-        console.log(`report Data :${reportData}`);
+        //console.log(`report Data :${reportData}`);
         res.render('admin/salesReport/salesReport',{
             layout:'adminlayout',
             reportData
         })
     }catch(error){
-        console.log(error)
+        //console.log(error)
     }
 }
 
@@ -375,7 +375,7 @@ exports.getSalesReportPage = async(req,res)=>{
 exports.getReportData = async(req,res)=>{
     try{
         const { filterType, startDate, endDate } = req.query;
-        console.log(req.query);
+        //console.log(req.query);
 
         const orders = await getOrders(filterType, startDate, endDate);
         const completedOrders = orders.filter(order => order.orderStatus === 'Completed');
@@ -390,11 +390,11 @@ exports.getReportData = async(req,res)=>{
                             totalRevenue: totalRevenue,
                             totalDiscountGiven: totalDiscountGiven
                         };
-        console.log(`report Data :${reportData}`);
+        //console.log(`report Data :${reportData}`);
         res.json(reportData);
 
     }catch(error){
-        console.log(error);
+        //console.log(error);
     }
 }
 
@@ -403,16 +403,16 @@ exports.getReportData = async(req,res)=>{
 exports.downloadReport = async(req,res)=>{
     try{
         const { filterType, format, startDate, endDate } = req.query;
-        console.log(req.query);
+        //console.log(req.query);
 
         const orders = await getOrders(filterType, startDate, endDate)
         orders.forEach(order => {
-            console.log('Order ID:', order.newOrderId);
+            //console.log('Order ID:', order.newOrderId);
             order.items.forEach(item => {
-                console.log('Product ID:', item.productId);
-                console.log('Quantity:', item.quantity);
-                console.log('Price:', item.price);
-                console.log('Product Attribute Value:', item.productId.attributeValue);
+                //console.log('Product ID:', item.productId);
+                //console.log('Quantity:', item.quantity);
+                //console.log('Price:', item.price);
+                //console.log('Product Attribute Value:', item.productId.attributeValue);
             });
         });
                 
@@ -426,7 +426,7 @@ exports.downloadReport = async(req,res)=>{
 
     }catch(error){
         res.status(500).json('Server Error');
-        console.log(error)
+        //console.log(error)
     }
 }
 
