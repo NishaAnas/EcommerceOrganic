@@ -2,7 +2,7 @@ const category = require('../../modals/categories')
 const product = require('../../modals/product')
 const offer = require('../../modals/offer'); 
 
-
+//get offer management page
 exports.getOfferManage = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
@@ -39,6 +39,7 @@ exports.getOfferManage = async (req, res) => {
     }
 };
 
+//get the product details 
 exports.getProducts = async (req, res) => {
     try {
         const products = await product.find({ isActive: true }).lean();
@@ -47,7 +48,7 @@ exports.getProducts = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
-
+//get the category details
 exports.getCategories = async (req, res) => {
     try {
         const categories = await category.find({ isActive: true }).lean();
@@ -57,6 +58,7 @@ exports.getCategories = async (req, res) => {
     }
 };
 
+//add new offers
 exports.addOffers = async (req, res) => {
     const{title,type,applicableItems,discountType,discountValue,startDate,endDate} = req.body
     //console.log(req.body);
@@ -99,12 +101,12 @@ exports.addOffers = async (req, res) => {
         }
         res.status(200).json('Offer Added Successfully');
     }catch(error){
-        //console.log(error);
         res.status(500).json('Server Error');
     }
     
 };
 
+//Get the offer details for edit page
 exports.getOffer = async (req, res) => {
     try {
         const offers = await offer.findById(req.params._id).lean();
@@ -122,9 +124,7 @@ exports.getOffer = async (req, res) => {
 // Edit an offer
 exports.editOffer = async (req, res) => {
     const { title, type, applicableItems, discountType, discountValue, startDate, endDate, isActive } = req.body;
-    ////console.log(req.body);
     const offerId = req.params._id;
-    ////console.log(offerId);
     try {
         const existingOfferCheck = await offer.findOne({ title });
         //if not the same document

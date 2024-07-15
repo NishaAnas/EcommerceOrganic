@@ -3,6 +3,7 @@
     <div class="container">
         <h1>User Account - Orders</h1>
         <div class="orders-list">
+            {{!-- iterate througth each orders --}}
             {{#each orderDetails}}
             <a href="/orderDetails/{{ this._id }}" class="order-card">
             <div class="order-card">
@@ -24,8 +25,9 @@
                 </div>
             </div>
         </a>
+        {{!-- for each order status cancel button will be changed --}}
             {{#if (isEqual this.orderStatus "Cancelled")}}
-                <button class="cancel-button-disabled" disabled>Cancelled</button>
+                <button class="cancel-button-disabled cancel-button" disabled>Cancelled</button>
             {{else if (isEqual this.orderStatus "Completed")}}
                 <button class="return-button" data-orderid="{{ this._id }}">Return Order</button>
             {{else if (isEqual this.orderStatus "Return")}}
@@ -35,6 +37,7 @@
             {{/if}}
             {{/each}}
         </div>
+        {{!-- pagination --}}
         <nav aria-label="Page navigation example">
         <ul class="pagination justify-content-center">
             {{#if (gt currentPage 1)}}
@@ -50,5 +53,6 @@
         </ul>
     </nav>
     </div>
+    {{!-- custom script --}}
     <script src="/javascripts/orderDetails.js"></script>
 </body>

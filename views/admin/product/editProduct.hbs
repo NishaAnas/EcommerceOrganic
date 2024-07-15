@@ -10,6 +10,7 @@
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
             <h1 class="h2">Editing: {{ productDetailsViewing.title }}</h1>
             <div class="btn-toolbar mb-2 mb-md-0">
+                <!-- Button for addingf new attributes -->
                 <div class="btn-group me-2">
                     <button class="btn btn-sm btn-outline-secondary" id="add_attributes" data-bs-toggle="modal" data-bs-target="#addAttributesModal">+ADD VARIENT</button>
                 </div>
@@ -30,6 +31,7 @@
                 </div>
             </div>
         </div>
+        <!-- display success and error message -->
         {{#if error}}
             <div class="alert alert-danger">
                 {{error}}
@@ -40,6 +42,7 @@
                 {{success}}
             </div>
         {{/if}}
+        <!-- Form for editing product -->
         <form id="editProductForm" action="/admin/editProduct/{{productDetailsViewing._id}}?_method=PUT" method="POST" enctype="multipart/form-data">
             <div class="row form-group mb-4 p-3 gap-4">
                 <div class="col">
@@ -74,6 +77,7 @@
                     </select>
                 </div>
             </div>
+            <!-- Uplaod images -->
             <div class="container mt-3 w-100 py-4">
                 <div class="card shadow-sm w-100">
                     <div class="card-header d-flex justify-content-between">
@@ -93,6 +97,7 @@
                 </div>
                 <span id="image_error" style="color: red;"></span>
             </div>
+            <!-- Table for displaying attribute details -->
             <table class="table table-striped responsiveTable">
                 <thead>
                     <tr>
@@ -107,6 +112,7 @@
                     </tr>
                 </thead>
                 <tbody>
+                    <!-- iterate through each variations -->
                     {{#each productVariations}}
                         <tr>
                             <td class="col-1">{{this.sku}}</td>
@@ -265,6 +271,7 @@
             </div>
         </div>
     </div>
+    <!-- Custom javascript for edit product -->
     <script src="/javascripts/editProduct.js"></script>
 </body>
 <script>

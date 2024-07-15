@@ -1,14 +1,20 @@
+<!-- Include Bootstrap CSS -->
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+<!-- Include jQuery UI for datepicker -->
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 <body>
+    <!-- Main container for Coupon Management -->
     <div class="container mt-5">
         <h2>Coupon Management</h2>
 
+        <!-- Display error message if present -->
         {{#if error}}
         <div class="alert alert-danger">
             {{error}}
         </div>
         {{/if}}
+        <!-- Display success message if present -->
         {{#if success}}
         <div class="alert alert-success">
             {{success}}
@@ -21,7 +27,7 @@
             </button>
         </div>
 
-
+        <!-- Table to display coupons -->
         <div class="table-responsive">
             <table class="table table-bordered">
                 <thead class="thead-light">
@@ -37,6 +43,7 @@
                     </tr>
                 </thead>
                 <tbody>
+                    <!-- Iterate through each coupon in Coupons array -->
                     {{#each Coupons}}
                     <tr>
                         <td>{{this.name}}</td>
@@ -218,6 +225,7 @@
         <script src="/javascripts/couponMange.js"></script>
 
         <script>
+            //{{!-- script for date picker calender --}}
             $('#couponExpiryDate, #editCouponExpiryDate').datepicker({
             dateFormat: 'yy-mm-dd'
         });

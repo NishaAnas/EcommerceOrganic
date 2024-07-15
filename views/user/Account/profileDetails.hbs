@@ -1,7 +1,8 @@
 <link rel="stylesheet" href="/stylesheets/profiledetails.css">
 <body>
 <div class="container px-1 py-5 mx-auto">
-    {{#if error}}
+    {{!-- dispaly success and error message --}}
+{{#if error}}
 <div class="alert alert-danger">
     {{error}}
 </div>
@@ -27,6 +28,7 @@
         <div class="col-lg-8 col-md-6  ">
             
             <div class="card col-lg-10 col-md-8">
+                {{!-- form for editing profiles --}}
                 <form class="form-card p-3" id="editprofileForm" action="/editProfile/{{userDetails._id}}?_method=PUT" method="POST">
                     
                     <div class="form-group col-m-6 flex-column d-flex gap-2">
@@ -63,7 +65,7 @@
 
 
 
-<!-- Modal -->
+<!-- Modal for changing password -->
 <div class="modal fade" id="changePassword" tabindex="-1" aria-labelledby="changePasswordLabel" aria-hidden="true">
   <div class="modal-dialog">
         <div class="modal-content">
@@ -96,5 +98,6 @@
 </div>
 </div>
 </div>
+{{!-- custom javascript --}}
 <script src="/javascripts/accountscript.js"></script>
 </body>

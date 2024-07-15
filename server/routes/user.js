@@ -1,6 +1,6 @@
-var express = require('express')
+// Import necessary modules
+var express = require('express');
 var router = express.Router();
-//var userController = require('../controller/userController.js');
 var authController = require('../controller/user/authenticationController.js');
 var prodController = require('../controller/user/productController.js');
 var cartController = require('../controller/user/cartController.js');
@@ -8,23 +8,25 @@ var accountController = require('../controller/user/accountController.js');
 var checkoutController = require('../controller/user/checkoutController.js');
 var wishlistController = require('../controller/user/wishlistController.js');
 var walletController = require('../controller/user/walletController.js');
-var couponController = require('../controller/user/couponControlle.js')
+var couponController = require('../controller/user/couponControlle.js');
 const passport = require('passport');
 require('../config/passport.js');
 
 router.use(passport.initialize());
 router.use(passport.session());
 
-//GET user Home Page
-router.get('/' ,  authController.userHome)
+// Home Page Route
+// GET user Home Page
+router.get('/', authController.userHome);
 
-//GET Login Page
-router.get('/login',authController.login)
+// Authentication Routes
+// GET Login Page
+router.get('/login', authController.login);
 
-//Get Auth using Google
-router.get('/auth/google',passport.authenticate('google',{scope:['email' ,'profile']}));
+// GET Auth using Google
+router.get('/auth/google', passport.authenticate('google', { scope: ['email', 'profile'] }));
 
-//Auth callBAck
+// GET Google Auth Callback
 router.get('/auth/google/callback',
     passport.authenticate('google', { failureRedirect: '/failure' }),
     (req, res) => {
@@ -33,192 +35,183 @@ router.get('/auth/google/callback',
     }
 );
 
-//Success
-router.get('/success',authController.successGoogleLogin);
+// GET Google Auth Success
+router.get('/success', authController.successGoogleLogin);
 
-//Failure
-router.get('/failure',authController.failureGoogleLogin);
+// GET Google Auth Failure
+router.get('/failure', authController.failureGoogleLogin);
 
-//POST Auth using Facebook
-router.get('/auth/facebook',passport.authenticate('facebook',{scope:
-    ['public_profile', 'email']
-    }));
+// GET Auth using Facebook
+router.get('/auth/facebook', passport.authenticate('facebook', { scope: ['public_profile', 'email'] }));
 
-
-//Auth callback
+// GET Facebook Auth Callback
 router.get('/auth/facebook/callback',
     passport.authenticate('facebook', { failureRedirect: '/faceFailure' }),
     (req, res) => {
-        req.flash('success', 'Login with facebook Successful');
+        req.flash('success', 'Login with Facebook Successful');
         res.redirect('/faceSuccess');
     }
-    );
+);
 
-//Success
-router.get('/faceSuccess',authController.successFacebookLogin);
-    
-//Failure
-router.get('/faceFailure',authController.failureFacebookLogin);
+// GET Facebook Auth Success
+router.get('/faceSuccess', authController.successFacebookLogin);
 
+// GET Facebook Auth Failure
+router.get('/faceFailure', authController.failureFacebookLogin);
 
-//GET SignUp Page
-router.get('/signup',authController.signup)
+// GET SignUp Page
+router.get('/signup', authController.signup);
 
-//POST Signup Page
-router.post('/signup',authController.postSignup)
+// POST SignUp Page
+router.post('/signup', authController.postSignup);
 
-//POST Login Page
-router.post('/login',authController.postLogin)
+// POST Login Page
+router.post('/login', authController.postLogin);
 
-//GET Forgot Password Page
-router.get('/forgotPassword',authController.forgotPassword)
+// GET Forgot Password Page
+router.get('/forgotPassword', authController.forgotPassword);
 
-//POST Forgot Password Page
-router.post('/forgotPassword',authController.postForgotPassword)
+// POST Forgot Password Page
+router.post('/forgotPassword', authController.postForgotPassword);
 
-//POST Reset Password Page
-router.post('/resetpassword',authController.postResetPassword)
+// POST Reset Password Page
+router.post('/resetpassword', authController.postResetPassword);
 
-//GET Reset Password Page
-router.get('/resetPassword',authController.resetPassword)
+// GET Reset Password Page
+router.get('/resetPassword', authController.resetPassword);
 
-//GET OTP Verification Page
-router.get('/otp-verification',authController.otpverify)
+// GET OTP Verification Page
+router.get('/otp-verification', authController.otpverify);
 
-//POST Veify OTP page
-router.post('/verifyOtp',authController.postVerifyotp)
+// POST Verify OTP Page
+router.post('/verifyOtp', authController.postVerifyotp);
 
-//GET Logout Page
-router.get('/logout',authController.getLogout)
+// GET Logout Page
+router.get('/logout', authController.getLogout);
 
+// Product Routes
+// GET Category Page
+router.get('/categories', prodController.getCategories);
 
-//GET category Page
-router.get('/categories',prodController.getCategories)
+// GET Product Listing Page
+router.get('/productList/:_id', prodController.productListing);
 
-//GET Product Listing Page
-router.get('/productList/:_id',prodController.productListing)
+// GET Product Details Page
+router.get('/productDetails/:variantId', prodController.productDetails);
 
-//GET Product Details Page
-router.get('/productDetails/:variantId',prodController.productDetails)
+// GET Product Plus Page
+router.get('/productPlus/:productId', prodController.getProductPlus);
 
-//GET Product Plus Page
-router.get('/productPlus/:productId',prodController.getProductPlus)
+// Cart Routes
+// GET Cart Page
+router.get('/cart', cartController.showShoppingCart);
 
+// POST Add To Cart
+router.post('/addToCart', cartController.addToCart);
 
+// POST Remove Cart Product
+router.post('/removeCartProduct/:_id', cartController.deleteCartProduct);
 
-//GET Cart page
-router.get('/cart',cartController.showShoppingCart)
+// GET Empty Cart
+router.get('/emptyCart', cartController.getEmptyCart);
 
-//POST AddToCart
-router.post('/addToCart',cartController.addToCart)
-
-//Delete Cart Product
-router.post('/removeCartProduct/:_id',cartController.deleteCartProduct);
-
-//Empty Cart
-router.get('/emptyCart',cartController.getEmptyCart)
-
-//Update Cart Item
+// POST Update Cart Item
 router.post('/updateCartItem', cartController.updateCartItem);
 
-//Update session total
-router.post('/updateCartTotal',cartController.updateTotal)
+// POST Update Session Total
+router.post('/updateCartTotal', cartController.updateTotal);
 
+// User Account Routes
+// GET User Account Page
+router.get('/profileDetails', accountController.getProfilePage);
 
+// PUT Edit Profile Information
+router.put('/editProfile/:_id', accountController.editProfileInformation);
 
-//Get User Account Page
-router.get('/profileDetails',accountController.getProfilePage);
+// POST Change Password
+router.post('/changePassword/:_id', accountController.changePassword);
 
-//Edit Profile Information
-router.put('/editProfile/:_id',accountController.editProfileInformation);
+// GET Address Management Page
+router.get('/addressManagement', accountController.getmanageAddess);
 
-//Change Password
-router.post('/changePassword/:_id',accountController.changePassword);
+// POST Add Address
+router.post('/addAddress', accountController.addAddress);
 
-//Addres Management Page
-router.get('/addressManagement',accountController.getmanageAddess);
+// POST Update Default Address
+router.post('/updateDefaultAddress', accountController.updateDefaultAddress);
 
-//add Address to th edatabase
-router.post('/addAddress',accountController.addAddress);
+// PUT Edit Address
+router.put('/editAddress/:_id', accountController.editAddress);
 
-//update default value of address
-router.post('/updateDefaultAddress',accountController.updateDefaultAddress);
+// PUT Delete Address
+router.put('/deleteAddress/:_id', accountController.deleteAddress);
 
-//Edit Address in Address management page
-router.put('/editAddress/:_id',accountController.editAddress);
+// GET Order Details Page
+router.get('/acctorderDetails', accountController.getOrderDetails);
 
-//Delete Address in Address management Page
-router.put('/deleteAddress/:_id',accountController.deleteAddress)
-
-//GET order details page 
-router.get('/acctorderDetails',accountController.getOrderDetails);
-
-//Cancel Order
+// Order Management Routes
+// POST Cancel Order
 router.post('/cancelOrder', accountController.cancelOrder);
 
-//Return Order
-router.post('/returnOrder',accountController.returnOrder);
+// POST Return Order
+router.post('/returnOrder', accountController.returnOrder);
 
-//Cancel return request
-router.post('/cancelReturn',accountController.cancelReturn);
+// POST Cancel Return Request
+router.post('/cancelReturn', accountController.cancelReturn);
 
-//Cancel a single item of an order
+// POST Cancel Single Order Item
 router.post('/cancelOrderItem', accountController.cancelOrderItem);
 
-router.post('/returnOrderItem',accountController.returnOrderItem)
+// POST Return Single Order Item
+router.post('/returnOrderItem', accountController.returnOrderItem);
 
+// Checkout Routes
+// GET Checkout Page
+router.get('/checkout', checkoutController.getcheckOut);
 
-
-//GET Checkout Page
-router.get('/checkout',checkoutController.getcheckOut);
-
-//Post checkout (Place Order)
+// POST Place Order
 router.post('/placeOrder', checkoutController.placeOrder);
 
-//POST Payement verification
-router.post('/payementVerification',checkoutController.payemntVerification)
+// POST Payment Verification
+router.post('/payementVerification', checkoutController.payemntVerification);
 
-//Payment Failed
-router.post('/paymentFailed',checkoutController.paymentFailed)
+// POST Payment Failed
+router.post('/paymentFailed', checkoutController.paymentFailed);
 
-//GET Order Details Page
-router.get('/orderDetails/:_id',checkoutController.getOrderDetails);
+// GET Order Details Page
+router.get('/orderDetails/:_id', checkoutController.getOrderDetails);
 
-//GET Invoice
-router.get('/displayInvoice/:orderId',checkoutController.displayInvoice);
+// GET Display Invoice
+router.get('/displayInvoice/:orderId', checkoutController.displayInvoice);
 
-//Retry Payment
-router.post('/retryPayment/:orderId',checkoutController.retryPayment);
+// POST Retry Payment
+router.post('/retryPayment/:orderId', checkoutController.retryPayment);
 
+// Wishlist Routes
+// GET Empty Wishlist
+router.get('/emptyWishlist', wishlistController.getEmptyWishlist);
 
-//GET Empty Wishlist
-router.get('/emptyWishlist',wishlistController.getEmptyWishlist)
+// GET Wishlist Page
+router.get('/wishlist', wishlistController.getWislist);
 
-//GET Wishlist page
-router.get('/wishlist',wishlistController.getWislist)
+// POST Add To Wishlist
+router.post('/addToWishlist', wishlistController.addToWishlist);
 
-//Add Product to wishlist
-router.post('/addToWishlist',wishlistController.addToWishlist)
+// POST Remove From Wishlist
+router.post('/removeFromWishlist', wishlistController.removefromWishlist);
 
-//Remove from Wishlist
-router.post('/removeFromWishlist',wishlistController.removefromWishlist)
+// POST Add To Cart From Wishlist
+router.post('/addToCartWishlist', wishlistController.wishAddtoCart);
 
-//Add to cart From wishlist
-router.post('/addToCartWishlist',wishlistController.wishAddtoCart)
+// Wallet Routes
+// GET Wallet
+router.get('/wallet', walletController.getWallet);
 
+// POST Add Money To Wallet
+router.post('/walletaddMoney', walletController.addMoney);
 
-
-
-//GET wallet
-router.get('/wallet',walletController.getWallet);
-
-//Add Money to wallet
-router.post('/walletaddMoney',walletController.addMoney);
-
-//Get Applicable coupons
-router.get('/getApplicableCoupons',couponController.getCoupons);
-
-
+// Coupon Routes
+// GET Applicable Coupons
+router.get('/getApplicableCoupons', couponController.getCoupons);
 
 module.exports = router;
-

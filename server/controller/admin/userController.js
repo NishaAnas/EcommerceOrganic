@@ -1,5 +1,6 @@
 const user = require('../../modals/user')
 
+//Get user managemnt page
 exports.getUserManagement = async(req,res) =>{
     try{    
         const page = parseInt(req.query.page) || 1;
@@ -7,7 +8,6 @@ exports.getUserManagement = async(req,res) =>{
         const skip = (page - 1) * limit;
     
         const Users = await user.find({}).skip(skip).limit(limit).lean();
-        //console.log(Users);
 
         const totalUsers = await user.countDocuments({});
         const totalPages = Math.ceil(totalUsers / limit);
@@ -21,12 +21,12 @@ exports.getUserManagement = async(req,res) =>{
                 success: successMessage, 
                 error: errorMessage})
     }catch(error){
-        //console.log(error)
         req.flash('error', 'Server Error');
         res.render('admin/user/userManagement', { layout: 'adminlayout', error: error });
     }
 }
 
+//block a user
 exports.blockUser = async (req, res) => {
     try {
         const userId = req.body.userId;
@@ -37,6 +37,7 @@ exports.blockUser = async (req, res) => {
     }
 };
 
+//unblock that user
 exports.unblockUser = async (req, res) => {
     try {
         const userId = req.body.userId;

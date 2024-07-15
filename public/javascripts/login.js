@@ -1,42 +1,48 @@
+// Wait for the DOM content to be fully loaded
 document.addEventListener('DOMContentLoaded', () => {
+  // Get references to DOM elements
   const email = document.getElementById('email');
   const password = document.getElementById('password');
   const form = document.getElementById('login_form');
-
   const email_error = document.getElementById('email_error');
   const password_error = document.getElementById('password_error');   
 
-  form.addEventListener('submit',(e)=>{
-  e.preventDefault();
-  let isValid = true;
+  // Add submit event listener to form
+  form.addEventListener('submit', (e) => {
+    e.preventDefault(); // Prevent form submission
+    let isValid = true; // Flag to track form validation status
 
-  email_error.innerHTML = "";
-  password_error.innerHTML = "";
+    email_error.innerHTML = ""; // Clear any previous email error messages
+    password_error.innerHTML = ""; // Clear any previous password error messages
 
-  const emailValue = email.value.trim();
-  const passwordValue = password.value.trim();
+    const emailValue = email.value.trim(); // Get trimmed value of email input
+    const passwordValue = password.value.trim(); // Get trimmed value of password input
 
-  //validation of email Address
- const email_regex = /^[a-z]{3,}@[a-z]+\.(com|in|org|net)$/;
- if (emailValue.trim().length > 50 || emailValue.trim().length < 8) {
-   isValid = false;
-   email_error.innerHTML = "Enter valid email address"
- }else
-  if(!email_regex.test(emailValue)){
-   isValid = false;
- email_error.innerHTML = 'Enter a valid Email Address'
-}
+    // Regular expression to validate email format
+    const email_regex = /^[a-z]{3,}@[a-z]+\.(com|in|org|net)$/;
 
-//password validation
-if (passwordValue.length < 8 || passwordValue.length > 20) {
-  isValid = false;
-   password_error.innerHTML = "Password length must be between 8 and 20"
-}
+    // Validate email length and format
+    if (emailValue.length > 50 || emailValue.length < 8) {
+      isValid = false;
+      email_error.innerHTML = "Email address must be between 8 and 50 characters";
+    } else if (!email_regex.test(emailValue)) {
+      isValid = false;
+      email_error.innerHTML = 'Enter a valid email address';
+    }
 
-if(isValid){
-  form.submit();
-}
-email.value = '';
-  password.value = ''
-})
-})
+    // Validate password length
+    if (passwordValue.length < 8 || passwordValue.length > 20) {
+      isValid = false;
+      password_error.innerHTML = "Password length must be between 8 and 20";
+    }
+
+    // If form is valid, submit it
+    if (isValid) {
+      form.submit();
+    }
+
+    // Clear input fields after submission attempt
+    email.value = '';
+    password.value = '';
+  });
+});

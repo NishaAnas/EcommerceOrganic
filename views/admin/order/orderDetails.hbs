@@ -1,48 +1,14 @@
+<!-- Bootstrap CSS for styling -->
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-<style>
-        .container {
-            background-color: #f9f9f9;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        h2 {
-            border-bottom: 2px solid #6c757d;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-        .order-info {
-            margin-bottom: 15px;
-        }
-        .order-info strong {
-            color: #6c757d;
-        }
-        .order-items {
-            list-style-type: none;
-            padding: 0;
-        }
-        .order-items li {
-            background-color: #fff;
-            padding: 15px;
-            border: 1px solid #e9ecef;
-            margin-bottom: 10px;
-            border-radius: 5px;
-        }
-        .order-items li strong {
-            display: block;
-            color: #6c757d;
-        }
-        .btn-primary {
-            background-color: #6c757d;
-            border-color: #6c757d;
-        }
-    </style>
+<!-- Custom stylesheet for additional styling -->
+<link rel="stylesheet" href="/stylesheets/adminorderDetails.css">
 </head>
 <body>
+    <!-- Container for the order details content -->
     <div class="container mt-5">
         <h2>Order Details <small class="text-muted">Order ID: {{orderDetails.newOrderId}}</small></h2>
-        
-        <div class="order-info">
+    <!-- Order information section -->    
+    <div class="order-info">
     <div class="row">
         <div class="col-md-4"><strong>User:</strong></div>
         <div class="col-md-8">{{orderDetails.userId.userName}}</div>
@@ -107,6 +73,6 @@
 </table>
         <a href="/admin/ordermanage" class="btn btn-primary mt-3">Back to Orders</a>
     </div>
-
+    <!-- JavaScript file for order management functionality -->
     <script src="/javascripts/orderManagement.js"></script>
     </body>

@@ -1,5 +1,8 @@
+<!-- Custom CSS for additional styling -->
 <link rel="stylesheet" href="/stylesheets/addProduct.css">
+<!-- Bootstrap CSS for styling -->
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<!-- SweetAlert2 for alert popups -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <body>
     <div class="container ">
@@ -26,6 +29,7 @@
         {{success}}
     </div>
     {{/if}}
+    <!-- Form for adding a new product -->
     <form id="addProductForm" action="/admin/addProduct" method="post"
         enctype="multipart/form-data">
         <div class="row form-group mb-4 p-3 gap-4">
@@ -74,7 +78,8 @@
                         <span id="category_error" style="color: red;"></span>
                     </div>
                 </div>
-            </div>            
+            </div>
+            <!-- Image upload section -->            
             <div class="container mt-3 w-100 py-4">
                 <div class="card shadow-sm w-100">
                     <div class="card-header d-flex justify-content-between">

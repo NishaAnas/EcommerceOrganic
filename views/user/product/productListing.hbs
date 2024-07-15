@@ -117,33 +117,6 @@
                     </div>
                 </div>
                 <div class="filter-section">
-                    <h5 class="filter-header" data-toggle="collapse" data-target="#featuredFilter">Featured Products</h5>
-                    <div id="featuredFilter" class="collapse">
-                        <input type="checkbox" id="featured" name="featured">
-                        <label for="featured">Featured products</label>
-                    </div>
-                </div>
-                <div class="filter-section">
-                    <h5 class="filter-header" data-toggle="collapse" data-target="#offersFilter">Offers</h5>
-                    <div id="offersFilter" class="collapse">
-                        <input type="checkbox" id="offers" name="offers">
-                        <label for="offers">Offers</label>
-                    </div>
-                </div>
-                <div class="filter-section">
-                    <h5 class="filter-header" data-toggle="collapse" data-target="#discountFilter">Discount</h5>
-                    <div id="discountFilter" class="collapse">
-                        <input type="checkbox" id="discount10" name="discount10">
-                        <label for="discount10">10% Discount</label><br>
-                        <input type="checkbox" id="discount20" name="discount20">
-                        <label for="discount20">20% Discount</label><br>
-                        <input type="checkbox" id="discount30" name="discount30">
-                        <label for="discount30">30% Discount</label><br>
-                        <input type="checkbox" id="discount40" name="discount40">
-                        <label for="discount40">40% Discount</label>
-                    </div>
-                </div>
-                <div class="filter-section">
                     <h5 class="filter-header" data-toggle="collapse" data-target="#sortFilter">Sort</h5>
                     <div id="sortFilter" class="collapse">
                         <input type="radio" id="sortNameAsc" name="sort" value="name_asc">
@@ -154,13 +127,6 @@
                         <label for="sortPriceAsc">Price (Low-High)</label><br>
                         <input type="radio" id="sortPriceDesc" name="sort" value="price_desc">
                         <label for="sortPriceDesc">Price (High-Low)</label>
-                    </div>
-                </div>
-                <div class="filter-section">
-                    <h5 class="filter-header" data-toggle="collapse" data-target="#bestSellersFilter">Best Sellers</h5>
-                    <div id="bestSellersFilter" class="collapse">
-                        <input type="checkbox" id="bestSellers" name="bestSellers">
-                        <label for="bestSellers">Best sellers</label>
                     </div>
                 </div>
                 <div class="filter-section">
@@ -202,15 +168,6 @@
                         <a class="prod_card" href="/productPlus/{{this._id}}" class="product-link">
                             <div class="profile-card-2">
                                 <img src="/{{this.images.[0]}}" alt="{{title}}" loading="lazy" class="img img-responsive">
-                                {{!-- {{#if this.offer}}
-                                <span class="product-discount-label">
-                                    {{#if (isEqual this.offer.discountType "Percentage")}}
-                                        {{this.offer.discountValue}}% off
-                                    {{else}}
-                                        {{this.offer.discountValue}} Rs off
-                                    {{/if}}
-                                </span>
-                                    {{/if}} --}}
                             <div class="d-flex flex-row align-items-start gap-2">
                                 <div class="profile-name">
                                     {{name}}

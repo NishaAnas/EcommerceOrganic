@@ -4,7 +4,7 @@
 <body>
     <div class="container mt-5">
         <h2>Product Management <small>Organic</small></h2>
-
+        <!-- Display success and error message -->
         {{#if error}}
         <div class="alert alert-danger">
             {{error}}
@@ -19,7 +19,7 @@
             <!-- Add Product Button -->
             <a href="/admin/addProduct" class="btn btn-sm btn-success">+ Add Product</a>
         </div>
-
+        <!-- Table for dispalying product details -->
         <div class="table-responsive">
             <table class="table table-bordered">
                 <thead class="thead-light">
@@ -76,6 +76,6 @@
             </div>
         </div>
     </div>
-    
+    <!-- Custom javascript page -->
     <script src="/javascripts/product.js"></script>
 </body>

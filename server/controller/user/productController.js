@@ -1,11 +1,10 @@
-const mongoose = require('mongoose')
 const category = require('../../modals/categories');
 const product = require('../../modals/product');
 const prodVariation = require('../../modals/productVariation');
 const shoppingCart = require('../../modals/shoppingCart');
 const wishlist = require('../../modals/wishlist');
 const offer = require('../../modals/offer');
-const crypto = require('crypto')
+
 
 // Get Category Page
 exports.getCategories = async (req, res) => {
@@ -16,15 +15,15 @@ exports.getCategories = async (req, res) => {
    try{
       let categories = await category.find().lean();
 
+      //Find any active offers
       const activeOffers = await offer.find({
          isActive: true,
          type: "Category",
          startDate: { $lte: new Date() },
          endDate: { $gte: new Date() }
       }).lean();
-      ////console.log(activeOffers);
    
-     // Attach offers to respective categories
+     // Attach active offers to respective categories
       categories = categories.map(category => {
          const categoryOffer = activeOffers.find(offer => offer.applicableItems.toString() === category.name.toString());
          if (categoryOffer) {
@@ -32,8 +31,8 @@ exports.getCategories = async (req, res) => {
          }
          return category;
       });
-      //console.log(categories);
 
+      //render the category listing page with appropriate details
       res.render('user/product/categorylisting', { 
          categories,
          userData, 
@@ -41,7 +40,6 @@ exports.getCategories = async (req, res) => {
          error: errorMessage,
       });
    }catch(error){
-      //console.log(error);
          req.flash('error', 'Server Error');
          res.redirect('/');
    }
@@ -58,18 +56,25 @@ exports.getCategories = async (req, res) => {
             return res.status(400).json({ error: 'Error in fetching Category Id' });
          }
 
+         //pagiantion 
          const page = parseInt(req.query.page) || 1;
          const limit = 5;
          const skip = (page - 1) * limit;
+
+         //Searching
          const searchQuery = req.query.search || '';
-         const selectedCategories = Array.isArray(req.query.selectedCategories) ? req.query.selectedCategories : [req.query.selectedCategories].filter(Boolean);
-         const maxPrice = req.query.maxPrice ? parseFloat(req.query.maxPrice) : null;
-         const sortOption = req.query.sort || '';
-
          const searchCondition = searchQuery ? { name: new RegExp(searchQuery, 'i') } : {};
-         const categoryCondition = selectedCategories.length > 0 ? { categoryId: { $in: selectedCategories } } : {};
-         const priceCondition = maxPrice !== null ? { price: { $lte: maxPrice } } : {};
 
+         //Filter the products selected category
+         const selectedCategories = Array.isArray(req.query.selectedCategories) ? req.query.selectedCategories : [req.query.selectedCategories].filter(Boolean);
+         const categoryCondition = selectedCategories.length > 0 ? { categoryId: { $in: selectedCategories } } : {};
+         
+         //Filter the products Maximum price
+         const maxPrice = req.query.maxPrice ? parseFloat(req.query.maxPrice) : null;
+         const priceCondition = maxPrice !== null ? { price: { $lte: maxPrice } } : {};
+         
+         //Filter the products sort condition
+         const sortOption = req.query.sort || '';
          let sortCondition = {};
          switch (sortOption) {
             case 'name_asc':
@@ -86,18 +91,20 @@ exports.getCategories = async (req, res) => {
                   break;
          }
 
+         //find products with the given conditions
          const products = await product.find({ categoryId, ...categoryCondition, ...searchCondition, ...priceCondition })
             .sort(sortCondition)
             .skip(skip)
             .limit(limit)
             .lean();
 
+         console.log(products);
          const totalProducts = await product.countDocuments({ categoryId, ...categoryCondition, ...searchCondition, ...priceCondition });
          const totalPages = Math.ceil(totalProducts / limit);
 
          const categoryName = await category.findOne({ _id: categoryId }, 'name').lean();
          const selectedCategoriesNames = await category.find({ _id: { $in: selectedCategories } }, 'name').lean();
-         //console.log(selectedCategoriesNames)
+
 
       // Apply category discount to each product if applicable
       for (let prod of products) {
@@ -119,7 +126,6 @@ exports.getCategories = async (req, res) => {
             prod.finalPrice = null; 
          }
       }
-         //console.log(products)
 
          if (req.xhr) {
             return res.json({
@@ -172,6 +178,7 @@ exports.productDetails = async (req, res) => {
          const categoryOffer = productDetails.categoryOffer ? await offer.findById(productDetails.categoryOffer).lean() : null;
          const productOffer = productDetails.productOffer ? await offer.findById(productDetails.productOffer).lean() : null;
 
+         //calculate maximum discount from category and product
          let maxDiscount = 0;
          if (categoryOffer) {
             const categoryDiscount = categoryOffer.discountType === 'Percentage' ? (actualPrice * categoryOffer.discountValue) / 100 : categoryOffer.discountValue;
@@ -191,13 +198,11 @@ exports.productDetails = async (req, res) => {
       }
 
       const products = await prodVariation.findByIdAndUpdate(req.params.variantId);
-      //console.log(products);
 
       // Fetch category details
       const categoryId = productDetails.categoryId;
       const categories = await category.findById(categoryId);
       const categoryName = categories.name;
-      ////console.log(categories.name);
 
       // Fetch all product variations in the same category and shuffle to get six random variants
       const allVariants = await prodVariation.find({ productId: { $in: (await product.find({ categoryId: categoryId }).distinct('_id')) } }).lean();
@@ -237,7 +242,7 @@ exports.productDetails = async (req, res) => {
             productInWishlist = existingWishlist.products.some(item => item.product.equals(productId));
          }
       }
-      ////console.log(productInWishlist);
+
       res.render('user/product/productDetails', { 
          productDetails,
          categoryName, 
@@ -271,6 +276,7 @@ exports.getProductPlus = async (req, res) => {
       const baseProduct = await product.findById(productId).lean();
       const categories = await category.findById(baseProduct.categoryId);
 
+      //pagination searching and sorting
       const page = parseInt(req.query.page) || 1;
       const limit = 5;
        const skip = (page - 1) * limit;
@@ -298,7 +304,6 @@ exports.getProductPlus = async (req, res) => {
       }
 
       const productList = await prodVariation.find(query).skip(skip).limit(limit).sort(sort).lean();
-      ////console.log(productList);
       const totalProducts = await prodVariation.countDocuments(query);
       const totalPages = Math.ceil(totalProducts / limit);
 

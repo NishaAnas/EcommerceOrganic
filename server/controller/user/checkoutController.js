@@ -19,13 +19,6 @@ const razorpayInstance = new RazorPay({
     key_secret: process.env.RAZORPAY_SECRET_KEY
 });
 
-// Generate signature for Razorpay
-// const generateSignature = (orderId, paymentId) => {
-//     const hmac = crypto.createHmac('sha256', process.env.RAZORPAY_SECRET_KEY);
-//     hmac.update(`${orderId}|${paymentId}`);
-//     return hmac.digest('hex');
-// };
-
 
 //GET Checkout Page
 exports.getcheckOut = async (req, res) => {
@@ -46,14 +39,6 @@ exports.getcheckOut = async (req, res) => {
             req.flash('error', 'Your account is blocked by Admin.');
             return res.redirect('/login');
         }
-
-        // const addressRecord = await address.findOne({ userId: userId, isDefault: true });
-        // const defaultAddress = addressRecord ? addressRecord.toObject() : null;
-        // //////console.log(defaultAddress);
-
-        // //save shipping address to session
-        // req.session.addressDetails = defaultAddress;
-
         // Fetch the first three addresses for the user
         const addressRecords = await address.find({ userId: userId }).limit(3).lean();
 
@@ -62,14 +47,11 @@ exports.getcheckOut = async (req, res) => {
 
         // Retrieve cart details from the session
         const cartDetails = req.session.cartDetails;
-        //////console.log(req.session.cartDetails);
 
         if (!cartDetails) {
             req.flash('error', 'Your cart is empty.');
             return res.redirect('/cart');
         }
-
-        //////console.log(req.session.cartDetails.cartitems);
 
         return res.render('user/checkout/checkout', {
             userData,
@@ -87,7 +69,6 @@ exports.getcheckOut = async (req, res) => {
             layout:'checkoutlayout'
         });
     } catch (error) {
-        ////console.log(error);
         req.flash('error', 'Server Error');
         res.redirect('/')
     }
@@ -96,11 +77,8 @@ exports.getcheckOut = async (req, res) => {
 
 //POST Checkout (Place Order)
 exports.placeOrder = async (req, res) => {
-    //////console.log(req.body);
     const userData = req.session.userLoggedInData;
-    //const shippingAddress = req.session.addressDetails;
     const cartDetails = req.session.cartDetails;
-    ////console.log(`cartDetails : ${cartDetails.afterDiscountTotal}`);
     const { selectedAddressId, deliveryOption, paymentOption} = req.body;
 
     if (!cartDetails) {
@@ -125,11 +103,8 @@ exports.placeOrder = async (req, res) => {
         }
         req.session.addressDetails = shippingAddress;
 
-        //////console.log(req.session.addressDetails)
-
         //function to generate 16 digit orderId
         const newOrderId = uuidv4();
-        //////console.log(newOrderId);
 
         // Create order items from cart details
         const items = cartDetails.cartitems.map(item => ({
@@ -149,8 +124,6 @@ exports.placeOrder = async (req, res) => {
         }
 
         const totalAmount = cartDetails.afterDiscountTotal + deliveryFee;
-        
-        ////console.log(`total Amount :${totalAmount}`);
 
         // Create delivery details
         const delivery = {
@@ -171,10 +144,8 @@ exports.placeOrder = async (req, res) => {
             orderStatus: 'Pending'
         };
 
-        ////console.log(`order Data : ${orderData.items}`);
-
         // Check payment option
-        if (paymentOption === 'cod') {
+        if (paymentOption === 'cod') {              //COD
             if(totalAmount > 1000){
                 return res.status(400).json({ error: 'COD orders above Rs. 1000 are not allowed.' });
             }
@@ -195,9 +166,8 @@ exports.placeOrder = async (req, res) => {
                 neworderId: newOrder.newOrderId,
                 orderId: newOrder._id
             });
-        } else if (paymentOption === 'razorpay') {
+        } else if (paymentOption === 'razorpay') {          //Razorpay
             const amount =  Math.round(totalAmount * 100); // Convert to paise
-            ////console.log(`amount :${amount}`);
             const options = {
                 amount: amount,
                 currency: 'INR',
@@ -210,7 +180,6 @@ exports.placeOrder = async (req, res) => {
                 throw new Error('Failed to create Razorpay order');
             }
 
-            //////console.log(razorpayOrder);
             orderData.payment = {
                 method: 'Razorpay',
                 status: 'Pending',
@@ -233,11 +202,9 @@ exports.placeOrder = async (req, res) => {
                     contact: userData.contact
                 }
             });
-        }else if (paymentOption === 'wallet') {
-            ////console.log('wallet')
+        }else if (paymentOption === 'wallet') {         //wallet
             const userId = userData.userId;
             const Wallet = await wallet.findOne({ userId:userId});
-            ////console.log(Wallet.balance)
 
             if (!Wallet || Wallet.balance < totalAmount) {
                 return res.status(400).json({ error: 'Insufficient wallet balance' });
@@ -295,11 +262,11 @@ const updateStockAndClearCart = async (items, userId , req) => {
     req.session.addressDetails = null;
 };
 
+//payment Verification
 exports.payemntVerification = async (req, res) => {
     try {
         const { razorpayPaymentId, razorpayOrderId, razorpaySignature, orderId } = req.body;
         const paymentDocument = await razorpayInstance.payments.fetch(razorpayPaymentId);
-        ////console.log(paymentDocument);
 
         if (paymentDocument.status === 'captured') {
             await order.findByIdAndUpdate(orderId, {
@@ -344,7 +311,6 @@ exports.getOrderDetails = async (req, res) => {
     const errorMessage = req.flash('error');
     const userData = req.session.userLoggedInData;
     const orderId = req.params._id;
-    //////console.log(orderId);
 
     try {
         if (!req.session.userLoggedInData || !req.session.userLoggedInData.userloggedIn) {
@@ -385,7 +351,6 @@ exports.getOrderDetails = async (req, res) => {
             ...orderDetails.toObject(),
             items: itemsWithImages
         };
-        //////console.log(orderWithItemsAndImages);
 
         return res.render('user/checkout/orderdetails', { 
             order: orderWithItemsAndImages, 
@@ -394,12 +359,12 @@ exports.getOrderDetails = async (req, res) => {
             error: errorMessage 
         });
     } catch (error) {
-        ////console.log(error);
         req.flash('error', 'Server Error');
         res.redirect('/')
     }
 }
 
+//Function to calculate delivery Fee
 const calculateDeliveryFee = (deliveryOption) => {
     let deliveryFee = 0;
     if (deliveryOption === 'express') {
@@ -423,8 +388,6 @@ exports.displayInvoice = async(req,res)=>{
         if (!orders) {
             return res.status(404).send('Order not found');
         }
-        ////console.log(orders);
-
         const deliveryFee = calculateDeliveryFee(orders.delivery.method);
         const subTotal = orders.items.reduce((acc, item) => acc + item.price * item.quantity, 0);
         const totalAmount = subTotal - orders.discountAmount + deliveryFee;
@@ -460,7 +423,6 @@ exports.displayInvoice = async(req,res)=>{
             storeEmail: "xyz@987.com",
             storePhone: "+91-012-345-6789",
         };
-        //////console.log(invoiceData)
         res.json(invoiceData);
     } catch (err) {
         console.error(err);
@@ -468,21 +430,20 @@ exports.displayInvoice = async(req,res)=>{
     }
 }
 
+
+//If payment failed then retry payment
 exports.retryPayment = async(req,res)=>{
     const { orderId } = req.params;
     const { paymentMethod } = req.body;
     const userData = req.session.userLoggedInData;
-    ////console.log(req.session.userLoggedInData)
-
-    // ////console.log(orderId);
-    // ////console.log(paymentMethod);
-
+    console.log(req.body);
     try{
         const orderDetails = await order.findById(orderId);
-        if (!orderDetails || orderDetails.payment.status !== 'Pending' || orderDetails.orderStatus==='Cancelled') {
+        if (!orderDetails || orderDetails.payment.status !== 'Failed' || orderDetails.orderStatus==='Cancelled') {
             return res.status(400).json({ error: 'Invalid order.' });
         }
 
+        console.log(orderDetails);
         if (paymentMethod === 'razorpay') {
             const amount = orderDetails.totalAmount * 100; // Convert to paise
             const options = {
@@ -520,7 +481,6 @@ exports.retryPayment = async(req,res)=>{
             const userId = orderDetails.userId;
 
             const Wallet = await wallet.findOne({ userId:userId});
-            ////console.log(Wallet.balance)
 
             if (!Wallet || Wallet.balance < orderDetails.totalAmount) {
                 return res.status(400).json({ error: 'Insufficient wallet balance' });
@@ -540,7 +500,6 @@ exports.retryPayment = async(req,res)=>{
 
         }
     }catch(error){
-        ////console.log(error);
         res.status(500).json({
             error: 'Server Error'
         })

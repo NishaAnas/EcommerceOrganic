@@ -5,19 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Organic</title>
     <link rel="icon" href="/images/Organic_icon.ico" type="image/x-icon">
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
-      crossorigin="anonymous">
-    <link rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet">
-    <link rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="/stylesheets/style.css">
-     <link rel="stylesheet" href="/stylesheets/accountstyle.css" />
-     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="/stylesheets/accountstyle.css" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   </head>
   <body>
@@ -41,21 +34,15 @@
                   <a class="nav-link active" aria-current="page" href="/categories">Shop</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link active" aria-current="page" href="#">Offers</a>
+                  <a class="nav-link active" aria-current="page" href="/acctorderDetails">Orders</a>
                 </li>
                 <li class="nav-item">
-                  <a class="nav-link" href="#">Wallet</a>
+                  <a class="nav-link" href="/wallet">Wallet</a>
                 </li>
               </ul>
               <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                 <div class="d-flex flex-row justify-content-end gap-10">
                   <span class="navlink-container">
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">About Us</a>
-                    </li>
-                    <li class="nav-item">
-                      <a class="nav-link" href="#">Contact Us</a>
-                    </li>
                     <div class="d-flex flex-row justify-content-end gap-2 dropdown-wrapper">
                       <li class="nav-item dropdown">
                         <div class="nav-link dropdown-toggle" role="button" id="accountDropdown" data-bs-toggle="dropdown" aria-expanded="false">
@@ -85,8 +72,6 @@
                         <a href="/cart" type="button" class="btn  btn-small">
                           <i class="bi bi-cart-fill"></i>
                         </a>
-                          <!-- Display cart count or other information -->
-                          {{!-- <span>{{ userCart.items.length }}</span> --}}
                       </li>
                     </div>
                   </div>
@@ -121,14 +106,8 @@
                     <a href="/wishlist" class="nav_link d-flex flex-row align-items-center gap-2">
                         <i class="bi bi-heart-fill"></i> <span class="nav_name">Wishlist</span>
                     </a>
-                    <a href="#" class="nav_link d-flex flex-row align-items-center gap-2">
-                        <i class="bi bi-gift-fill"></i> <span class="nav_name">Coupons</span>
-                    </a>
                     <a href="/wallet" class="nav_link d-flex flex-row align-items-center gap-2">
                         <i class="bi bi-wallet2"></i> <span class="nav_name">Wallet</span>
-                    </a>
-                    <a href="#" class="nav_link d-flex flex-row align-items-center gap-2">
-                        <i class="bi bi-p-circle-fill"></i> <span class="nav_name">Privacy Policy</span>
                     </a>
                     <a href="/logout" class="nav_link d-flex flex-row align-items-center gap-2">
                 <i class="bi bi-box-arrow-in-left"></i> <span class="nav_name">SignOut</span>
@@ -144,93 +123,86 @@
 
 </main>
     <footer class="rectangle-parent">
-      <div class="rectangle"></div>
-      <div class="child-frame">
-        <!-- Footer content goes here -->
-        <div class="content-frame">
-          <a class="sub-frames" href="#">
-            <img
-              class="rectangle-shape-icon"
-              loading="lazy"
-              alt="organic"
-              src="/images/organic-store-white-logo.png" />
-          </a>
-          <div class="maecenas-mi-justo">
-            Maecenas mi justo, interdum at consectetur vel, tristique et arcu.
-            Ut quis eros blandit, ultrices diam in, elementum ex. Suspendisse
-            quis faucibus urna. Suspendisse pellentesque.
-          </div>
-        </div>
-        <div class="parent-frame">
-          <div class="links-frame">
-            <h3 class="quick-links">Quick Links</h3>
-            <div class="page-frames">
-              <a class="about" href="#">About</a>
-              <a class="cart" href="#">Cart</a>
-              <a class="checkout" href="#">Checkout</a>
-              <a class="contact" href="#">Contact</a>
-              <a class="home" href="#">Home</a>
-              <a class="my-account" href="#">My account</a>
-              <a class="shop" href="#">Shop</a>
+        <div class="rectangle"></div>
+        <div class="child-frame">
+          <!-- Footer content goes here -->
+          <div class="content-frame">
+            <a class="sub-frames" href="/">
+              <img class="rectangle-shape-icon" loading="lazy" alt="organic" src="/images/organic-store-white-logo.png" />
+            </a>
+            <div class="maecenas-mi-justo">
+              Maecenas mi justo, interdum at consectetur vel, tristique et arcu.
+              Ut quis eros blandit, ultrices diam in, elementum ex. Suspendisse
+              quis faucibus urna. Suspendisse pellentesque.
             </div>
-            <div class="footer-frame">
-              <h3 class="site-links">Site Links</h3>
-              <div class="policies-frame">
-                <a class="privacy-policy" href="#">Privacy Policy</a>
-                <a class="shipping-details" href="#">Shipping Details<av>
-                    <a class="offers-coupons" href="#">Offers Coupons</a>
-                    <a class="terms-conditions" href="#">Terms &
-                      Conditions</a>
+          </div>
+          <div class="parent-frame">
+            <div class="links-frame">
+              <h3 class="quick-links">Quick Links</h3>
+              <div class="page-frames">
+                <a class="cart" href="/cart">Cart</a>
+                <a class="home" href="/">Home</a>
+                <a class="my-account" href="/profileDetails">My account</a>
+                <a class="shop" href="/categories">Shop</a>
+              </div>
+              <div class="footer-frame">
+                <h3 class="site-links">Site Links</h3>
+                <div class="policies-frame">
+                  <a class="privacy-policy" href="/">Privacy Policy</a>
+                  <a class="shipping-details" href="/">Shipping Details<av>
+                      <a class="offers-coupons" href="/">Offers Coupons</a>
+                      <a class="terms-conditions" href="/">Terms &
+                        Conditions</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="shipping-details1">
+                <div class="offers-frame">
+                  <div class="coupons-frame">
+                    <h3><a class="download-our-mobile" href="/"> Download Our
+                        Mobile App</a> </h3>
+                    <div class="lorem-ipsum-dolor">
+                      Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                      Donec
+                      aliquam gravida sollicitudin. Praesent porta enim mi, non
+                      tincidunt libero interdum sit amet.
+                    </div>
+                  </div>
+                  <div class="link-text">
+                    <h3 class="quick-links1">Quick Links</h3>
+                    <div class="store-frame">
+                      <a class="know-more-about" href="/">Know More About Us</a>
+                      <a class="visit-store" href="/">Visit Store</a>
+                      <a class="lets-connect" href="/">Let’s Connect</a>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-            <div class="shipping-details1">
-              <div class="offers-frame">
-                <div class="coupons-frame">
-                  <h3><a class="download-our-mobile" href="#"> Download Our
-                      Mobile App</a> </h3>
-                  <div class="lorem-ipsum-dolor">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                    Donec
-                    aliquam gravida sollicitudin. Praesent porta enim mi, non
-                    tincidunt libero interdum sit amet.
-                  </div>
-                </div>
-                <div class="link-text">
-                  <h3 class="quick-links1">Quick Links</h3>
-                  <div class="store-frame">
-                    <a class="know-more-about" href="#">Know More About Us</a>
-                    <a class="visit-store" href="#">Visit Store</a>
-                    <a class="lets-connect" href="#">Let’s Connect</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="copyright-frame">
-            <!-- Copyright content goes here -->
-            <div class="rectangle1"></div>
-            <div class="copyright-2024">Copyright © 2024 | Organic Store</div>
+            <div class="copyright-frame">
+              <!-- Copyright content goes here -->
+              <div class="rectangle1"></div>
+              <div class="copyright-2024">Copyright © 2024 | Organic Store</div>
 
-            <ul class="ms-auto mb-2 mb-lg-0">
-              <div class="d-flex flex-row justify-content-end gap-10">
-                <button type="button" class="btn btn-small">
-                  <i class="bi bi-facebook"></i>
-                </button>
-                <button type="button" class="btn btn-small">
-                  <i class="bi bi-twitter-x"></i>
-                </button>
-                <button type="button" class="btn btn-small">
-                  <i class="bi bi-instagram"></i>
-                </button>
-                <button type="button" class="btn btn-small">
-                  <i class="bi bi-threads"></i>
-                </button>
-              </div>
-            </ul>
-          </div>
-        </footer>
+              <ul class="ms-auto mb-2 mb-lg-0">
+                <div class="d-flex flex-row justify-content-end gap-10">
+                  <button type="button" class="btn btn-small">
+                    <i class="bi bi-facebook"></i>
+                  </button>
+                  <button type="button" class="btn btn-small">
+                    <i class="bi bi-twitter-x"></i>
+                  </button>
+                  <button type="button" class="btn btn-small">
+                    <i class="bi bi-instagram"></i>
+                  </button>
+                  <button type="button" class="btn btn-small">
+                    <i class="bi bi-threads"></i>
+                  </button>
+                </div>
+              </ul>
+            </div>
+          </footer>
 
         <script
           src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"

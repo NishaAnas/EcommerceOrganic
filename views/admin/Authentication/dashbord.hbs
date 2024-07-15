@@ -1,10 +1,12 @@
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<link rel="stylesheet"
+    href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <link rel="stylesheet" href="/stylesheets/dashboard.css">
 <body>
     <div class="container mt-4">
         <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4">
             <div class="col">
+                <!-- Cards for displaying metrics -->
                 <div
                     class="card radius-10 border-start border-0 border-3 border-info">
                     <div class="card-body">
@@ -93,6 +95,7 @@
         {{!-- Graph details --}}
         <div class="col-md-8">
             <div class="d-flex  align-items-center justify-content-end">
+                <!-- Dropdown to select graph type (Daily, Monthly, Yearly) -->
                 <select class="graphSales"
                     style="background-color: antiquewhite; border-radius: 4px;">
                     <option selected disabled>Daily</option>
@@ -100,8 +103,10 @@
                     <option value="Monthly">Monthly</option>
                     <option value="Yearly">Yearly</option>
                 </select>
+                <!-- Button to apply selected graph type -->
                 <button class="btn btn-success ms-2 graphChange">Apply</button>
             </div>
+            <!-- Canvas for displaying chart -->
             <canvas class="myChart mt-4" width="400" height="200"></canvas>
         </div>
 
@@ -128,9 +133,11 @@
             </div>
         </div>
     </body>
+    <!-- Chart.js library for chart rendering -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', () => {
+    // Function to fetch and display data for selected graph type (Daily, Monthly, Yearly)
     const fetchAndDisplayData = (url, chartLabel) => {
         fetch(url)
             .then(response => {
@@ -142,6 +149,7 @@
             .then(data => {
                 let labels, revenue;
 
+                // Adjust data based on selected chartLabel (Daily, Monthly, Yearly)
                 if (chartLabel === 'Daily') {
                     labels = data.map(entry => {
                         const date = new Date(entry._id);
@@ -162,12 +170,14 @@
                     revenue = data.map(entry => entry.totalRevenue);
                 }
 
+                // Get chart canvas context and destroy existing chart instance if any
                 const ctx = document.querySelector('.myChart').getContext('2d');
                 const chartInstance = Chart.getChart(ctx);
                 if (chartInstance) {
                     chartInstance.destroy();
                 }
 
+                // Create new Chart.js instance for rendering bar chart
                 new Chart(ctx, {
                     type: 'bar',
                     data: {
@@ -300,6 +310,4 @@
                 const selectedValue = $(this).val();
                 fetchBestSellers(selectedValue);
             });
-
-
     </script>

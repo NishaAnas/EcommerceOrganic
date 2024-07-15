@@ -1,13 +1,16 @@
 $(document).ready(function () {
+    // Update max price label dynamically as slider changes
     $('#price-range').on('input', function () {
         var value = $(this).val();
         $('#max-price-label').text(value);
     });
 
+    // Update displayed price value as slider changes
     $('#priceRange').on('input', function() {
         $('#priceValue').text($(this).val());
     });
 
+    // Reset all filters to default values
     $('#reset-filters').click(function () {
         $('#search-input').val('');
         $('input[type="checkbox"]').prop('checked', false);
@@ -17,11 +20,13 @@ $(document).ready(function () {
         fetchFilteredProducts();
     });
 
+    // Handle form submission for fetching filtered products
     $('#filter-form').submit(function(event) {
         event.preventDefault();
-        fetchFilteredProducts();
+        fetchFilteredProducts();// Fetch products based on current filter settings
     });
 
+     // Function to fetch products based on current filters and pagination
     function fetchFilteredProducts(page = 1) {
         const searchQuery = $('#search-input').val();
         const maxPrice = $('#priceRange').val();
@@ -45,17 +50,20 @@ $(document).ready(function () {
                 categoryId: categoryId 
             },
             success: function(response) {
+                // Handle successful response
                 if (response.products.length > 0) {
                     $('#search-error').hide();
                     renderProducts(response.products);
                     updatePagination(response.currentPage, response.totalPages, response.filters);
                 } else {
+                    // Display error message if no products found
                     $('#search-error').show();
                     $('#product-list').html('');
                     updatePagination(1, 1, {});
                 }
+                // Log selected categories and max price
                 console.log('Selected Categories Names:', response.selectedCategoriesNames);
-            console.log('Max Price:', response.maxPrice);
+                console.log('Max Price:', response.maxPrice);
 
             // Update selected categories and max price
             updateSelectedFilters(response.selectedCategoriesNames, response.maxPrice);
@@ -66,8 +74,10 @@ $(document).ready(function () {
         });
     }
 
+    // Function to update selected category filters and max price in UI
     function updateSelectedFilters(selectedCategoriesNames, maxPrice) {
         if (selectedCategoriesNames.length > 0) {
+            // Display selected categories
             let categoriesHtml = '<div class="selected-categories" style="display: block;"><strong>Selected Categories:</strong>';
             selectedCategoriesNames.forEach(category => {
                 categoriesHtml += `<span class="selected-category-label">${category.name}<strong> / </strong></span>`;
@@ -87,11 +97,13 @@ $(document).ready(function () {
         }
     }
 
+    // Function to render products in UI based on fetched data
     function renderProducts(products) {
         const productContainer = $('#product-list');
         productContainer.empty();
 
         products.forEach(product => {
+            // Generate HTML for each product card
             const productHtml = `
                 <div class="col-md-4">
                     <hr>
@@ -112,10 +124,11 @@ $(document).ready(function () {
                     </a>
                 </div>
             `;
-            productContainer.append(productHtml);
+            productContainer.append(productHtml);// Append product HTML to container
         });
     }
 
+    // Function to update pagination links based on current page and total pages
     function updatePagination(currentPage, totalPages, filters) {
         const paginationSummary = $('.pagination-summary');
         const paginationLinks = $('.pagination-links');
@@ -125,23 +138,27 @@ $(document).ready(function () {
 
         const filterParams = $.param(filters);
 
+        // Add previous page link if current page is greater than 1
         if (currentPage > 1) {
             paginationLinks.append(`<a href="#" class="pagination-link text-primary" data-page="${currentPage - 1}" data-filters="${filterParams}">Previous</a>`);
         }
 
+        // Add pagination links for each page
         for (let i = 1; i <= totalPages; i++) {
             const activeClass = i === currentPage ? 'active' : '';
             paginationLinks.append(`<a href="#" class="pagination-link text-primary ${activeClass}" data-page="${i}" data-filters="${filterParams}">${i}</a>`);
         }
 
+        // Add next page link if current page is less than total pages
         if (currentPage < totalPages) {
             paginationLinks.append(`<a href="#" class="pagination-link text-primary" data-page="${currentPage + 1}" data-filters="${filterParams}">Next</a>`);
         }
 
+        // Handle click event for pagination links
         $('.pagination-link').click(function (event) {
             event.preventDefault();
             const page = $(this).data('page');
-            fetchFilteredProducts(page);
+            fetchFilteredProducts(page);// Fetch products for clicked page
         });
     }
 

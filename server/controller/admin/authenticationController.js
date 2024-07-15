@@ -1,17 +1,12 @@
 const user = require('../../modals/user')
-const category = require('../../modals/categories')
-const product = require('../../modals/product')
 const admin = require ('../../modals/admin');
 const order = require('../../modals/order.js')
-const { upload, resizeImages } = require('../../config/multer.js');
-const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
 const path = require('path');
 const moment = require('moment');
 const PDFDocument = require('pdfkit');
 const ExcelJS = require('exceljs');
 const fs = require('fs');
-const Chart = require('chart.js');
 
 
 //GET Admin Login
@@ -25,8 +20,6 @@ exports.getAdminLogin = (req,res)=>{
 
 //POST Admin Login
 exports.postAdminLogin = async(req,res)=>{
-    //console.log("entered routes For Login POST")
-
     try {
     const { email, password } = req.body;
     const existingAdmin = await admin.findOne({ email });
@@ -43,7 +36,6 @@ exports.postAdminLogin = async(req,res)=>{
         return res.redirect(`/admin/adminlogin`);
     }
     else{
-        //console.log('Admin found');
         req.session.adminLoggedInData = {
             adminloggedIn: true,
             email: email,
@@ -69,7 +61,6 @@ exports.postAdminSignup = async(req,res)=>{
 try{
     // Destructure request body
 const {email, password, conformpassword} = req.body;
-//console.log(`${email} ${password} ${conformpassword}`)
 
 // Validate password and confirmation
 if (password !== conformpassword) {
@@ -197,11 +188,14 @@ exports.getAdminhomePage = async(req, res) => {
         }
         } catch (error) {
             req.flash('error', 'Server Error');
-        console.error(error);
+            console.error(error);
         } 
 }
 
+// <------------------------FOR CHART-------------------->
 
+
+//for getting daily revenue
 exports.getDailyRevenue = async (req, res) => {
     try {
         const now = new Date();
@@ -234,6 +228,7 @@ exports.getDailyRevenue = async (req, res) => {
     }
 };
 
+//for getting monthly revenue
 exports.getMonthlyRevenue = async (req, res) => {
     try {
         const now = new Date();
@@ -265,7 +260,7 @@ exports.getMonthlyRevenue = async (req, res) => {
     }
 };
 
-
+//FOR GETTING YEARLY REVENUE
 exports.getYearlyRevenue = async (req, res) => {
     try {
         const startDate = new Date(2020, 0, 1); // Start of 2020
@@ -296,9 +291,7 @@ exports.getYearlyRevenue = async (req, res) => {
     }
 };
 
-
-
-
+//for getting orders based on the query
 const getOrders = async (type, startDate, endDate) => {
     let query = {};
 
@@ -367,7 +360,8 @@ exports.getSalesReportPage = async(req,res)=>{
             reportData
         })
     }catch(error){
-        //console.log(error)
+        req.flash('error', 'Server Error');
+        console.error(error);
     }
 }
 
@@ -390,7 +384,6 @@ exports.getReportData = async(req,res)=>{
                             totalRevenue: totalRevenue,
                             totalDiscountGiven: totalDiscountGiven
                         };
-        //console.log(`report Data :${reportData}`);
         res.json(reportData);
 
     }catch(error){
@@ -407,12 +400,7 @@ exports.downloadReport = async(req,res)=>{
 
         const orders = await getOrders(filterType, startDate, endDate)
         orders.forEach(order => {
-            //console.log('Order ID:', order.newOrderId);
             order.items.forEach(item => {
-                //console.log('Product ID:', item.productId);
-                //console.log('Quantity:', item.quantity);
-                //console.log('Price:', item.price);
-                //console.log('Product Attribute Value:', item.productId.attributeValue);
             });
         });
                 
@@ -426,7 +414,6 @@ exports.downloadReport = async(req,res)=>{
 
     }catch(error){
         res.status(500).json('Server Error');
-        //console.log(error)
     }
 }
 
@@ -489,6 +476,8 @@ const generatePDFReport = (orders, res) => {
     doc.end();
 };
 
+
+//Function to draw table
 const drawTableRow = (doc, top, left, height, widths, row, isHeader = false, isBold = false) => {
     const backgroundColor = isHeader ? '#eeeeee' : '#ffffff';
     doc.rect(left, top, widths.reduce((a, b) => a + b), height).fill(backgroundColor).stroke();
@@ -506,6 +495,8 @@ const drawTableRow = (doc, top, left, height, widths, row, isHeader = false, isB
     });
 };
 
+
+// // function to Draw an empty row
 const drawEmptyRow = (doc, top, left, height, widths) => {
     const backgroundColor = '#ffffff';
     doc.rect(left, top, widths.reduce((a, b) => a + b), height).fill(backgroundColor).stroke();
@@ -518,6 +509,7 @@ const drawEmptyRow = (doc, top, left, height, widths) => {
     });
 };
 
+//function to generate excel sheet
 const generateExcelReport = (orders, res) => {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Sales Report');

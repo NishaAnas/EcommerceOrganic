@@ -1,7 +1,7 @@
 const coupon = require('../../modals/coupon')
 const mongoose = require('mongoose')
 
-
+//get the coupons 
 exports.getCoupons = async(req,res)=>{
     const successMessage = req.flash('success');
     const errorMessage = req.flash('error');
@@ -40,6 +40,7 @@ exports.getCoupons = async(req,res)=>{
     } 
 }
 
+//Add coupons 
 exports.addCoupon = async(req,res)=>{
     const {name,discount,description,expiryDate,minAmount,firstPurchase } = req.body; 
     //console.log(req.body);
@@ -72,8 +73,6 @@ exports.addCoupon = async(req,res)=>{
     });
         try {
         await coupon.create(newCoupon);
-        //console.log('Coupon added successfully');
-        //console.log('Coupon Added:', newCoupon);
         req.flash('success', 'Added Successfully ');
         res.json({ success: 'Coupon added successfully' });
     }catch{
@@ -83,6 +82,7 @@ exports.addCoupon = async(req,res)=>{
     }
 }
 
+//get coupon details for edit page
 exports.getCoupon = async (req, res) => {
     try {
         const Coupon = await coupon.findById(req.params.id);
@@ -113,6 +113,8 @@ exports.editCoupon=async(req,res)=>{
         res.status(500).json({ error: 'Failed to update coupon' });
     }
 }
+
+//Delete coupons
 exports.deleteCoupon = async (req, res) => {
     try {
         await coupon.findByIdAndDelete(req.params._id);

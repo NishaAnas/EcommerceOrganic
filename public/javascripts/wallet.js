@@ -1,4 +1,5 @@
 $(document).ready(function() {
+    // Handling click on the add money button
     $('#add-money-button').click(async function() {
         const amount = $('#amount').val();
         if (amount <= 0) {
@@ -11,6 +12,7 @@ $(document).ready(function() {
         }
 
         try {
+            // Sending POST request to add money to wallet
             const response = await fetch('/walletaddMoney', {
                 method: 'POST',
                 headers: {
@@ -24,6 +26,7 @@ $(document).ready(function() {
             }
 
             const result = await response.json();
+            // Displaying success message and reloading page on success
             Swal.fire({
                 title: 'Success!',
                 text: result.message,

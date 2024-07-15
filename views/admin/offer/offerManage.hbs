@@ -242,12 +242,14 @@
 
     <script>
         $(document).ready(function() {
+            //Get the aplicable items
             $('#type , #editType').change(function() {
                 const type = $(this).val();
                 const applicableItems = $(this).attr('id') === 'type' ? $('#applicableItems') : $('#editApplicableItems');
                 applicableItems.empty();
                 applicableItems.prop('disabled', false);
 
+                //if product poplate with the products
                 if (type === 'Product'){
                     $.ajax({
                         url: '/admin/getproducts', 
@@ -258,7 +260,7 @@
                             });
                         }
                     });
-                } else if (type === 'Category') {
+                } else if (type === 'Category') {   //if category populate it with category names
                     $.ajax({
                         url: '/admin/getcategories', 
                         method: 'GET',
@@ -271,6 +273,7 @@
                 }
             });
 
+            //when submit the add_offer form
             $('#addOfferForm').submit(function(event) {
                 event.preventDefault();
                 const form = $(this);
@@ -278,6 +281,7 @@
                 const endDate = new Date($('#endDate').val());
                 const currentDate = new Date();
 
+                //validate date
                 if (startDate > endDate) {
                     Swal.fire({
                         icon: 'error',
@@ -301,6 +305,7 @@
                     isActive: isActive
                 };
 
+                //AJAX for adding offer
                 $.ajax({
                     url: '/admin/addOffer',
                     method: 'POST',
@@ -325,7 +330,7 @@
                 });
             });
 
-// Fetch offer details and populate the Edit Offer modal
+    // Fetch offer details and populate the Edit Offer modal
     $('.editOfferBtn').click(function() {
         const offerId = $(this).data('id');
 
@@ -382,7 +387,7 @@
             endDate: $('#editEndDate').val(),
             isActive: isActive
         };
-
+        //AJAX for editing Offer
         $.ajax({
             url: `/admin/editOffer/${offerId}`,
             method: 'POST',
@@ -447,7 +452,7 @@
 
 
         });
-
+        //function for closing modal
         function closeaddModal() {
                 $('#addOfferModal').modal('hide');
             }
@@ -455,6 +460,7 @@
             $('#editOfferModal').modal('hide')
         }
 
+        //format date
         $('.offer-date').each(function() {
                     const date = new Date($(this).text());
                     const formattedDate = date.toLocaleString('en-US', {

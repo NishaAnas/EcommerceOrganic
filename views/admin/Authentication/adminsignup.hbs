@@ -1,52 +1,70 @@
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-<body>
-<main>
-    <div class="container-fluid m-5 p-3 gap-2">
-        <div class="row d-flex flex-column align-items-center justify-contents-center" style="width: 100%;">     
-        <div class="col-sm-6 login-section-wrapper">
-        <div class="login-wrapper my-auto">           
-            <h1 class="login-title" style="color: #6A9739; ">Admin Account</h1>
-            <h3 class="login-subtile">Register</h3>
-            {{#if error}}
-            <div class="alert alert-danger">
-            {{error}}
-            </div>
-            {{/if}}
-            {{#if success}}
-            <div class="alert alert-success">
-            {{success}}
-            </div>
-            {{/if}}
-                    <form action="/admin/adminsignup" method="post" id="signup_form">
-                        <div class="form-group mb-4">
-                        <label for="email"><b>Email Address</b></label>
-                        <input type="email" name="email" id="email" class="form-control" placeholder="email@example.com" >
-                        <span id="email_error"  style="color: red;"></span>
-                        </div>
-                        <div class="form-group mb-4">
-                        <label for="password"><b>Password</b></label>
-                        <input type="password" name="password" id="password" class="form-control" placeholder="Enter your passsword" >
-                        <span id="password_error"  style="color: red;"></span>
-                        </div>
-                        <div class="form-group mb-4">
-                        <label for="conformpassword"><b>Confirm Password</b></label>
-                        <input type="password" name="conformpassword" id="conformpassword" class="form-control" placeholder="Re-enter your passsword" >
-                        <span id="conformpassword_error"  style="color: red;"></span>
-                        </div>
-                        <span id="form_error" style="color: red;" ></span>
-                        <button type="submit" name="register" class="btn btn-primary p-3" style="width: 100%; background-color: #6A9739;">Register</button>
 
-                    </form>
-            <div class="d-flex flex-row align-items-center justify-content-between">
-                <p class="login-wrapper-footer-text">Already Have an Account?
-                <a class="login-wrapper-footer-text signup" style="color: #6A9739; " href="/admin/adminlogin" class="text-reset">Login</a></p>  
+<body>
+    <main>
+        <div class="container-fluid m-5 p-3 gap-2">
+            <div class="row d-flex flex-column align-items-center justify-contents-center" style="width: 100%;">
+                <div class="col-sm-6 login-section-wrapper">
+                    <div class="login-wrapper my-auto">
+                        <h1 class="login-title" style="color: #6A9739; ">Admin Account</h1>
+                        <h3 class="login-subtitle">Register</h3>
+
+                        {{#if error}}
+                        <!-- Display error message if error exists -->
+                        <div class="alert alert-danger">
+                            {{error}}
+                        </div>
+                        {{/if}}
+
+                        {{#if success}}
+                        <!-- Display success message if success exists -->
+                        <div class="alert alert-success">
+                            {{success}}
+                        </div>
+                        {{/if}}
+
+                        <!-- Signup form -->
+                        <form action="/admin/adminsignup" method="post" id="signup_form">
+                            <div class="form-group mb-4">
+                                <label for="email"><b>Email Address</b></label>
+                                <input type="email" name="email" id="email" class="form-control"
+                                    placeholder="email@example.com">
+                                <span id="email_error" style="color: red;"></span> <!-- Error message for email validation -->
+                            </div>
+
+                            <div class="form-group mb-4">
+                                <label for="password"><b>Password</b></label>
+                                <input type="password" name="password" id="password" class="form-control"
+                                    placeholder="Enter your password">
+                                <span id="password_error" style="color: red;"></span> <!-- Error message for password validation -->
+                            </div>
+
+                            <div class="form-group mb-4">
+                                <label for="conformpassword"><b>Confirm Password</b></label>
+                                <input type="password" name="conformpassword" id="conformpassword"
+                                    class="form-control" placeholder="Re-enter your password">
+                                <span id="conformpassword_error" style="color: red;"></span> <!-- Error message for confirm password validation -->
+                            </div>
+
+                            <span id="form_error" style="color: red;"></span> <!-- General form error message -->
+
+                            <button type="submit" name="register" class="btn btn-primary p-3"
+                                style="width: 100%; background-color: #6A9739;">Register</button>
+                        </form>
+
+                        <!-- Login link -->
+                        <div class="d-flex flex-row align-items-center justify-content-between">
+                            <p class="login-wrapper-footer-text">Already Have an Account?
+                                <a class="login-wrapper-footer-text signup" style="color: #6A9739;"
+                                    href="/admin/adminlogin" class="text-reset">Login</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>      
-            </div>
-        </div>
         </div>
     </main>
 </body>
 
+<!-- Include custom JavaScript for admin signup functionality -->
 <script src="/javascripts/adminsignup.js"></script>
-

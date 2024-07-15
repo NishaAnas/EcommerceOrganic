@@ -34,11 +34,11 @@ form.addEventListener('submit',(e)=>{
     isValid = false;
     password_error.innerHTML = "Password must contain at least one lowercase letter"  
   }else
-   if (!password_regex4.test(passwordValue)) {
+  if (!password_regex4.test(passwordValue)) {
     isValid = false;
     password_error.innerHTML = "Password must contain at least one special character"  
   }else
-   if (!password_regex5.test(passwordValue)) {
+  if (!password_regex5.test(passwordValue)) {
     isValid = false;
     password_error.innerHTML = "Password must contain at least one uppercase letter" 
   }  

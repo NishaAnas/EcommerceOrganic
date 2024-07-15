@@ -1,4 +1,5 @@
 document.querySelectorAll('.deleteButton').forEach(button => {
+    //conformation to delete a product
     button.addEventListener('click', async function(event) {
         event.preventDefault();
         const form = document.getElementById('deleteform');

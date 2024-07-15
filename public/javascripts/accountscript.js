@@ -1,7 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Get form elements
     const editProfileForm = document.getElementById('editprofileForm');
     const changePasswordForm = document.getElementById('changePasswordForm');
 
+    // Attach event listeners to forms
     editProfileForm.addEventListener('submit', (e) => {
         e.preventDefault();
         validateProfileForm();
@@ -12,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
         validateChangePasswordForm();
     });
 
+    // Function to validate profile form
     function validateProfileForm() {
         let isValid = true;
         const uname = document.getElementById('fname');
@@ -22,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const phone_error = document.getElementById('phone_error');
         const form_error = document.getElementById('form_error');
 
+        // Clear previous error messages
         username_error.innerHTML = '';
         email_error.innerHTML = '';
         phone_error.innerHTML = '';
@@ -31,12 +35,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const emailValue = email.value.trim();
         const phoneNumberValue = mob.value.trim();
 
+        // Check for empty fields
         if (userNameValue === '' || emailValue === '' || phoneNumberValue === '') {
             isValid = false;
             form_error.innerHTML = 'All fields are required. Please fill all the fields.';
         }
 
-        // Validation for User Name
+        // Validate Username
         const username_regex1 = /^[a-zA-Z]/;
         const username_regex2 = /^[a-zA-Z][a-zA-Z0-9_ ]{7,19}$/;
         if (userNameValue.length < 3 || userNameValue.length > 20) {
@@ -50,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
             username_error.innerHTML = 'Username must start with a letter, contain only alphanumeric characters, underscores, and spaces, and be between 8 to 20 characters long';
         }
 
-        // Validation for Email
+        // Validate Email
         const email_regex = /^[a-z]{3,}@[a-z]+\.(com|in|org|net)$/;
         if (emailValue.length > 50 || emailValue.length < 8) {
             isValid = false;
@@ -60,18 +65,20 @@ document.addEventListener('DOMContentLoaded', () => {
             email_error.innerHTML = 'Enter a valid Email Address.';
         }
 
-        // Validation for Phone Number
+        // Validate Phone Number
         const phoneRegex = /^[1-9]\d{9}$/;
         if (phoneNumberValue.length < 10 || !phoneRegex.test(phoneNumberValue)) {
             isValid = false;
             phone_error.innerHTML = 'Enter a valid Phone number.';
         }
 
+        // Submit the form if valid
         if (isValid) {
             editProfileForm.submit();
         }
     }
 
+    // Function to validate change password form
     function validateChangePasswordForm() {
         let isValid = true;
         const oldPassword = document.getElementById('oldPassword');
@@ -81,6 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const new_error = document.getElementById('new_error');
         const confirm_error = document.getElementById('confirm_error');
 
+        // Clear previous error messages
         old_error.innerHTML = '';
         new_error.innerHTML = '';
         confirm_error.innerHTML = '';
@@ -89,12 +97,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const newPasswordValue = newPassword.value.trim();
         const confirmPasswordValue = confirmPassword.value.trim();
 
+        // Check for empty fields
         if (oldPasswordValue === '' || newPasswordValue === '' || confirmPasswordValue === '') {
             isValid = false;
             old_error.innerHTML = 'All fields are required.';
         }
 
-        // Validation for New Password
+        // Validate New Password
         const password_regex2 = /\d/; // Password must contain at least one number
         const password_regex3 = /[a-z]/; // Password must contain at least one lowercase letter
         const password_regex4 = /[^A-Za-z0-9]/; // Password must contain at least one special character
@@ -117,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
             new_error.innerHTML = 'Password must contain at least one uppercase letter.';
         }
 
-        // Validation for Confirm Password
+        // Validate Confirm Password
         if (confirmPasswordValue.length < 8) {
             isValid = false;
             confirm_error.innerHTML = 'Password must contain at least 8 characters.';
@@ -126,6 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
             confirm_error.innerHTML = 'Passwords do not match.';
         }
 
+        // Submit the form if valid
         if (isValid) {
             changePasswordForm.submit();
         }

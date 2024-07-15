@@ -1,5 +1,5 @@
 $(document).ready(function(){
-
+    //cancel button dispaly
     $('.cancel-button').each(function() {
         var paymentMethod = $(this).data('payment-method');
         var paymentStatus = $(this).data('payment-status');
@@ -306,7 +306,6 @@ $(document).ready(function(){
                                             text: razorResult.message,
                                             icon: 'success'
                                         }).then(() => {
-                                            //window.location.href = `/orderdetails/${razorResult.orderId}`;
                                             location.reload();
                                         });
                                 }catch (error) {

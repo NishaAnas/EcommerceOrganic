@@ -1,15 +1,9 @@
-const user = require('../../modals/user')
 const category = require('../../modals/categories')
 const product = require('../../modals/product')
-const admin = require ('../../modals/admin')
 const prodVariation =require('../../modals/productVariation')
 const { upload, resizeImages } = require('../../config/multer');
 const mongoose = require('mongoose')
-const bcrypt = require('bcrypt')
 const path = require('path');
-const fs = require('fs');
-
-
 
 //Get Product Management Page
 exports.getProductPage = async(req, res) => {
@@ -44,7 +38,6 @@ exports.getProductPage = async(req, res) => {
             error: errorMessage 
         })
     } catch (error) {
-        //console.log(error)
         req.flash('error', 'Server Error');
         res.redirect('/admin/product');
     }
@@ -58,7 +51,6 @@ try {
     
     // Fetch all categories from the database
     const categories = await category.find({ isActive: true, isDeleted: false }, 'name').lean();
-    //console.log(categories);
     
     res.render('admin/product/addProduct', { categories,layout: 'adminlayout',success: successMessage, error: errorMessage });
 } catch (error) {
@@ -100,8 +92,6 @@ const newProduct = new product({
 });
 try {
   await product.create(newProduct);
-  //console.log('Product added successfully');
-  //console.log('Product Added:', newProduct);
   req.flash('success', 'Added Successfully ');
     res.redirect('/admin/product');
   
@@ -136,7 +126,6 @@ try {
         layout: 'adminlayout' 
     });
 } catch (error) {
-    //console.log(error)
     req.flash('error', 'Server Error');
     res.redirect('/admin/product');
 }
@@ -148,7 +137,6 @@ exports.editPutProduct = async (req, res) => {
 //console.log(req.body);
 try {
     const existingProductCheck = await product.findOne({ title: req.body.producttitle });
-    //console.log(existingProductCheck);
     // If another product with the same name exists and has a different ID
     if (existingProductCheck && existingProductCheck._id.toString() !== req.params._id) {
         const existingProductName = existingProductCheck.title.toLowerCase().trim();
@@ -169,7 +157,6 @@ if(req.resizedImages && req.resizedImages.length >0){
     const existingProduct = await product.findById(req.params._id);
     imagePath = existingProduct.images;
 }
-//console.log(imagePath);
 
 if(imagePath.length !== 1 ){
     req.flash('error', 'Only 1 image is required');
@@ -201,7 +188,6 @@ await product.findByIdAndUpdate(req.params._id, {
 exports.postAddVariations = async (req,res)=>{
     try{
         const productId = req.params._id;
-        //console.log(req.body);
         const { sku, attributeName, attributeValue, price, stock } = req.body;
 
         const existingVariation = await prodVariation.findOne({
@@ -240,7 +226,6 @@ exports.postAddVariations = async (req,res)=>{
                 $push: { variations: savedVariation._id }
             });
 
-            //console.log('Varient of the Product Added:', newVariation);
             req.flash('success', 'Varient of the Product added successfully ');
             res.redirect(`/admin/editProduct/${req.params._id}`);
     }catch(error){
@@ -254,16 +239,12 @@ exports.postAddVariations = async (req,res)=>{
 exports.getVariantDetails = async (req, res) => {
     try {
         const variantId = req.params._id;
-        //console.log(variantId);
-
         const variant = await prodVariation.findById(variantId);
         
         if (!variant) {
 
             return res.status(404).json({ error: 'Variant not found' });
         }
-        //console.log(variant)
-
         res.json({ variant });
     } catch (error) {
         console.error('Server Error', error);
@@ -271,6 +252,7 @@ exports.getVariantDetails = async (req, res) => {
     }
 };
 
+//when editing removing an image
 exports.removeImage = async(req,res)=>{
     const { variantId, index } = req.body;
     try{
@@ -287,19 +269,13 @@ exports.removeImage = async(req,res)=>{
 
         res.status(200).json({ message: 'Image removed successfully from database' });
     }catch(err){
-        //console.log(err);
         res.status(500).json({ error: 'Server error' });
     }
 }
 
 // Edit Variant Details
 exports.editVarientDetails = async (req, res) => {
-    const variantId = req.body.variantId;
-    //console.log(variantId);
-    //console.log(req.body);
-    //console.log(req.body.imageURLs);
-    //console.log(`resized images:${req.resizedImages}`);
-    
+    const variantId = req.body.variantId;  
 
     try {
         const existingVariant = await prodVariation.findOne({
@@ -319,11 +295,6 @@ exports.editVarientDetails = async (req, res) => {
 
         // Handle image removal (if any)
         let imagePath = updatedVariant.images || []; // Start with existing images or empty array
-
-        // Remove image if specified in request
-        if (req.body.removeImage) {
-            imagePath.splice(req.body.removeImage, 1); // Remove the image at specified index
-        }
 
         if (req.resizedImages && req.resizedImages.length > 0) {
             const resizedImagePaths = req.resizedImages.map(relativeImagePath => {
@@ -368,7 +339,7 @@ exports.deleteVariant = async(req,res)=>{
         if (varientDetailsViewing) {
             prodId = varientDetailsViewing.productId;
         } else {
-            //console.log("Variant not found");
+            req.flash('error', 'Variant not found');
         }
         //console.log(varientDetailsViewing)
         await prodVariation.findByIdAndUpdate(req.params._id, {
@@ -376,7 +347,6 @@ exports.deleteVariant = async(req,res)=>{
             isDeleted: true
         }
         });
-        //console.log('Variation soft-deleted successfully');
         req.flash('success', 'Variation soft-deleted successfully');
         res.redirect(`/admin/editProduct/${prodId}`);
         } catch (error) {
@@ -391,13 +361,11 @@ exports.markdeleteProduct = async (req, res) => {
 try {
     const productDetailsViewing = await product.findOne({ _id: req.params._id }).lean();
 
-    //console.log(productDetailsViewing)
     await product.findByIdAndUpdate(req.params._id, {
     $set: {
         isDeleted: true
     }
     });
-    //console.log('Product soft-deleted successfully');
     req.flash('success', 'Product soft-deleted successfully');
     res.redirect('/admin/product');
     } catch (error) {

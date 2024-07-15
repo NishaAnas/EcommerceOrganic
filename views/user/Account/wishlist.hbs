@@ -1,5 +1,6 @@
 <link rel="stylesheet" href="/stylesheets/wishlist.css">
 <body>
+    {{!-- dispaly success and error message --}}
     {{#if error}}
     <div id="flash-message" class="alert alert-danger" role="alert">
         {{error}}
@@ -14,6 +15,7 @@
     <div class="container py-5">
         <h1>My Wishlist</h1>
         <div class="row">
+            {{!-- dispaly each wishlist items as card --}}
             {{#each wishlist}}
             <div class="col-md-4">
                 <div class="profile-card-2">

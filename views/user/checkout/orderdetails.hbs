@@ -5,6 +5,7 @@
     <div class="container">
         <h1>Order Details</h1>
         <div class="order-summary">
+            {{!-- order summary --}}
             <h2>Order Summary</h2>
             <div class="order-info">
                 <div class="row">
@@ -45,6 +46,7 @@
                     <div class="col">Delivery Details:</div>
                     <div class="col">{{ order.delivery.method}} ({{ order.delivery.status}})</div>
                 </div>
+                {{!-- for each order status --}}
                 <div class="row">
                     {{#if (isEqual order.orderStatus "Cancelled")}}
                         <button class="btn btn-sm btn-info cancel-button" disabled>Cancelled</button>
@@ -58,7 +60,7 @@
                     
                 </div>
                 </div>
-
+            {{!-- dispaly order items --}}
         <div class="order-items">
             <h2>Ordered Items</h2>
             <table>
@@ -176,6 +178,7 @@
                             </div>
                         </div>
                     </div>
+                    {{!-- download button --}}
                         <div class="d-print-none mt-4 float-end">
                             <a href="#" class="btn btn-success me-1" id="downloadInvoice"><i class="fa fa-download"></i> Download PDF</a>
                         </div>
@@ -223,7 +226,7 @@
 </body>
 <script>
     $(document).ready(function(){
-        
+        //function to dispaly invoice
         $('[data-bs-target="#invoiceModal"]').on('click', function() {
         var orderId = $(this).data('orderid');
         $.ajax({
@@ -286,7 +289,7 @@
         const cancelButton = document.getElementById('cancelButton');
 
     });
-
+    //function to download invoice as pdf
     function generatePDF() {
     var invoiceElement = document.getElementById('invoiceContent');
     if (invoiceElement) {

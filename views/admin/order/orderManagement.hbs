@@ -1,8 +1,9 @@
+<!-- Bootstrap CSS for styling -->
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 <body>
     <div class="container mt-5">
         <h2>Order Management <small>Organic</small></h2>
-
+        <!-- Success and error messages -->
         {{#if success}}
         <div class="alert alert-success">
             {{success}}
@@ -13,7 +14,7 @@
             {{error}}
         </div>
         {{/if}}
-
+        <!-- Table for displaying order details -->
         <div class="table-responsive" style="font-size: 75%;">
             <table class="table table-bordered">
                 <thead class="thead-light">
@@ -29,12 +30,14 @@
                 <tbody>
                     {{#each Orders}}
                     <tr>
+                        <!-- Link to order details page -->
                         <td><a href="/admin/orderDetails/{{this._id}}">{{this.newOrderId}}</a>
                         </td>
                         <td class="order-date">{{this.orderDate}}</td>
                         <td>{{this.userId.email}}</td>
             <td>Rs{{this.totalAmount}}</td>
             <td>
+                <!-- Dropdown for changing order status -->
                 <select class="order-status" data-order-id="{{this._id}}">
                     {{#if (isEqual this.orderStatus 'Cancelled')}}disabled{{/if}}
                     <option value="Pending" {{#if (isEqual this.orderStatus 'Pending')}}selected{{/if}}>Pending</option>
@@ -71,6 +74,6 @@
                 {{/if}}
             </div>
         </div>
+        <!-- JavaScript file for order management functionality -->
 <script src="/javascripts/orderManagement.js"></script>
-
     </body>

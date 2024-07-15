@@ -105,7 +105,6 @@ exports.editCategory = async (req, res) => {
         const successMessage = req.flash('success');
         const errorMessage = req.flash('error');
         const categoryDetailsViewing = await category.findOne({ _id: req.params._id }).lean();
-        ////console.log(categoryDetailsViewing)
         res.render('admin/category/editCategory', 
             { 
             locals, 
@@ -117,14 +116,12 @@ exports.editCategory = async (req, res) => {
     } catch (error) {
         req.flash('error', 'Server Error');
         res.redirect('/admin/category');
-        //console.log(error)
     }
 
 };
 /* POST Edit Product page.(UPDATE) */
 
 exports.editPutcategory = async (req, res) => {
-    //console.log(req.body)
     try {
         const existingCategory = await category.findOne({ name: req.body.categoryName });
 
@@ -164,17 +161,15 @@ exports.editPutcategory = async (req, res) => {
             isDeleted: req.body.isDeleted === 'on',
         })
 
-        //console.log('Category updated Successfully');
         req.flash('success', 'Category updated successfully');
         res.redirect(`/admin/category`);
     } catch (error) {
-        //console.log(error)
         req.flash('error', 'Server Error');
         res.redirect(`/admin/category`);
     }
 }
 
-
+//Soft delete the category
 exports.markdeleteCategory = async (req, res) => {
     try {
         await category.findByIdAndUpdate(req.params._id, {
@@ -183,11 +178,9 @@ exports.markdeleteCategory = async (req, res) => {
                 isDeleted: true
             }
         })
-        //console.log('Category  marked as deleted Successfully');
         req.flash('success', 'Category deleted successfully');
         res.redirect('/admin/category');
     } catch (error) {
-        //console.log(error)
         req.flash('error', 'Server Error');
         res.redirect('/admin/category');
     }

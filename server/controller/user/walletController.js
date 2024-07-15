@@ -14,17 +14,20 @@ const initializeWallet = async (userId) => {
         });
         await Wallet.save();
 
+        //save it to the userdocument
         await user.findByIdAndUpdate(userId, { walletId: Wallet._id });
     }
 
     return Wallet._id;
 };
 
+
+//function to credit wallet with reasons
 exports.creditWallet = async (userId, amount, reason, orderId = null) => {
     try {
         const walletId = await initializeWallet(userId);
-        
-        const Wallet = await wallet.findOneAndUpdate({_id: walletId },
+
+        const Wallet = await wallet.findOneAndUpdate({ _id: walletId },
             {
                 $inc: { balance: amount },
                 $push: {
@@ -43,11 +46,12 @@ exports.creditWallet = async (userId, amount, reason, orderId = null) => {
     }
 };
 
+//function to debit wallet with reason
 exports.debitWallet = async (userId, amount, reason, orderId = null) => {
     try {
         const walletId = await initializeWallet(userId);
 
-        const Wallet = await wallet.findOneAndUpdate({ _id:walletId },
+        const Wallet = await wallet.findOneAndUpdate({ _id: walletId },
             {
                 $inc: { balance: -amount },
                 $push: {
@@ -66,9 +70,8 @@ exports.debitWallet = async (userId, amount, reason, orderId = null) => {
     }
 };
 
-exports.getWallet = async(req,res)=>{
-    const successMessage = req.flash('success');
-    const errorMessage = req.flash('error');
+//Get wallet page
+exports.getWallet = async (req, res) => {
     try {
         if (!req.session.userLoggedInData || !req.session.userLoggedInData.userloggedIn) {
             req.flash('error', 'To access the wallet, please log in first.');
@@ -84,25 +87,10 @@ exports.getWallet = async(req,res)=>{
         }
         const userData = req.session.userLoggedInData;
         const userDetails = await user.findById(userId).lean();
+
+        //Call function to initialize the wallet
         const WalletId = await initializeWallet(userId);
-        const Wallet = await wallet.findById(WalletId ).lean();
-        //console.log(Wallet);
-
-        // if (!Wallet) {
-        //     return res.render('user/wallet/wallet', { 
-        //         userData,
-        //         userDetails,
-        //         balance: 0, 
-        //         transactions: [] ,
-        //         currentPage: 1,
-        //         totalPages: 1,
-        //         layout:'userAccountLayout'
-        //     });
-        // }
-
-
-        //const walletDetails=Wallet.transactions;
-        ////console.log(Wallet.transactions);
+        const Wallet = await wallet.findById(WalletId).lean();
 
         // Pagination 
         const page = parseInt(req.query.page) || 1;
@@ -120,7 +108,7 @@ exports.getWallet = async(req,res)=>{
             walletDetails: transactions,
             currentPage: page,
             totalPages: totalPages,
-            layout:'userAccountLayout'
+            layout: 'userAccountLayout'
         });
     } catch (error) {
         console.error('Error fetching wallet:', error);
@@ -130,7 +118,7 @@ exports.getWallet = async(req,res)=>{
 }
 
 //Add Money to wallet
-exports.addMoney = async(req,res)=>{
+exports.addMoney = async (req, res) => {
     try {
         const userId = req.session.userLoggedInData.userId;
         const { amount } = req.body;
@@ -139,6 +127,7 @@ exports.addMoney = async(req,res)=>{
             return res.status(400).json({ message: 'Invalid amount' });
         }
 
+        //Call function to credit the wallet with reason
         await exports.creditWallet(userId, amount, 'Amount Deposited');
 
         res.status(200).json({ message: 'Amount added successfully' });

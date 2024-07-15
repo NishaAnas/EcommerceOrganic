@@ -3,7 +3,7 @@
 <body>
     <div class="container mt-5">
         <h2>User Management <small>Organic</small></h2>
-
+        <!-- display success and error message -->
         {{#if success}}
         <div class="alert alert-success">
             {{success}}
@@ -14,7 +14,7 @@
             {{error}}
         </div>
         {{/if}}
-
+        <!-- display user details -->
         <div class="table-responsive">
             <table class="table table-bordered">
                 <thead class="thead-light">
@@ -64,6 +64,7 @@
     </div>
     <script>
     $(document).ready(function() {
+        //<!-- Change the status from block to unblock -->
         $('.toggle-status').click(function() {
             const userId = $(this).data('user-id');
             const $button = $(this);

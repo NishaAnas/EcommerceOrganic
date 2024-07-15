@@ -30,6 +30,7 @@
                 </div>
             </div>
         </div>
+            <!-- Dispaly success or error message -->
         {{#if error}}
             <div class="alert alert-danger">
                 {{error}}
@@ -49,14 +50,14 @@
                 <div class="card-body">
                     <h5 class="card-title">{{name}}</h5>
                     <p class="card-text">
-                       <b>Street: </b> {{street}} ,
-                       <b>Area: </b> {{area}}<br>
-                       <b>City: </b>{{city}} , 
-                       <b>State: </b>  {{state}}<br>
-                       <b>Country: </b>{{country}} , 
-                       <b>Pincode: </b>{{pincode}}
+                    <b>Street: </b> {{street}} ,
+                    <b>Area: </b> {{area}}<br>
+                    <b>City: </b>{{city}} , 
+                    <b>State: </b>  {{state}}<br>
+                    <b>Country: </b>{{country}} , 
+                    <b>Pincode: </b>{{pincode}}
                     </p>
-                     <div class="form-check">
+                    <div class="form-check">
                         <input class="form-check-input" type="radio" name="defaultAddress" id="defaultAddress{{@index}}" {{#if isDefault}}checked{{/if}} data-address-id="{{_id}}">
                         <label class="form-check-label" for="defaultAddress{{@index}}">
                             Use as default address
@@ -151,7 +152,7 @@
     </div>
 
     <!-- Edit Address Modal -->
-   {{#each userAddresses}}
+{{#each userAddresses}}
 <div class="modal fade" id="editAddressModal{{_id}}" tabindex="-1" aria-labelledby="editAddressModalLabel{{_id}}" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">

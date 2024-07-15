@@ -1,4 +1,3 @@
-const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const user = require('../../modals/user');
 const address = require('../../modals/address');
@@ -36,7 +35,6 @@ exports.getProfilePage = async (req, res) => {
         const userData = req.session.userLoggedInData;
 
         const userDetails = await user.findById(userId).lean();
-        ////console.log(userDetails);
         res.render('user/Account/profileDetails', {
             userDetails,
             userData,
@@ -45,7 +43,7 @@ exports.getProfilePage = async (req, res) => {
             error: errorMessage
         });
     } catch (error) {
-        //console.log(error)
+        req.flash('error', 'Server Error');
     }
 }
 
@@ -54,9 +52,7 @@ exports.getProfilePage = async (req, res) => {
 exports.editProfileInformation = async (req, res) => {
     try {
         const userId = req.params._id;
-        ////console.log(userId);
         const { uname, email, mob } = req.body;
-        ////console.log(req.body);
         // Update user information in the database
         const updatedUser = await user.findByIdAndUpdate(userId,
             {
@@ -132,7 +128,6 @@ exports.getmanageAddess = async (req, res) => {
         const userData = req.session.userLoggedInData;
         const pincodes = await pincode.find().lean();
         const pincodeList = pincodes.map(p => ({ pincode: p.pincode, area: p.area }));
-        ////console.log(pincodeList);
         const userDetails = await user.findById(userId).lean();
         const userAddresses = await address.find({ userId }).lean();
 
@@ -151,7 +146,7 @@ exports.getmanageAddess = async (req, res) => {
             error: errorMessage
         });
     } catch (error) {
-        //console.log(error);
+        req.flash('error', 'Server Error');
     }
 }
 
@@ -160,7 +155,6 @@ exports.getmanageAddess = async (req, res) => {
 exports.addAddress = async (req, res) => {
     try {
         const userId = req.session.userLoggedInData.userId;
-        //console.log(req.body);
 
         const newAddress = new address({
             userId: userId,
@@ -186,7 +180,6 @@ exports.addAddress = async (req, res) => {
         res.redirect('/addressManagement');
 
     } catch (error) {
-        //console.log(error);
         req.flash('error', 'server Error ');
         res.redirect(`/addressManagement`);
     }
@@ -229,7 +222,6 @@ exports.editAddress = async (req, res) => {
     try {
         const addressId = req.params._id;
         const { name, street, area, pincode } = req.body;
-        //console.log(req.body)
 
         const updatedAddress = await address.findByIdAndUpdate(addressId, {
             name,
@@ -247,7 +239,6 @@ exports.editAddress = async (req, res) => {
 
         res.redirect('/addressManagement');
     } catch (error) {
-        //console.log(error);
         req.flash('error', 'An error occurred while updating the address. Please try again.');
         res.redirect('/addressManagement');
     }
@@ -278,13 +269,12 @@ exports.deleteAddress = async (req, res) => {
         
         res.redirect('/addressManagement');
     } catch (error) {
-        //console.log(error);
         req.flash('error', 'An error occurred while deleting the address. Please try again.');
         res.redirect('/addressManagement');
     }
 }
 
-//GET Order Details
+//GET Order Details for account page
 exports.getOrderDetails = async (req, res) => {
     const successMessage = req.flash('success');
     const errorMessage = req.flash('error');
@@ -320,8 +310,7 @@ exports.getOrderDetails = async (req, res) => {
     });
 }
 
-// Function to update stock in ProductVariation
-
+// Function to update stock in ProductVariation when cancel an order
 const updateStock = async (items) => {
     const updatedProducts = await Promise.all(items.map(async (item) => {
         const productDetail = await prodVariation.findById(item.productId);
@@ -342,7 +331,6 @@ exports.cancelOrder = async (req, res) => {
         const { orderId } = req.body;
 
         const orderToCancel = await order.findById(orderId).populate('userId');
-        ////console.log(`orderToCancel:${orderToCancel}`);
 
         if (!orderToCancel) {
             return res.status(404).json({ message: 'Order not found' });
@@ -366,7 +354,6 @@ exports.cancelOrder = async (req, res) => {
 
             // Call updateStock function
             await updateStock(items);
-            ////console.log(updatedProducts); 
 
             return res.status(200).json({
                 message: 'Order cancelled successfully',
@@ -381,14 +368,12 @@ exports.cancelOrder = async (req, res) => {
                     { orderStatus: 'Cancelled' },
                     { new: true }
                 )
-                ////console.log(`updatedOrder:${updatedOrder}`);
 
                 if (!updatedOrder) {
                     throw new Error('Failed to update order status');
                 }
                 // Call updateStock function
                 await updateStock(items);
-                ////console.log(updatedProducts); 
                 const userId = orderToCancel.userId;
                 const totalAmount = orderToCancel.totalAmount;
                 const orId = orderToCancel._id;
@@ -405,14 +390,12 @@ exports.cancelOrder = async (req, res) => {
             const updatedOrder = await order.findOneAndUpdate({ _id: orderId },
                 { orderStatus: 'Cancelled' },
                 { new: true })
-            ////console.log(`updatedOrder:${updatedOrder}`);
 
             if (!updatedOrder) {
                 throw new Error('Failed to update order status');
             }
             // Call updateStock function
             await updateStock(items);
-            ////console.log(updatedProducts);
 
             const userId = orderToCancel.userId;
             const totalAmount = orderToCancel.totalAmount;
@@ -427,11 +410,11 @@ exports.cancelOrder = async (req, res) => {
             return res.status(400).json({ message: 'Invalid payment method' });
         }
     } catch (error) {
-        //console.log(error);
         res.status(500).json({ message: 'Server error', error });
     }
 }
 
+//When completed return order
 exports.returnOrder = async(req,res)=>{
     const { orderId } = req.body;
     try{
@@ -454,6 +437,7 @@ exports.returnOrder = async(req,res)=>{
     }
 }
 
+//after return cancel the return
 exports.cancelReturn = async(req,res)=>{
     const { orderId } = req.body;
     try{
@@ -475,7 +459,7 @@ exports.cancelReturn = async(req,res)=>{
     }
 }
 
-//Update Stock for each item
+//Update Stock for each item when cancel the item in order
 const updateStockForItem = async (item) => {
     const productDetail = await prodVariation.findById(item.productId);
     if (productDetail) {
@@ -499,7 +483,6 @@ exports.cancelOrderItem = async (req, res) => {
         if (!orderToCancelItem) {
             return res.status(404).json({ message: 'Order not found' });
         }
-        ////console.log(orderToCancelItem);
         if(orderToCancelItem.discountAmount){
             return res.status(400).json({ message: 'For orders which applied coupons individual order cannot be cancelled' });
         }
@@ -509,7 +492,6 @@ exports.cancelOrderItem = async (req, res) => {
             return res.status(404).json({ message: 'Item not found in the order' });
         }
         const itemToCancel = orderToCancelItem.items[itemIndex];
-        ////console.log(itemToCancel)
 
         const paymentMethod = orderToCancelItem.payment.method;
         const itemAmount = itemToCancel.quantity * itemToCancel.productId.price;
@@ -573,7 +555,6 @@ exports.cancelOrderItem = async (req, res) => {
 exports.returnOrderItem = async(req,res)=>{
     try {
         const { orderId, itemId } = req.body;
-        //console.log(req.body);
 
         const orderToReturnItem = await order.findById(orderId).populate({
             path: 'items.productId',
@@ -603,7 +584,6 @@ exports.returnOrderItem = async(req,res)=>{
                 $inc: { totalAmount: -itemAmount }
             };
         } else if (paymentMethod === 'Razorpay') {
-            ////console.log(orderToReturnItem.payment.transactionId)
             orderToReturnItem.items.splice(itemIndex, 1);
             updateQuery = { 
                 $set: { items: orderToReturnItem.items },
@@ -631,7 +611,6 @@ exports.returnOrderItem = async(req,res)=>{
             order: updatedOrder
         });
     } catch (error) {
-        //console.log(error);
         res.status(500).json({ message: 'Server error', error });
     }
 }

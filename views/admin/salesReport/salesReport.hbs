@@ -75,11 +75,12 @@
     </div>
 </div>
 <script>
+    //<!-- function to apply filters -->
     function applyFilters() {
         const filterType = $('#filterType').val();
         const startDate = $('#startDate').val();
         const endDate = $('#endDate').val();
-
+        //<!-- AJAX for getting sales report -->
         $.ajax({
             type: 'GET',
             url: `/admin/reportSales?filterType=${filterType}&startDate=${startDate}&endDate=${endDate}`,
@@ -100,7 +101,7 @@
             }
         });
     }
-
+    //<!-- function to Download report -->
     function downloadReport(format) {
         window.location.href = `/admin/downloadReport?filterType=${filterType}&format=${format}&startDate=${startDate}&endDate=${endDate}`;
     }

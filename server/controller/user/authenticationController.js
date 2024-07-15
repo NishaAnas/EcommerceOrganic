@@ -4,28 +4,60 @@ const otpGenerator = require('otp-generator');
 const twilio = require('twilio');
 const user = require('../../modals/user.js')
 const category = require('../../modals/categories.js');
+const Order = require('../../modals/order.js');
+const productVariation = require('../../modals/productVariation.js');
 const nodemailer = require("nodemailer");
 const crypto = require('crypto')
 
+//Details for twilio app
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const twilioPhonenumber = process.env.TWILIO_PHONE_NUMBER;
 const twilioClient = new twilio(accountSid, authToken)
 
+//function for finding best selling products
+const getBestSellingProducts = async () => {
+   const bestSellingProducts = await Order.aggregate([
+      { $unwind: "$items" },
+      { 
+         $group: {
+               _id: "$items.productId",
+               totalQuantity: { $sum: "$items.quantity" }
+         }
+      },
+      { $sort: { totalQuantity: -1 } },
+      { $limit: 3 }
+   ]);
+   return bestSellingProducts;
+};
+
+//function to find the product deatils
+const getProductDetails = async (productIds) => {
+   const products = await productVariation.find({
+      _id: { $in: productIds }
+   }).lean();
+   return products;
+};
+
 
 //GET User Home Page
 exports.userHome = async (req, res) => {
    try {
-      ////console.log(req.session.userLoggedInData);
       if (req.session.userLoggedInData) {
          const successMessage = req.flash('Successfully Logged In');
          const userData = req.session.userLoggedInData;
          const categories = await category.find({}).lean();
-         res.render('user/Authentication/index', { userData, categories, success: successMessage });
+         const bestSellingProducts = await getBestSellingProducts();
+         const productIds = bestSellingProducts.map(item => item._id);
+         const products = await getProductDetails(productIds);
+         res.render('user/Authentication/index', { userData, categories, products, success: successMessage });
       }else{
          
          const categories = await category.find({}).lean();
-         res.render('user/Authentication/index',{categories});
+         const bestSellingProducts = await getBestSellingProducts();
+         const productIds = bestSellingProducts.map(item => item._id);
+         const products = await getProductDetails(productIds);
+         res.render('user/Authentication/index',{categories,products});
       }
    } catch (error) {
       req.flash('error', 'Server Error');
@@ -37,7 +69,6 @@ exports.userHome = async (req, res) => {
 
 //GET Login Page
 exports.login = (req, res) => {
-   //console.log('login page loaded')
    const error = req.flash('error');
    const success = req.flash('success');
    if (!req.session.userLoggedInData){
@@ -59,11 +90,9 @@ exports.postSignup = async (req, res) => {
 
    // Destructure request body
    const { userName, email, password, conformPassword, phoneNumber } = req.body;
-   ////console.log(` ${userName} ${email} ${password}  ${conformPassword} ${phoneNumber}`)
 
    // Validate password and confirmation
    if (!password == conformPassword) {
-      //console.log('password does not match')
       req.flash('error', 'Passwords do not match.');
       return res.redirect('/signup');
    }
@@ -88,7 +117,6 @@ exports.postSignup = async (req, res) => {
          phoneNumber,
          otp
       };
-      //console.log(req.session.signupData)
       // Send OTP via SMS
       await sendOTPViaSMS(phoneNumber, otp);
       // Send OTP via email
@@ -114,8 +142,6 @@ exports.postVerifyotp = async (req, res) => {
    try {
       const otpEntered = req.body.otp;
       const { userName, email, password, phoneNumber, otp } = req.session.signupData;
-
-      ////console.log(req.session.signupData)
 
       if (otpEntered !== otp) {
          req.flash('error', 'OTP mismatch. Please enter the correct OTP.');
@@ -205,8 +231,6 @@ async function sendConfirmationEmail(email) {
 
 //POST Login Page
 exports.postLogin = async (req, res) => {
-   //console.log("entered routes For Login POST")
-   //console.log(req.body)
    try {
       const { email, password } = req.body;
       const existingUser = await user.findOne({ email });
@@ -241,7 +265,6 @@ exports.postLogin = async (req, res) => {
          req.flash('error', 'Invalid email or password.');
          return res.redirect('/login');
       } else {
-         //console.log('User found');
          req.session.userLoggedInData = {
             userloggedIn: true,
             email: email,
@@ -249,7 +272,6 @@ exports.postLogin = async (req, res) => {
             userName: existingUser.userName,
             phoneNumber: existingUser.phoneNumber
          };
-         ////console.log(req.session.userLoggedInData)
          req.flash('success', 'Successfully logged in.');
          //check for Cart Redirection
          const return_url = req.session.returnTo;
@@ -277,7 +299,6 @@ exports.forgotPassword = (req, res) => {
 
 //POST Forgot Password page
 exports.postForgotPassword = async (req, res) => {
-
    const email = req.body.email;
 
    try {
@@ -289,14 +310,10 @@ exports.postForgotPassword = async (req, res) => {
       }
       req.session.email =email;
       const UserId = User._id;
-      ////console.log(req.session.email);
-      ////console.log(UserId);
       // Generate a unique reset password token
       const resetToken = crypto.randomBytes(20).toString('hex');
       const expirytime = Date.now() + 3600000; // Token expires in 1 hour
        // Save the reset token and its expiration time in the user document
-       ////console.log(resetToken);
-       ////console.log(expirytime);
       await user.updateOne({_id:UserId},{$set:{resetPasswordToken:resetToken,resetPasswordExpires:expirytime}})
 
       // Send an email with the reset password link
@@ -313,6 +330,7 @@ exports.postForgotPassword = async (req, res) => {
 
 }
 
+//Function to send rest password to mail
 async function sendResetPasswordEmail(email, resetPasswordLink) {
    try {
       const transporter = nodemailer.createTransport({
@@ -334,7 +352,6 @@ async function sendResetPasswordEmail(email, resetPasswordLink) {
       };
 
       await transporter.sendMail(mailOptions);
-      //console.log('Reset password email sent successfully');
    } catch (error) {
       console.error('Error sending reset password email:', error);
       throw new Error('Error sending reset password email');
@@ -348,7 +365,6 @@ exports.resetPassword = (req, res) => {
 
    const emailId = req.session.emailId;
    req.session.resetToken = req.query.token;
-   ////console.log(req.session.resetToken);
    res.render('user/Authentication/resetPassword' , {email : emailId , layout:'athenticationlayout',success, error});
 }
 
@@ -356,23 +372,16 @@ exports.resetPassword = (req, res) => {
 exports.postResetPassword = async (req, res) => {
    const  newPassword = req.body.password;
    const token = req.session.resetToken; 
-   ////console.log(req.body)
-   ////console.log(token)
-
    try {
       // Find the user with the reset password token
       const existingUser = await user.findOne({ resetPasswordToken: token });
       if (!existingUser) {
-         ////console.log('Invalid or expired token')
          req.flash('error', 'Invalid or expired token');
          return res.redirect('/resetPassword');
       }
 
       // Hash password
       const newhashedPassword = await bcrypt.hash(newPassword, 10);
-
-      ////console.log(newhashedPassword)
-      
       await user.updateOne({_id:existingUser._id},{$set:{hashedPassword:newhashedPassword,resetPasswordToken:undefined,resetPasswordExpires:undefined}})
       //console.log('Password reset successful')
       req.flash('success', 'Password reset successful');

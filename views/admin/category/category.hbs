@@ -1,27 +1,39 @@
+<!-- Link to custom CSS -->
 <link rel="stylesheet" href="/stylesheets/addcategory.css">
+
+<!-- Link to Bootstrap CSS -->
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+<!-- Script for SweetAlert2 library -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <body>
     <div class="container mt-5">
+        <!-- Page heading with subtitle -->
         <h2>Category Management <small>Organic</small></h2>
 
+        <!-- Display error message if present -->
         {{#if error}}
-            <div class="alert alert-danger">
-                {{error}}
-            </div>
-        {{/if}}                
-        {{#if success}}
-            <div class="alert alert-success">
-                {{success}}
-            </div>
+        <div class="alert alert-danger">
+            {{error}}
+        </div>
         {{/if}}
 
-        <div class="d-flex justify-content-end mb-3">       
-            <a href="/admin/addcategory" class="btn btn-sm btn-success mr-2">
-                    + Add Category
-            </a>     
-            
+        <!-- Display success message if present -->
+        {{#if success}}
+        <div class="alert alert-success">
+            {{success}}
         </div>
+        {{/if}}
+
+        <!-- Add Category button -->
+        <div class="d-flex justify-content-end mb-3">
+            <a href="/admin/addcategory" class="btn btn-sm btn-success mr-2">
+                + Add Category
+            </a>
+        </div>
+
+        <!-- Responsive table for displaying categories -->
         <div class="table-responsive">
             <table class="table table-bordered">
                 <thead class="thead-light">
@@ -33,19 +45,23 @@
                     </tr>
                 </thead>
                 <tbody>
+                    <!-- Iterate over each category -->
                     {{#each Category}}
                     <tr style="width: 100%;">
                         <td>{{this.name}}</td>
                         <td><img src="/{{this.images.[0]}}" alt="Category Image" class="img-fluid" style="width: 50px; height: 50px;"></td>
                         <td>
+                            <!-- Display active status with color coding -->
                             <span class="{{#if this.isActive}}text-success{{else}}text-danger{{/if}}">
                                 {{#if this.isActive}}Active{{else}}Deactive{{/if}}
                             </span>
                         </td>
                         <td class="d-flex justify-content-start">
+                            <!-- Edit category button -->
                             <a href="/admin/editCategory/{{this._id}}" class="btn btn-sm btn-primary mr-2">
                                 <i class="bi bi-pencil"></i>
                             </a>
+                            <!-- Delete category form -->
                             <form action="/admin/deleteCategory/{{this._id}}?_method=PUT" method="POST" class="d-inline">
                                 <button type="submit" class="btn btn-sm btn-danger">
                                     <i class="bi bi-trash"></i>
@@ -57,11 +73,14 @@
                 </tbody>
             </table>
         </div>
+
         <!-- Pagination Section -->
         <div class="pagination-container text-primary d-flex justify-content-between mt-4">
+            <!-- Display current page and total pages -->
             <div class="pagination-summary">
                 Page {{ currentPage }} of {{ totalPages }}
             </div>
+            <!-- Navigation links for previous and next pages -->
             <div class="pagination-links d-flex gap-3">
                 {{#if (gt currentPage 1)}}
                 <a href="/admin/category?page={{ subtract currentPage 1 }}" class="pagination-link">Previous</a>

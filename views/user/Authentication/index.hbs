@@ -1,11 +1,7 @@
 <link rel="stylesheet" href="/stylesheets/index.css" />
-<link rel="stylesheet"
-  href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400&display=swap" />
-<link rel="stylesheet"
-  href="https://fonts.googleapis.com/css2?family=Open Sans:wght@400;700&display=swap" />
-<link rel="stylesheet"
-  href="https://fonts.googleapis.com/css2?family=Inter:wght@400&display=swap" />
-  
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather:wght@400&display=swap" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open Sans:wght@400;700&display=swap" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400&display=swap" /> 
 <body>
             {{#if error}}
             <div id="flashMessage" class="alert alert-danger" role="alert">
@@ -21,8 +17,7 @@
     <main>
       <section class="website-image row ">
         <div class="col-lg-6 d-flex flex-column align-items-center">
-          <img class="branch-icon " loading="lazy" alt
-            src="/images/organic-products.png" />
+          <img class="branch-icon " loading="lazy" alt="image" src="/images/organic-products.png" />
         </div>
         <div
           class="col-lg-6 col-md-8 col-sm-10 d-flex flex-column align-items-center">
@@ -32,14 +27,9 @@
               <div class="iteration-loop">
                 <div class="sequence-flow">
                   <div class="parallel-split">
-                    <img
-                      class="logo-leaf-new-1-icon"
-                      loading="lazy"
-                      alt
-                      src="/images/logo-leaf-new.png" />
+                    <img class="logo-leaf-new-1-icon" loading="lazy" alt="images" src="/images/logo-leaf-new.png" />
                   </div>
-                  <div
-                    class="conditional-link d-flex flex-column align-items-center">
+                  <div class="conditional-link d-flex flex-column align-items-center">
                     <div class="best-quality-products">
                       Best Quality Products
                     </div>
@@ -53,10 +43,12 @@
                 </div>
                 <div
                   class="error-handler d-flex justify-content-center align-items-center">
+                  <a href="/categories">
                   <button class="flow-control ">
                     <div class="rectangle"></div>
                     <div class="shop-now">Shop Now</div>
                   </button>
+                  </a>
                 </div>
               </div>
             </div>
@@ -89,57 +81,59 @@
         </div>
       </section>
       <section class="input-output">
-        <div class="data-processor">
-          <div class="matrix-operations">
-            <div class="graph-connection">
-              <h1 class="best-selling-products">Best Selling Products</h1>
-              <div class="text-manipulator">
-                <img
-                  class="geometry-tools-icon"
-                  loading="lazy"
-                  alt
-                  src="/images/logo-leaf-new.png" />
-              </div>
-            </div>
-          </div>
+  <div class="data-processor">
+      <div class="graph-connection ">
+        <h1 class="best-selling-products">Best Selling Products</h1>
+        <div class="text-manipulator">
+                  <img class="geometry-tools-icon" loading="lazy" alt
+                    src="/images/logo-leaf-new.png" />
+                </div>
+        <div class="card-aligner">
+        
+          {{#each products}}
           <div class="card alignment-helper" style="width: 18rem;">
-            <img
-              src="/images/Assorted-cofee-organic-in-a-packet-with-organic-as-label.jpg"
-              class="card-img-top" alt="...">
-            <div class="card-body image-icon">
-              <h5 class="card-title assorted-coffee">Assorted Coffee</h5>
-              <p class="card-text frame-container">35.00 ,<br>
-                Groceries</p>
-              <div
-                class="error-handler d-flex justify-content-center align-items-center">
-                <button class="flow-control ">
-                  <div class="rectangle"></div>
-                  <div class="shop-now">Shop Now</div>
-                </button>
-              </div>
+          <img
+            src="{{this.images.[0]}}"
+            class="card-img-top" alt=" {{this.attributeValue}}">
+          <div class="card-body image-icon">
+            <h5 class="card-title assorted-coffee"> {{this.attributeValue}}</h5>
+            <p class="card-text frame-container"></p>
+            <div class="error-handler d-flex justify-content-center align-items-center">
+              <button class="flow-control ">
+                <div class="rectangle"></div>
+                <a href="/productDetails/{{this._id}}">
+                <div class="shop-now">Shop Now</div>
+                </a>
+              </button>
             </div>
           </div>
+        </div>
+        {{/each}}
+        </a>
+        </div>
+      </div>
+  </div>
+</section>
 
-        </section>
         <section class="vector-graphic">
           <div class="symbol-library">
             <div class="color-palette">
-              <img class="brush-collection-icon" loading="lazy" alt
-                src="/images/basil-leaf.png" />
+              <img class="brush-collection-icon" loading="lazy" alt="images" src="/images/basil-leaf.png" />
             </div>
             <div class="shape-builder">
               <div class="stroke-settings">
                 <div class="wrapper-filling-options">
-                  <img class="filling-options-icon" loading="lazy" alt
-                    src="/images/fruits1.jpg" />
+                  <img class="filling-options-icon" loading="lazy" alt="images" src="/images/fruits1.jpg" />
                 </div>
                 <h3 class="farm-fresh-fruits">Farm Fresh Fruits</h3>
                 <div class="paragraph-settings">
                   <div class="grid-system">
                     <div class="constraints-manager">
+                      <a href="/categories">
                       <button class="anchoring-helper">
                         <div class="shop-now1">Shop Now</div>
                       </button>
+                      </a>
                     </div>
                     <div class="ut-sollicitudin-quam">Ut sollicitudin quam vel
                       purus tempus, vel eleifend felis varius.
@@ -155,10 +149,12 @@
                 <h3 class="fresh-vegetables">Fresh Vegetables</h3>
                 <div class="condition-node">
                   <div class="loop-node">
+                    <a href="/categories">
                     <button class="merge-node">
                       <div class="rectangle6"></div>
                       <div class="shop-now2">Shop Now</div>
                     </button>
+                    </a>
                   </div>
                   <div class="aliquam-porta-justo">Aliquam porta justo nibh, id
                     laoreet sapien sodales vitaejusto.
@@ -176,10 +172,12 @@
                   </div>
                   <div class="data-transformer">
                     <div class="sorting-node">
+                      <a href="/categories">
                       <button class="search-node">
                         <div class="rectangle7"></div>
                         <div class="shop-now3">Shop Now</div>
                       </button>
+                      </a>
                     </div>
                     <div class="phasellus-sed-urna">Phasellus sed urna mattis,
                       viverra libero sed, aliquamest.
@@ -197,56 +195,17 @@
             <div class="random-node">
               <h1 class="get-25-off">Get 25% Off On Your First Purchase!</h1>
             </div>
+            <a href="/categories">
             <button class="variable-node">
               <div class="rectangle9"></div>
               <div class="shop-now4">Shop Now</div>
             </button>
+            </a>
           </div>
           <div class="repeat-until-node col-lg-12-md-6 d-flex align-items-center">
             <div class="rectangle10"></div>
             <h3 class="try-it-for">Try It For Free. No Registration Needed.</h3>
           </div>
-        </section>
-        <section class="input-output for-each-node">
-          <div class="data-processor switch-node">
-            <div class="matrix-operations">
-              <div class="graph-connection">
-                <h1 class="best-selling-products">Trending Products</h1>
-                <div class="text-manipulator">
-                  <img class="geometry-tools-icon" loading="lazy" alt
-                    src="/images/logo-leaf-new.png" />
-                </div>
-              </div>
-            </div>
-            <div class="card alignment-helper" style="width: 18rem;">
-              <img
-                src="/images/Assorted-cofee-organic-in-a-packet-with-organic-as-label.jpg"
-                class="card-img-top" alt="...">
-              <div class="card-body image-icon">
-                <h5 class="card-title assorted-coffee">Assorted Coffee</h5>
-                <p class="card-text frame-container">35.00 ,<br> Groceries</p>
-                <div
-                  class="error-handler d-flex justify-content-center align-items-center">
-                  <button class="flow-control ">
-                    <div class="rectangle"></div>
-                    <div class="shop-now">Shop Now</div>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div class="layout-node">
-              <img
-                class="grid-node-icon"
-                loading="lazy"
-                alt
-                src="/images/basil-leaf.png" />
-            </div>
-            <div class="stack-node">
-              <h1 class="customers-reviews">Customers Reviews</h1>
-            </div>
-          </div>
-
         </section>
         <section class=" column-node d-flex flex-row justify-content-around">
   <div class="box-node d-flex flex-row col-lg-4 col-md-6 col-sm-12">
@@ -292,5 +251,4 @@
       </main>
     </div>
   </div>
-  <script src="/javascripts/index.js"></script>
 </body>

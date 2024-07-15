@@ -1,4 +1,5 @@
 $(document).ready(function(){
+    //Remove items from wishlist
     $('.remove-button').click(function() {
         var variantId = $(this).data('variantid');
         Swal.fire({

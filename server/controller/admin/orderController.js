@@ -1,12 +1,4 @@
-const user = require('../../modals/user');
-const category = require('../../modals/categories');
-const product = require('../../modals/product');
-const admin = require ('../../modals/admin');
 const order = require('../../modals/order');
-const { upload, resizeImages } = require('../../config/multer');
-const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
-const path = require('path');
 
 //GET Order Management Page
 exports.getOrdermanager = async(req,res)=>{
@@ -28,7 +20,6 @@ exports.getOrdermanager = async(req,res)=>{
         const totalOrders = await order.countDocuments({});
         const totalPages = Math.ceil(totalOrders / limit);
         
-            ////console.log(Orders);
         res.render('admin/order/orderManagement', { 
             Orders, 
             currentPage: page,
@@ -69,6 +60,7 @@ exports.changeOrderStatus = async (req, res) => {
     }
 };
 
+//Cancel an order
 exports.cancelOrder = async (req, res) => {
     try {
         const { orderId } = req.body;
@@ -81,6 +73,7 @@ exports.cancelOrder = async (req, res) => {
     }
 };
 
+//get order deatils for the details page
 exports.getOrderDetails = async(req,res)=>{
     try {
         const orderId = req.params.id;
@@ -107,7 +100,6 @@ exports.getOrderDetails = async(req,res)=>{
             deliveryCharge = 60;
         } 
 
-        //console.log(orderDetails.items)
         res.render('admin/order/orderDetails', { 
             orderDetails,
             deliveryCharge, 

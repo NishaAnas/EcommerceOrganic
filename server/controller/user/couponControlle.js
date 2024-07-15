@@ -1,7 +1,7 @@
-const mongoose = require('mongoose');
 const coupon = require('../../modals/coupon');
 const order = require('../../modals/order');
 
+//get the applicable coupons in the shopping cart
 exports.getCoupons = async(req,res)=>{
     try{
         if (!req.session.userLoggedInData || !req.session.userLoggedInData.userloggedIn) {
@@ -11,10 +11,9 @@ exports.getCoupons = async(req,res)=>{
         const userId = req.session.userLoggedInData.userId;
         const totalAmount = parseFloat(req.query.totalAmount);
 
-            // Check if this is the user's first purchase
+        // Check if this is the user's first purchase
         const userOrders = await order.find({ userId });
         const isFirstPurchase = userOrders.length === 0;
-        //////console.log(userOrders);
 
         let coupons;
 
@@ -39,6 +38,6 @@ exports.getCoupons = async(req,res)=>{
         res.json({ coupons });
 
     }catch(error){
-        ////console.log(error);
+        res.status(500).json({ error: 'Server Error' })
     }
 }

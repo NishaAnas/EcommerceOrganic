@@ -3,12 +3,12 @@ function validateForm() {
 
     // Check if OTP is a 6-digit number
     if (!/^\d{6}$/.test(otp)) {
-      alert("Please enter a valid 6-digit OTP");
-      return false;
+    alert("Please enter a valid 6-digit OTP");
+    return false;
     }
     return true; // Proceed with form submission
-  }
-  document.addEventListener("DOMContentLoaded", function() {
+}
+document.addEventListener("DOMContentLoaded", function() {
     
     // Disable resend button initially
     document.getElementById('resendButton').disabled = true;
