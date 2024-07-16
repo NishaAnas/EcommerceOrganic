@@ -19,6 +19,7 @@ const flash = require('connect-flash');
 const Swal = require('sweetalert2');
 const RazorPay = require('razorpay');
 const Chart = require('chart.js');
+const PORT = process.env.PORT;
 
 
 var userRouter = require('./server/routes/user');
@@ -39,7 +40,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 //set Session
 app.use(
   session({
-    secret: 'secretPassword',
+    secret: process.env.SESSION_SECRET_KEY,
     resave: false,
     saveUninitialized: true,
     cookie: {
@@ -128,6 +129,10 @@ app.use(function (err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.render('error');
+});
+
+app.listen(PORT, () => {
+  console.log(`Server Started at port ${PORT}`);
 });
 
 module.exports = app;
