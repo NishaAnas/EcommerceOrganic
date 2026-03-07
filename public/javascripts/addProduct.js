@@ -122,6 +122,9 @@ form.addEventListener('submit', (e) => {
     } else if (!priceRegex.test(price)) {
         isValid = false;
         priceError.innerHTML = 'Invalid price format. Only numbers are allowed.';
+    }else if(price <= 0 || price >= 50000){
+        isValid = false;
+        priceError.innerHTML = 'Invalid price .';
     }
 
     // Image validation

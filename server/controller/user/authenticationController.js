@@ -1,3 +1,4 @@
+// process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 const mongoose = require('mongoose')
 const bcrypt = require('bcrypt')
 const otpGenerator = require('otp-generator');
@@ -118,7 +119,7 @@ exports.postSignup = async (req, res) => {
          otp
       };
       // Send OTP via SMS
-      await sendOTPViaSMS(phoneNumber, otp);
+      //await sendOTPViaSMS(phoneNumber, otp);
       // Send OTP via email
       await sendOTPViaEmail(email, otp);
       // Render OTP verification page
@@ -432,7 +433,6 @@ exports.successGoogleLogin = (req, res) => {
 //Failure Google Auth
 exports.failureGoogleLogin = (req, res) => {
    req.flash('error', 'Login with Google Unsuccessful');
-   // res.render('user/Authentication/login' , {layout:'athenticationlayout'});
    res.redirect('/login');
 }
 

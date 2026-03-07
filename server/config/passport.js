@@ -50,6 +50,7 @@ async (request, accessToken, refreshToken, profile, done) => {
         }
         return done(null, user); // Pass the user instance to the callback
     } catch (err) {
+        console.error('Error in Google Strategy:', err);
         return done(err, false, { message: 'Internal Server Error' }); // Handle errors
     }
 }
@@ -85,6 +86,7 @@ async (accessToken, refreshToken, profile, done) => {
         }
         return done(null, user); // Pass the user instance to the callback
     } catch (err) {
+        console.error('Error in Facebook Strategy:', err);
         return done(err, false, { message: 'Internal Server Error' }); // Handle errors
     }
 }

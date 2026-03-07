@@ -318,6 +318,9 @@
         if (!price || isNaN(price)) {
             document.getElementById('price_error').innerText = 'Valid price is required';
             isValid = false;
+        }else if (price <= 0 || price > 50000) {
+            isValid = false;
+            document.getElementById('price_error').innerText = 'Price must be greater than 0 and less than or equal to 50,000.';
         }
 
         if (!isValid) {
@@ -362,6 +365,9 @@
         if (!price || isNaN(price)) {
             document.getElementById('variant_price_error').innerText = 'Valid price is required';
             isValid = false;
+        }else if (price <= 0 || price > 50000) {
+            isValid = false;
+            document.getElementById('variant_price_error').innerText = 'Price must be greater than 0 and less than or equal to 50,000.';
         }
 
         // Validate Stock
@@ -369,6 +375,9 @@
         if (!stock || isNaN(stock)) {
             document.getElementById('variant_stock_error').innerText = 'Valid stock is required';
             isValid = false;
+        }else if (stock <= 0 || stock > 50000) {
+            isValid = false;
+            document.getElementById('variant_stock_error').innerText = 'Stock must be greater than 0 and less than or equal to 50,000.';
         }
 
         if (!isValid) {
@@ -413,6 +422,9 @@
         if (!price || isNaN(price)) {
             document.getElementById('edit_variant_price_error').innerText = 'Valid price is required';
             isValid = false;
+        }else if (price <= 0 || price > 50000) {
+            isValid = false;
+            document.getElementById('edit_variant_price_error').innerText = 'Price must be greater than 0 and less than or equal to 50,000.';
         }
 
         // Validate Stock
@@ -420,6 +432,9 @@
         if (!stock || isNaN(stock)) {
             document.getElementById('edit_variant_stock_error').innerText = 'Valid stock is required';
             isValid = false;
+        }else if (stock <= 0 || stock > 50000) {
+            isValid = false;
+            document.getElementById('edit_variant_stock_error').innerText = 'Stock must be greater than 0 and less than or equal to 50,000.';
         }
 
         if (!isValid) {

@@ -14,7 +14,7 @@ exports.getAdminLogin = (req,res)=>{
     const isAdmin = true;
     //console.log(req.session.adminLoggedInData)
     if (! req.session.adminLoggedInData) {
-    res.render('admin/Authentication/adminLogin',{isAdmin,success: req.flash('success'),error: req.flash('error'), layout:'athenticationlayout'});
+    res.render('admin/Authentication/adminlogin',{isAdmin,success: req.flash('success'),error: req.flash('error'), layout:'athenticationlayout'});
 }
 }
 
